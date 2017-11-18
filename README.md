@@ -6,10 +6,11 @@ Tested with Inkscape 0.92
 This project is based on the Gcodetools extension.
 
 ## How to use Lasertools
-Watch this Video for a quick introduction
+**Watch this Video for a quick introduction:**
+
 https://youtu.be/NhUvRJsa4D0
 
-step by step workflow:
+**step by step workflow:**
 
 1. import picture to Inkscape
 2. set the size of the page to the size you want your engraving to be [under File/Document Properties/Page]
@@ -25,7 +26,7 @@ Calculating the Gcode can take quite some time on larger engravings. I would adv
 ## Installation
 Copy the .py and .inx file to the Inkscape Extentions folder.
 
-under linux:    /usr/share/inkscape/extensions/ 
+under linux:    /usr/share/inkscape/extensions
 under windows   C:\Program Files\Inkscape\share\extensions 
 
 ## Warning
