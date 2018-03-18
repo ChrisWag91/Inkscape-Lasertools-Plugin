@@ -1,1 +1,7 @@
- 
+/lib/*
+bezmisc.py 
+cubicsuperpath.py
+inkex.py
+simplepath.py
+simplestyle.py
+simpletransform.py
