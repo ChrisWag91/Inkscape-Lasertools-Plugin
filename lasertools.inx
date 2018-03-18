@@ -14,16 +14,12 @@
 	<param name="add-contours" type="boolean" _gui-text="Add contours">true</param>
 	<param name="add-infill" type="boolean" _gui-text="Add infill on closed loops">true</param>
 	<param name="engraving-newton-iterations" type="int" min="0" max="20" _gui-text="Accuracy of curve approximation (2-20):">10</param>	
-	<param name="directory" type="string" _gui-text="Directory:">/home/chris/GCodeExport/</param>
+	<param name="directory" type="string" _gui-text="Directory:">/insert your target directory here</param>
 	<param name="filename" type="string" _gui-text="Filename:">output.ngc</param>
 	<param name="add-numeric-suffix-to-filename" type="boolean" _gui-text="Add numeric suffix to filename">true</param>
+  <param name="create-log" type="boolean" _gui-text="Create log files">true</param>
 
-  <param name="unit" type="enum" _gui-text="All Units (mm or in):">
-    <item value="G21 (All units in mm)">mm</item>
-    <item value="G20 (All units in inches)">in</item>
-  </param>
-
-	<effect>
+	<effect needs-live-preview="false">
 		<effects-menu>
 			<submenu _name="Lasertools"/>
 		</effects-menu>

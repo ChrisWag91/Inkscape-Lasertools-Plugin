@@ -14,7 +14,7 @@
    viewBox="0 0 600 330"
    version="1.1"
    id="svg8"
-   inkscape:version="0.92.2 5c3e80d, 2017-08-06"
+   inkscape:version="0.92.2 2405546, 2018-03-11"
    sodipodi:docname="drawing_001_test.svg">
   <sodipodi:namedview
      id="base"
@@ -24,14 +24,14 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.39"
-     inkscape:cx="959.13037"
+     inkscape:cx="484.7714"
      inkscape:cy="647.08748"
      inkscape:document-units="mm"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="svg8"
      showgrid="false"
-     inkscape:window-width="1316"
-     inkscape:window-height="739"
-     inkscape:window-x="50"
+     inkscape:window-width="1920"
+     inkscape:window-height="1015"
+     inkscape:window-x="1920"
      inkscape:window-y="0"
      inkscape:window-maximized="1" />
   <defs
@@ -1059,40 +1059,4 @@
      id="g31023"
      inkscape:groupmode="layer"
      inkscape:label="3D" />
-  <g
-     id="g8472"
-     gcodetools="Gcodetools orientation group">
-    <g
-       id="g8464"
-       gcodetools="Gcodetools orientation point (2 points)">
-      <path
-         id="path8460"
-         style="stroke:none;fill:#000000;"
-         gcodetools="Gcodetools orientation point arrow"
-         d="m 0.0,330.0 2.9375,-6.343750000001 0.8125,1.90625 6.843748640396,-6.84374864039 0,0 0.6875,0.6875 -6.84375,6.84375 1.90625,0.812500000001 z z" />
-      <text
-         id="text8462"
-         xml:space="preserve"
-         y="320.0"
-         x="10.0"
-         style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;"
-         gcodetools="Gcodetools orientation point text">(0.0; 0.0; 0.0)</text>
-    </g>
-    <g
-       id="g8470"
-       gcodetools="Gcodetools orientation point (2 points)">
-      <path
-         id="path8466"
-         style="stroke:none;fill:#000000;"
-         gcodetools="Gcodetools orientation point arrow"
-         d="m 100.0,330.0 2.9375,-6.343750000001 0.8125,1.90625 6.843748640396,-6.84374864039 0,0 0.6875,0.6875 -6.84375,6.84375 1.90625,0.812500000001 z z" />
-      <text
-         id="text8468"
-         xml:space="preserve"
-         y="320.0"
-         x="110.0"
-         style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;"
-         gcodetools="Gcodetools orientation point text">(100.0; 0.0; 0.0)</text>
-    </g>
-  </g>
 </svg>
