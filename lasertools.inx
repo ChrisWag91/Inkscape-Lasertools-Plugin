@@ -7,17 +7,17 @@
 
 	<param name="laser-command" type="string" _gui-text="Laser ON Command:">S100</param>
 	<param name="laser-off-command" type="string" _gui-text="Laser OFF Command:">S1</param>	
-	<param name="laser-beam-with" type="float" precision="2" min="0.00" max="10.00" _gui-text="Laser beam with (mm):">0.35</param>	
+	<param name="laser-beam-with" type="float" precision="2" min="0.00" max="10.00" _gui-text="Laser beam with (mm):">0.30</param>	
 	<param name="laser-speed" type="int" min="0" max="4000" _gui-text="Laser Speed (mm/min or in/min):">1000</param>	
 	<param name="power-delay" type="float" min="0" max="1000" _gui-text="Power-On Delay (ms or s):">0</param>	
 	<param name="passes" type="int" min="1" max="100" _gui-text="Passes:">1</param>
 	<param name="add-contours" type="boolean" _gui-text="Add contours">true</param>
-	<param name="add-infill" type="boolean" _gui-text="Add infill on closed loops">true</param>
-	<param name="engraving-newton-iterations" type="int" min="0" max="20" _gui-text="Accuracy of curve approximation (2-20):">10</param>	
+	<param name="add-infill" type="boolean" _gui-text="Add infill on closed loops">true</param>	
 	<param name="directory" type="string" _gui-text="Directory:">/insert your target directory here</param>
 	<param name="filename" type="string" _gui-text="Filename:">output.ngc</param>
 	<param name="add-numeric-suffix-to-filename" type="boolean" _gui-text="Add numeric suffix to filename">true</param>
-  <param name="create-log" type="boolean" _gui-text="Create log files">true</param>
+  	<param name="create-log" type="boolean" _gui-text="Create log files">true</param>
+  	<param name="multi_thread" type="boolean" _gui-text="Enable multithreading">true</param>
 
 	<effect needs-live-preview="false">
 		<effects-menu>

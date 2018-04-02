@@ -33,6 +33,11 @@ import cubicsuperpath
 import bezmisc
 import simpletransform
 
+from multiprocessing import Pool
+
+import cProfile
+# import lsprofcalltree #Comment out if not profiling
+
 import os
 import math
 import re
@@ -58,15 +63,20 @@ if "errormsg" not in dir(inkex):
 ################################################################################
 
 gcode = ""
+
+enableMultithreading = False
+noOfThreads = 4
+csp = []
+profiling = True  # Disable if not debuging
+
 timestamp = datetime.datetime.fromtimestamp
 math.pi2 = math.pi*2
 doc_hight = 0
-straight_tolerance = 0.00001
-straight_distance_tolerance = 0.00001
-engraving_tolerance = 0.00001
+straight_tolerance = 0.1
+straight_distance_tolerance = 0.1
+engraving_tolerance = 0.2
 options = {}
 cspm = []
-wl = []
 offset_y = 0
 defaults = {
     'header': """
@@ -101,6 +111,20 @@ styles = {
 ################################################################################
 # Cubic Super Path additional functions
 ################################################################################
+
+
+def checkIfLineInsideShape(splitted_line):
+    # print_("sl input", splitted_line)
+    # check if the middle point of the first lines segment is inside the path.
+    # and remove the subline if not.
+    l1, l2 = splitted_line[0], splitted_line[1]
+    p = [(l1[0]+l2[0])/2, (l1[1]+l2[1])/2]
+
+    if point_inside_csp(p, csp):
+        return splitted_line
+
+    else:
+        return []
 
 
 def csp_segment_to_bez(sp1, sp2):
@@ -333,6 +357,67 @@ def csp_subpath_line_to(subpath, points):
 ################################################################################
 
 def point_inside_csp(p, csp, on_the_path=True):
+
+    x, y = p
+    ray_intersections_count = 0
+
+    for subpath in csp:
+
+        for i in range(1, len(subpath)):
+            sp1, sp2 = subpath[i-1], subpath[i]
+            ax, bx, cx, dx = csp_parameterize(sp1, sp2)[::2]
+            if ax == 0 and bx == 0 and cx == 0 and dx == x:
+                # we've got a special case here
+                b = csp_true_bounds([[sp1, sp2]])
+                if b[1][1] <= y <= b[3][1]:
+                    # points is on the path
+                    return on_the_path
+                else:
+                    # we can skip this segment because it wont influence the answer.
+                    pass
+            else:
+                for t in csp_line_intersection([x, y], [x, y+5], sp1, sp2):
+                    if t == 0 or t == 1:
+                        # we've got another special case here
+                        y1 = csp_at_t(sp1, sp2, t)[1]
+                        if y1 == y:
+                            # the point is on the path
+                            return on_the_path
+                        # if t == 0 we sould have considered this case previously.
+                        if t == 1:
+                            # we have to check the next segmant if it is on the same side of the ray
+                            st_d = csp_normalized_slope(sp1, sp2, 1)[0]
+                            if st_d == 0:
+                                st_d = csp_normalized_slope(sp1, sp2, 0.99)[0]
+
+                            for j in range(1, len(subpath)+1):
+                                if (i+j) % len(subpath) == 0:
+                                    continue  # skip the closing segment
+                                sp11, sp22 = subpath[(
+                                    i-1+j) % len(subpath)], subpath[(i+j) % len(subpath)]
+                                ax1, bx1, cx1, dx1 = csp_parameterize(
+                                    sp1, sp2)[::2]
+                                if ax1 == 0 and bx1 == 0 and cx1 == 0 and dx1 == x:
+                                    continue  # this segment parallel to the ray, so skip it
+                                en_d = csp_normalized_slope(sp11, sp22, 0)[0]
+                                if en_d == 0:
+                                    en_d = csp_normalized_slope(
+                                        sp11, sp22, 0.01)[0]
+                                if st_d*en_d <= 0:
+                                    ray_intersections_count += 1
+                                    break
+                    else:
+                        y1 = csp_at_t(sp1, sp2, t)[1]
+                        if y1 == y:
+                             # the point is on the path
+                            return on_the_path
+                        else:
+                            if y1 > y and 3*ax*t**2 + 2*bx*t + cx != 0:  # if it's 0 the path only touches the ray
+                                ray_intersections_count += 1
+    return ray_intersections_count % 2 == 1
+
+
+def point_inside_csp_vec(p, csp, on_the_path=True):
 
     x, y = p
     ray_intersections_count = 0
@@ -908,22 +993,20 @@ class laser_gcode(inkex.Effect):
                                      dest="log_create_log",                      default=True,                           help="Create log files")
         self.OptionParser.add_option("",   "--engraving-draw-calculation-paths", action="store", type="inkbool",
                                      dest="engraving_draw_calculation_paths",    default=True,                           help="Draw additional graphics to debug engraving path")
-        self.OptionParser.add_option("",   "--active-tab",                      action="store", type="string",
-                                     dest="active_tab",                          default="",                             help="Defines which tab is active")
         self.OptionParser.add_option("",   "--biarc-max-split-depth",           action="store", type="int",             dest="biarc_max_split_depth",
                                      default="10",                           help="Defines maximum depth of splitting while approximating using biarcs.")
         self.OptionParser.add_option("",   "--area-fill-angle",                 action="store", type="float",           dest="area_fill_angle",
                                      default="0",                            help="Fill area with lines heading this angle")
         self.OptionParser.add_option("",   "--area-fill-shift",                 action="store", type="float",
                                      dest="area_fill_shift",                     default="0",                            help="Shift the lines by tool d * shift")
-        self.OptionParser.add_option("",   "--area-fill-method",                action="store", type="string",          dest="area_fill_method",
-                                     default="zig-zag",                      help="Filling method either zig-zag or spiral")
         self.OptionParser.add_option("",   "--engraving-newton-iterations",     action="store", type="int",             dest="engraving_newton_iterations",
-                                     default="10",                           help="Number of sample points used to calculate distance")
+                                     default="20",                           help="Number of sample points used to calculate distance")
         self.OptionParser.add_option("",   "--add-contours",                    action="store", type="inkbool",
                                      dest="add_contours",                        default=True,                           help="Add contour to Gcode paths")
         self.OptionParser.add_option("",   "--add-infill",                      action="store", type="inkbool",
                                      dest="add_infill",                          default=True,                           help="Add infill to Gcode paths")
+        self.OptionParser.add_option("",   "--multi_thread",                      action="store", type="inkbool",
+                                     dest="multi_thread",                          default=True,                           help="Activate multithreading support")
 
     def parse_curve(self, p, layer, w=None, f=None):
 
@@ -951,8 +1034,10 @@ class laser_gcode(inkex.Effect):
                 sp1 = [[subpath[i-1][j][0], subpath[i-1][j][1]]
                        for j in range(3)]
                 sp2 = [[subpath[i][j][0], subpath[i][j][1]] for j in range(3)]
-                c += biarc(sp1, sp2, 0, 0) if w == None else biarc(sp1,
-                                                                   sp2, -f(w[k][i-1]), -f(w[k][i]))
+                if w == None:
+                    c += biarc(sp1, sp2, 0, 0)
+                else:
+                    c += biarc(sp1, sp2, -f(w[k][i-1]), -f(w[k][i]))
             c += [[[subpath[-1][1][0], subpath[-1][1][1]], 'end', 0, 0]]
             # print_("Curve: " + str(c) + "/n")
         return c
@@ -1364,13 +1449,237 @@ class laser_gcode(inkex.Effect):
         else:
             return None
 
+################################################################################
+# Fill area
+################################################################################
+
+    def area_fill(self):
+
+        global gcode
+        global offset_y
+        global csp
+
+        self.options.area_fill_angle = self.options.area_fill_angle * math.pi / 180
+
+        print_("===================================================================")
+        print_("Start filling area", time.strftime("%d.%m.%Y %H:%M:%S"))
+        print_("===================================================================")
+        timestamp2 = time.time()
+
+        if len(self.selected_paths) <= 0:
+            self.error(
+                _("This extension requires at least one selected path."), "warning")
+            return
+        if not self.check_dir():
+            return
+
+        for layer in self.layers:
+            if layer in self.selected_paths:
+                if self.options.laser_beam_with <= 0:
+                    self.error(_("Laser beam with must be > 0!"))
+
+                print_("    selecting paths")
+                timestamp = time.time()
+
+                for path in self.selected_paths[layer]:
+                    lines = []
+                    # print_(("doing path",    path.get("style"), path.get("d")))
+                    area_group = inkex.etree.SubElement(
+                        path.getparent(), inkex.addNS('g', 'svg'))
+                    d = path.get('d')
+                    if d == None:
+                        print_("omitting non-path")
+                        self.error(_("Warning: omitting non-path"),
+                                   "selection_contains_objects_that_are_not_paths")
+                        continue
+
+                    print_(time.time() - timestamp, "s for path selection")
+                    print_("    start csp transformation")
+                    timestamp = time.time()
+
+                    csp = cubicsuperpath.parsePath(d)
+                    csp = self.apply_transforms(path, csp)
+                    csp = csp_close_all_subpaths(csp)
+                    csp = self.transform_csp(csp, layer)
+
+                    print_("csp legth: ", len(csp))
+                    # print_("csp: ", csp)
+
+                    print_("    finished csp transformation")
+                    print_(time.time() - timestamp, "s for transformation")
+                    print_("    calculate bounds")
+                    timestamp = time.time()
+
+                    # rotate the path to get bounds in defined direction.
+                    a = - self.options.area_fill_angle
+                    rotated_path = [[[[point[0]*math.cos(a) - point[1]*math.sin(a), point[0]*math.sin(
+                        a)+point[1]*math.cos(a)] for point in sp] for sp in subpath] for subpath in csp]
+                    bounds = csp_true_bounds(rotated_path)
+
+                    # Draw the lines
+                    # Get path's bounds
+                    b = [0.0, 0.0, 0.0, 0.0]
+                    for k in range(4):
+                        i, j, t = bounds[k][2], bounds[k][3], bounds[k][4]
+                        b[k] = csp_at_t(rotated_path[i][j-1],
+                                        rotated_path[i][j], t)[k % 2]
+
+                    print_("    finished calculating bounds")
+                    print_(time.time() - timestamp, "s calculating bounds")
+
+                    # Zig-zag
+                    r = self.options.laser_beam_with
+                    if r <= 0:
+                        self.error(
+                            'Laser diameter must be greater than 0!', 'error')
+                        return
+
+                    lines += [[]]
+
+                    print_("    calculating infill")
+                    timestamp = time.time()
+
+                    i = b[0] - self.options.area_fill_shift*r
+                    top = True
+                    last_one = True
+                    while (i < b[2] or last_one):
+                        if i >= b[2]:
+                            last_one = False
+                        if lines[-1] == []:
+                            lines[-1] += [[i, b[3]]]
+
+                        if top:
+                            lines[-1] += [[i, b[1]], [i+r, b[1]]]
+
+                        else:
+                            lines[-1] += [[i, b[3]], [i+r, b[3]]]
+
+                        top = not top
+                        i += r
+
+                    print_(time.time() - timestamp,
+                           "s for calculating zigzag pattern")
+
+                    # Rotate created paths back
+                    a = self.options.area_fill_angle
+                    lines = [[[point[0]*math.cos(a) - point[1]*math.sin(a), point[0]*math.sin(
+                        a)+point[1]*math.cos(a)] for point in subpath] for subpath in lines]
+
+                    # print_("lines: ", lines)
+                    print_(time.time() - timestamp,
+                           "s for calculating zigzag + rotating")
+
+                    # get the intersection points
+                    splitted_line = [[lines[0][0]]]
+                    intersections = {}
+                    for l1, l2, in zip(lines[0], lines[0][1:]):
+                        ints = []
+
+                        if l1[0] == l2[0] and l1[1] == l2[1]:
+                            continue
+                        for i in range(len(csp)):
+                            for j in range(1, len(csp[i])):
+                                sp1, sp2 = csp[i][j-1], csp[i][j]
+                                roots = csp_line_intersection(l1, l2, sp1, sp2)
+                                for t in roots:
+                                    p = tuple(csp_at_t(sp1, sp2, t))
+                                    if l1[0] == l2[0]:
+                                        t1 = (p[1]-l1[1])/(l2[1]-l1[1])
+                                    else:
+                                        t1 = (p[0]-l1[0])/(l2[0]-l1[0])
+                                    if 0 <= t1 <= 1:
+                                        ints += [[t1, p[0], p[1], i, j, t]]
+                                        if p in intersections:
+                                            intersections[p] += [[i, j, t]]
+                                        else:
+                                            intersections[p] = [[i, j, t]]
+                                        # p = self.transform(p,layer,True)
+                                        # draw_pointer(p)
+                        ints.sort()
+                        for i in ints:
+                            splitted_line[-1] += [[i[1], i[2]]]
+                            splitted_line += [[[i[1], i[2]]]]
+                        splitted_line[-1] += [l2]
+                        i = 0
+
+                    print_(time.time() - timestamp,
+                           "s for calculating zigzag + rotating + intersections")
+                    print_("number of splitted lines: ", len(splitted_line))
+
+                    finalLines = []
+
+                    if self.options.multi_thread:
+                        pool = Pool(processes=noOfThreads)
+                        finalLines = pool.map(
+                            checkIfLineInsideShape, splitted_line)
+
+                        pool.close()
+                        pool.join()  
+
+                    else:
+                        while i < len(splitted_line):
+                            finalLines += [checkIfLineInsideShape(
+                                splitted_line[i])]
+                            i += 1
+                    i = 0
+
+                    # remove empty elements
+                    while i < len(finalLines):
+                        if finalLines[i] == [] or finalLines[i] == [[]]:
+                            del finalLines[i]
+                        else:
+                            i += 1
+
+                    # print_("splitted_line: ", splitted_line)
+                    # print_("final_line: ", finalLines)
+
+                    splitted_line = finalLines
+
+                    print_(time.time() - timestamp, "s for calculating infill")
+
+                    csp_line = csp_from_polyline(splitted_line)
+                    csp_line = self.transform_csp(csp_line, layer, True)
+
+                    #print_("g test", self.get_transforms(layer))
+                    #print_("Layer: ", layer)
+
+                    if self.get_transforms(layer) != []:
+                        offset_y = self.get_transforms(layer)[1][2]
+                    else:
+                        offset_y = 0
+
+                    print_("offset_y: ", offset_y)
+                    #print_("csp_line: ", csp_line, "/n")
+                    curve = self.parse_curve(csp_line, layer)
+                    #print_("curve: ", curve, "/n")
+
+                    print_("    drawing curve")
+                    timestamp = time.time()
+
+                    self.draw_curve(curve, layer, area_group)
+
+                    print_(time.time() - timestamp, "s for drawing curve")
+                    print_("    drawing curve")
+                    timestamp = time.time()
+
+                    gcode += self.generate_gcode(curve, layer, 0)
+
+                    print_(time.time() - timestamp, "s for generating Gcode")
+
+        if gcode != '' and not(self.options.add_contours):
+            self.export_gcode(gcode)
+
+        print_("===================================================================")
+        print_("Finished filling area", time.strftime("%d.%m.%Y %H:%M:%S"))
+        print_("===================================================================")
+        print_(time.time() - timestamp2, "s for infill")
 
 ################################################################################
 # Engraving
 ################################################################################
     def engraving(self):
         global x1, y1
-        global cspm, wl
+        global cspm
         global nlLT, i, j
         global max_dist  # minimum of tool radius and user's requested maximum distance
 
@@ -1429,7 +1738,6 @@ class laser_gcode(inkex.Effect):
         def get_radius_to_point(x1, y1, nx, ny, x2, y2):
 
             global max_dist
-
             # Start by converting coordinates to be relative to x1,y1
             x2, y2 = x2-x1, y2-y1
             denom = nx**2+ny**2-1
@@ -1479,14 +1787,11 @@ class laser_gcode(inkex.Effect):
 
         def get_biggest(x1, y1, nx, ny):
 
-            global max_dist, nlLT, i, j
+            global nlLT, i, j
             n1 = nlLT[j][i-1]  # current node
             jjmin = -1
             iimin = -1
-            r = max_dist
-            # set limits within which to look for lines
-            xmin, xmax = x1+r*nx-r, x1+r*nx+r
-            ymin, ymax = y1+r*ny-r, y1+r*ny+r
+
             for jj in xrange(0, len(nlLT)):  # for every subpath of this object
                 for ii in xrange(0, len(nlLT[jj])):  # for every point and line
                     if nlLT[jj][ii-1][2]:  # if a point
@@ -1495,6 +1800,7 @@ class laser_gcode(inkex.Effect):
                                 continue
                         t1 = get_radius_to_point(
                             x1, y1, nx, ny, nlLT[jj][ii-1][0][0], nlLT[jj][ii-1][0][1])
+
                         # print_("Try pt   i,ii,t1,x1,y1",i,ii,t1,x1,y1)
                     else:  # doing a line
                         if jj == j:  # except this one
@@ -1518,37 +1824,29 @@ class laser_gcode(inkex.Effect):
                         x23min, x23max = min(x2, x3), max(x2, x3)
                         y23min, y23max = min(y2, y3), max(y2, y3)
                         # see if line in range
-                        if n1[2] == False and (x23max < xmin or x23min > xmax or y23max < ymin or y23min > ymax):
+                        if n1[2] == False and (x23max < x1 or x23min > x1 or y23max < 1 or y23min > y1):
                             continue
                         t1 = get_radius_to_line(
                             x1, y1, nx, ny, nx2, ny2, x2, y2, nx23, ny23, x3, y3, nx3, ny3)
                         # print_("Try line i,ii,t1,x1,y1",i,ii,t1,x1,y1)
-                    if 0 <= t1 < r:
-                        r = t1
+                    if 0 <= t1:
                         iimin = ii
                         jjmin = jj
-                        xmin, xmax = x1+r*nx-r, x1+r*nx+r
-                        ymin, ymax = y1+r*ny-r, y1+r*ny+r
-                # next ii
-            # next jj
-            return (jjmin, iimin, r)
+                        #print_("iimin, jjmin:", ii, jj)
+            return (jjmin, iimin)
             # end of get_biggest
 
-        def save_point(x, y, w, i, j, ii, jj):
+        def save_point(x, y, i, j, ii, jj):
 
-            global wl, cspm
-
-            #print_("Save Point", wl, cspm)
+            global cspm
 
             x = round(x, 3)  # round to 3 decimals
             y = round(y, 3)  # round to 3 decimals
-            w = round(w, 3)  # round to 3 decimals
+
             if len(cspm) > 1:
                 _, xy1, _, i1, j1, ii1, jj1 = cspm[-1]
-                w1 = wl[-1]
                 if i == i1 and j == j1 and ii == ii1 and jj == jj1:  # one match
                     _, xy2, _, i1, j1, ii1, jj1 = cspm[-2]
-                    w2 = wl[-2]
                     if i == i1 and j == j1 and ii == ii1 and jj == jj1:  # two matches. Now test linearity
                         length1 = math.hypot(xy1[0]-x, xy1[1]-y)
                         length2 = math.hypot(xy2[0]-x, xy2[1]-y)
@@ -1558,13 +1856,9 @@ class laser_gcode(inkex.Effect):
                             xydist = abs(
                                 (xy2[0]-x)*(xy1[1]-y)-(xy1[0]-x)*(xy2[1]-y))/length2
                             if xydist < engraving_tolerance:  # so far so good
-                                wdist = w2+(w-w2)*length1/length2 - w1
-                                if abs(wdist) < engraving_tolerance:
-                                    # print_("pop",j,i,xy1)
-                                    cspm.pop()
-                                    wl.pop()
+                                cspm.pop()
             cspm += [[[x, y], [x, y], [x, y], i, j, ii, jj]]
-            wl += [w]
+
             # end of save_point
 
         # end of subfunction definitions. engraving() starts here:
@@ -1576,7 +1870,7 @@ class laser_gcode(inkex.Effect):
         timestamp2 = time.time()
 
         global gcode
-        r, w, wmax = 0, 0, 0  # theoretical and tool-radius-limited radii in pixels
+        r = 0,  # theoretical and tool-radius-limited radii in pixels
         x1, y1, nx, ny = 0, 0, 0, 0
 
         cspe = []
@@ -1586,8 +1880,9 @@ class laser_gcode(inkex.Effect):
             self.error(
                 _("Please select at least one path to engrave and run again."), "warning")
             return
-        if not self.check_dir():
-            return
+        if self.options.add_infill == False:
+            if not self.check_dir():
+                return
 
         # LT See if we can use this parameter for line and Bezier subdivision:
         bitlen = 20/self.options.engraving_newton_iterations
@@ -1606,39 +1901,33 @@ class laser_gcode(inkex.Effect):
 
                         # LT: Create my own list. n1LT[j] is for subpath j
                         nlLT = []
+                        noOfElements = 0
+                        delElements = 0
                         for j in xrange(len(cspi)):  # LT For each subpath...
                             # Remove zero length segments, assume closed path
                             i = 0
+                            noOfElements += len(cspi[j])
 
                             while i < len(cspi[j]):
                                 if abs(cspi[j][i-1][1][0]-cspi[j][i][1][0]) < engraving_tolerance and abs(cspi[j][i-1][1][1]-cspi[j][i][1][1]) < engraving_tolerance:
                                     cspi[j][i-1][2] = cspi[j][i][2]
                                     del cspi[j][i]
+                                    delElements += 1
                                 else:
                                     i += 1
+
+                        print_("Total number of points ", noOfElements)
+                        print_("Number of removed points: ", delElements)
 
                         for csp in cspi:
                             # print_("csp is",csp)
                             nlLT.append([])
                             for i in range(0, len(csp)):  # LT for each point
-                                # n = []
                                 sp0, sp1, sp2 = csp[i-2], csp[i-1], csp[i]
                                 # LT find angle between this and previous segment
                                 x0, y0 = sp1[1]
                                 nx1, ny1 = csp_normalized_normal(sp1, sp2, 0)
-                                # I don't trust this function, so test result
-                                if abs(1-math.hypot(nx1, ny1)) > 0.00001:
-                                    print_(
-                                        "csp_normalised_normal error t=0", nx1, ny1, sp1, sp2)
-                                    self.error(
-                                        _("csp_normalised_normal error. See log."), "warning")
-
                                 nx0, ny0 = csp_normalized_normal(sp0, sp1, 1)
-                                if abs(1-math.hypot(nx0, ny0)) > 0.00001:
-                                    print_(
-                                        "csp_normalised_normal error t=1", nx0, ny0, sp1, sp2)
-                                    self.error(
-                                        _("csp_normalised_normal error. See log."), "warning")
                                 bx, by, s = bisect(nx0, ny0, nx1, ny1)
                                 # record x,y,normal,ifCorner, sin(angle-turned/2)
                                 nlLT[-1] += [[[x0, y0], [bx, by], True, s]]
@@ -1684,8 +1973,7 @@ class laser_gcode(inkex.Effect):
                         reflex = False
                         for j in xrange(len(nlLT)):  # LT6b for each subpath
                             cspm = []  # Will be my output. List of csps.
-                            wl = []  # Will be my w output list
-                            w = r = 0  # LT initial, as first point is an angle
+                            r = 0  # LT initial, as first point is an angle
                             for i in xrange(len(nlLT[j])):  # LT for each node
                                 n0 = nlLT[j][i-2]  # previous node
                                 n1 = nlLT[j][i-1]  # current node
@@ -1697,20 +1985,7 @@ class laser_gcode(inkex.Effect):
                                 if n1[2] == True:  # We're at a corner
                                     bits = 1
                                     bit0 = 0
-                                    # lastr=r #Remember r from last line
-                                    lastw = w  # Remember w from last line
-                                    w = max_dist
-                                    if n1[3] > 0:  # acute. Limit radius
-                                        len1 = math.hypot(
-                                            (n0[0][0]-n1[0][0]), (n0[0][1]-n1[0][1]))
-                                        if i < (len(nlLT[j])-1):
-                                            len2 = math.hypot(
-                                                (nlLT[j][i+1][0][0]-n1[0][0]), (nlLT[j][i+1][0][1]-n1[0][1]))
-                                        else:
-                                            len2 = math.hypot(
-                                                (nlLT[j][0][0][0]-n1[0][0]), (nlLT[j][0][0][1]-n1[0][1]))
-                                        # set initial r value, not to be exceeded
-                                        w = math.sqrt(min(len1, len2))/n1[3]
+
                                 else:  # line. Cut it up if long.
                                     if n0[3] > 0 and not self.options.engraving_draw_calculation_paths:
                                         bit0 = r*n0[3]  # after acute corner
@@ -1725,58 +2000,50 @@ class laser_gcode(inkex.Effect):
                                 for b in xrange(bits):  # divide line into bits
                                     x1 = x1a+ny*(b*bitlen+bit0)
                                     y1 = y1a-nx*(b*bitlen+bit0)
-                                    jjmin, iimin, w = get_biggest(
+                                    jjmin, iimin = get_biggest(
                                         x1, y1, nx, ny)
                                     # print_("i,j,jjmin,iimin,w",i,j,jjmin,iimin,w)
-                                    w = min(r, self.options.laser_beam_with)
-                                    wmax = max(wmax, w)
+                                    # print_("jjmin,iimin ", jjmin, iimin)
+
                                     if reflex:  # just after a reflex corner
                                         reflex = False
-                                        if w < lastw:
-                                            save_point(
-                                                n0[0][0]+n0[1][0]*w, n0[0][1]+n0[1][1]*w, w, i, j, iimin, jjmin)
                                     if n1[2] == True:  # We're at a corner
                                         if n1[3] > 0:  # acute
                                             save_point(
-                                                x1+nx*w, y1+ny*w, w, i, j, iimin, jjmin)
+                                                x1, y1, i, j, iimin, jjmin)
                                             save_point(
-                                                x1, y1, 0, i, j, iimin, jjmin)
-                                        elif n1[3] < 0:  # reflex
-                                            if w > lastw:
-                                                wmax = max(wmax, w)
-                                                save_point(
-                                                    x1+nx*w, y1+ny*w, w, i, j, iimin, jjmin)
+                                                x1, y1, i, j, iimin, jjmin)
                                     # acute corner coming up
                                     elif b > 0 and n2[3] > 0 and not self.options.engraving_draw_calculation_paths:
                                         if jjmin == j and iimin == i+2:
                                             break
-                                    save_point(x1+nx*w, y1+ny*w, w,
-                                               i, j, iimin, jjmin)
+                                    save_point(x1, y1, i, j, iimin, jjmin)
 
                                 # LT end of for each bit of this line
                                 if n1[2] == True and n1[3] < 0:  # reflex angle
                                     reflex = True
-                                lastw = w  # remember this w
                             # LT next i
+                            if len(cspm) != 0:
+                                cspm += [cspm[0]]
+                                # print_("cspm",cspm, "/n")
 
-                            cspm += [cspm[0]]
-                            # print_("cspm",cspm, "/n")
+                                if self.options.engraving_draw_calculation_paths == True:
+                                    node = inkex.etree.SubElement(engraving_group, inkex.addNS('path', 'svg'),                                         {
+                                        "d":     cubicsuperpath.formatPath([cspm]),
+                                        'style':    styles["biarc_style"]['biarc1'],
+                                        "lasertools": "Engraving calculation paths",
+                                    })
 
-                            if self.options.engraving_draw_calculation_paths == True:
-                                node = inkex.etree.SubElement(engraving_group, inkex.addNS('path', 'svg'),                                         {
-                                    "d":     cubicsuperpath.formatPath([cspm]),
-                                    'style':    styles["biarc_style"]['biarc1'],
-                                    "lasertools": "Engraving calculation paths",
-                                })
-
-                            cspe += [cspm]
+                                cspe += [cspm]
 
                 if cspe != []:
                     curve = self.parse_curve(cspe, layer, None, None)
                     self.draw_curve(curve, layer, engraving_group)
 
-                    #print_("g test", self.get_transforms(layer))
-                    offset_y = self.get_transforms(layer)[1][2]
+                    if self.get_transforms(layer) != []:
+                        offset_y = self.get_transforms(layer)[1][2]
+                    else:
+                        offset_y = 0
 
                     gcode += self.generate_gcode(curve, layer, 0)
 
@@ -1834,7 +2101,7 @@ class laser_gcode(inkex.Effect):
             si = [i[0]*orientation_scale,
                   (i[1]*orientation_scale)+float(translate[1])]
             g = inkex.etree.SubElement(orientation_group, inkex.addNS('g', 'svg'), {
-                                       'gcodetools': "Gcodetools orientation point (2 points)"})
+                'gcodetools': "Gcodetools orientation point (2 points)"})
             inkex.etree.SubElement(g, inkex.addNS('path', 'svg'),
                                    {
                 'style':    "stroke:none;fill:#000000;",
@@ -1850,223 +2117,6 @@ class laser_gcode(inkex.Effect):
                 'gcodetools': "Gcodetools orientation point text"
             })
             t.text = "(%s; %s; %s)" % (i[0], i[1], i[2])
-
-    ################################################################################
-    # Fill area
-    ################################################################################
-
-    def area_fill(self):
-
-        global gcode
-        global offset_y
-
-        self.options.area_fill_angle = self.options.area_fill_angle * math.pi / 180
-
-        print_("===================================================================")
-        print_("Start filling area", time.strftime("%d.%m.%Y %H:%M:%S"))
-        print_("===================================================================")
-        timestamp2 = time.time()
-
-        if len(self.selected_paths) <= 0:
-            self.error(
-                _("This extension requires at least one selected path."), "warning")
-            return
-        for layer in self.layers:
-            if layer in self.selected_paths:
-                if self.options.laser_beam_with <= 0:
-                    self.error(_("Laser beam with must be > 0!"))
-
-                print_("    selecting paths")
-                timestamp = time.time()
-
-                for path in self.selected_paths[layer]:
-                    lines = []
-                    # print_(("doing path",    path.get("style"), path.get("d")))
-                    area_group = inkex.etree.SubElement(
-                        path.getparent(), inkex.addNS('g', 'svg'))
-                    d = path.get('d')
-                    if d == None:
-                        print_("omitting non-path")
-                        self.error(_("Warning: omitting non-path"),
-                                   "selection_contains_objects_that_are_not_paths")
-                        continue
-
-                    print_(time.time() - timestamp, "s for path selection")
-                    print_("    start csp transformation")
-                    timestamp = time.time()
-
-                    csp = cubicsuperpath.parsePath(d)
-                    csp = self.apply_transforms(path, csp)
-                    csp = csp_close_all_subpaths(csp)
-                    csp = self.transform_csp(csp, layer)
-
-                    print_("    finished csp transformation")
-                    print_(time.time() - timestamp, "s for transformation")
-                    print_("    calculate bounds")
-                    timestamp = time.time()
-
-                    # rotate the path to get bounds in defined direction.
-                    a = - self.options.area_fill_angle
-                    rotated_path = [[[[point[0]*math.cos(a) - point[1]*math.sin(a), point[0]*math.sin(
-                        a)+point[1]*math.cos(a)] for point in sp] for sp in subpath] for subpath in csp]
-                    bounds = csp_true_bounds(rotated_path)
-
-                    # Draw the lines
-                    # Get path's bounds
-                    b = [0.0, 0.0, 0.0, 0.0]
-                    for k in range(4):
-                        i, j, t = bounds[k][2], bounds[k][3], bounds[k][4]
-                        b[k] = csp_at_t(rotated_path[i][j-1],
-                                        rotated_path[i][j], t)[k % 2]
-
-                    print_("    finished calculating bounds")
-                    print_(time.time() - timestamp, "s calculating bounds")
-
-                    # Zig-zag
-                    r = self.options.laser_beam_with
-                    if r <= 0:
-                        self.error(
-                            'Tools diameter must be greater than 0!', 'error')
-                        return
-
-                    lines += [[]]
-
-                    print_("    calculating infill")
-                    timestamp = time.time()
-
-                    if self.options.area_fill_method == 'zig-zag':
-                        i = b[0] - self.options.area_fill_shift*r
-                        top = True
-                        last_one = True
-                        while (i < b[2] or last_one):
-                            if i >= b[2]:
-                                last_one = False
-                            if lines[-1] == []:
-                                lines[-1] += [[i, b[3]]]
-
-                            if top:
-                                lines[-1] += [[i, b[1]], [i+r, b[1]]]
-
-                            else:
-                                lines[-1] += [[i, b[3]], [i+r, b[3]]]
-
-                            top = not top
-                            i += r
-                    else:
-
-                        w, h = b[2]-b[0] + self.options.area_fill_shift * \
-                            r, b[3]-b[1] + self.options.area_fill_shift*r
-                        x, y = b[0] - self.options.area_fill_shift * \
-                            r, b[1] - self.options.area_fill_shift*r
-                        lines[-1] += [[x, y]]
-                        stage = 0
-                        start = True
-                        while w > 0 and h > 0:
-                            stage = (stage+1) % 4
-                            if stage == 0:
-                                y -= h
-                                h -= r
-                            elif stage == 1:
-                                x += w
-                                if not start:
-                                    w -= r
-                                start = False
-                            elif stage == 2:
-                                y += h
-                                h -= r
-                            elif stage == 3:
-                                x -= w
-                                w -= r
-
-                            lines[-1] += [[x, y]]
-
-                        stage = (stage+1) % 4
-                        if w <= 0 and h > 0:
-                            y = y-h if stage == 0 else y+h
-                        if h <= 0 and w > 0:
-                            x = x-w if stage == 3 else x+w
-                        lines[-1] += [[x, y]]
-                    # Rotate created paths back
-                    a = self.options.area_fill_angle
-                    lines = [[[point[0]*math.cos(a) - point[1]*math.sin(a), point[0]*math.sin(
-                        a)+point[1]*math.cos(a)] for point in subpath] for subpath in lines]
-
-                    # get the intersection points
-
-                    splitted_line = [[lines[0][0]]]
-                    intersections = {}
-                    for l1, l2, in zip(lines[0], lines[0][1:]):
-                        ints = []
-
-                        if l1[0] == l2[0] and l1[1] == l2[1]:
-                            continue
-                        for i in range(len(csp)):
-                            for j in range(1, len(csp[i])):
-                                sp1, sp2 = csp[i][j-1], csp[i][j]
-                                roots = csp_line_intersection(l1, l2, sp1, sp2)
-                                for t in roots:
-                                    p = tuple(csp_at_t(sp1, sp2, t))
-                                    if l1[0] == l2[0]:
-                                        t1 = (p[1]-l1[1])/(l2[1]-l1[1])
-                                    else:
-                                        t1 = (p[0]-l1[0])/(l2[0]-l1[0])
-                                    if 0 <= t1 <= 1:
-                                        ints += [[t1, p[0], p[1], i, j, t]]
-                                        if p in intersections:
-                                            intersections[p] += [[i, j, t]]
-                                        else:
-                                            intersections[p] = [[i, j, t]]
-                                        # p = self.transform(p,layer,True)
-                                        # draw_pointer(p)
-                        ints.sort()
-                        for i in ints:
-                            splitted_line[-1] += [[i[1], i[2]]]
-                            splitted_line += [[[i[1], i[2]]]]
-                        splitted_line[-1] += [l2]
-                        i = 0
-
-                    while i < len(splitted_line):
-                        # check if the middle point of the first lines segment is inside the path.
-                        # and remove the subline if not.
-                        l1, l2 = splitted_line[i][0], splitted_line[i][1]
-                        p = [(l1[0]+l2[0])/2, (l1[1]+l2[1])/2]
-                        if not point_inside_csp(p, csp):
-                            # i +=1
-                            del splitted_line[i]
-                        else:
-                            i += 1
-
-                    print_(time.time() - timestamp, "s for calculating infill")
-
-                    csp_line = csp_from_polyline(splitted_line)
-                    csp_line = self.transform_csp(csp_line, layer, True)
-
-                    # print_("g test", self.get_transforms(layer))
-                    offset_y = self.get_transforms(layer)[1][2]
-
-                    curve = self.parse_curve(csp_line, layer)
-
-                    print_("    drawing curve")
-                    timestamp = time.time()
-
-                    self.draw_curve(curve, layer, area_group)
-
-                    print_(time.time() - timestamp, "s for drawing curve")
-
-                    print_("    drawing curve")
-                    timestamp = time.time()
-
-                    gcode += self.generate_gcode(curve, layer, 0)
-
-                    print_(time.time() - timestamp, "s for generating Gcode")
-
-        if gcode != '' and not(self.options.add_contours):
-            self.export_gcode(gcode)
-
-        print_("===================================================================")
-        print_("Finished filling area", time.strftime("%d.%m.%Y %H:%M:%S"))
-        print_("===================================================================")
-        print_(time.time() - timestamp2, "s for infill")
 
 ################################################################################
 # Effect
@@ -2126,6 +2176,21 @@ class laser_gcode(inkex.Effect):
         if self.options.add_contours:
             self.get_info()
             self.selected_paths = self.paths
+            '''
+            if profiling:
+                if os.path.isfile(self.options.directory+"performance.prof"):
+                    os.remove(self.options.directory+"/performance.prof")
+
+                profile = cProfile.Profile()
+                profile.runctx('self.engraving()', globals(),
+                               locals())
+
+                kProfile = lsprofcalltree.KCacheGrind(profile)
+
+                kFile = open(self.options.directory+"/performance.prof", 'w+')
+                kProfile.output(kFile)
+                kFile.close()
+            '''
             self.engraving()
 
 
