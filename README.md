@@ -9,7 +9,9 @@ This project is based on the Gcodetools extension.
 ## How to use Lasertools
 **Watch this Video for a quick introduction:**
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/NhUvRJsa4D0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=NhUvRJsa4D0
+" target="_blank"><img src="http://img.youtube.com/vi/NhUvRJsa4D0/0.jpg"
+alt="Detailed Youtube Video" width="240" height="180" border="10" /></a>
 
 
 ************************************************************************************
