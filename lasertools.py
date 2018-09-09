@@ -2164,7 +2164,8 @@ class laser_gcode(inkex.Effect):
             "penetration feed": self.options.laser_speed,
             "feed": self.options.laser_speed,
             "gcode before path": ("G04 P" + self.options.power_delay + " " + self.options.laser_command),
-            "gcode after path": (self.options.laser_off_command + "\n" + "G00")
+            #"gcode after path": (self.options.laser_off_command + "\n" + "G00")
+            "gcode after path": (self.options.laser_off_command)
         }
 
         self.get_info()

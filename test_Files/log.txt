@@ -1,0 +1,1661 @@
+===================================================================
+Lasertools log file.
+Started at 09.09.2018 15:28:18.
+/mnt/Daten/GoogleDrive/Projekte/02_Progerammier Projekte/P017_Inkscape_Lasertools/Inkscape-Lasertools-Plugin/test_Files//log.txt
+===================================================================
+
+    Found orientation points in 'None' layer: [[[100.0, 100.0], [100.0, 0.0, 0.0]], [[0.0, 100.0], [0.0, 0.0, 0.0]]] 
+    Found orientation points in 'None' layer: [[[100.0, 100.0], [100.0, 0.0, 0.0]], [[0.0, 100.0], [0.0, 0.0, 0.0]]] 
+=================================================================== 
+Start filling area 09.09.2018 15:28:18 
+=================================================================== 
+Checking direcrory: '/mnt/Daten/GoogleDrive/Projekte/02_Progerammier Projekte/P017_Inkscape_Lasertools/Inkscape-Lasertools-Plugin/test_Files/' 
+Testing writing rights on '/mnt/Daten/GoogleDrive/Projekte/02_Progerammier Projekte/P017_Inkscape_Lasertools/Inkscape-Lasertools-Plugin/test_Files/TestPatternTWOPasses_0002.ngc' 
+    selecting paths 
+2.40802764893e-05 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.000829935073853 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000334024429321 s calculating bounds 
+    calculating infill 
+5.96046447754e-06 s for calculating zigzag pattern 
+0.000154972076416 s for calculating zigzag + rotating 
+0.00104689598083 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  19 
+0.109941005707 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0123751163483 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000596046447754 s for generating Gcode 
+0.000941038131714 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.00082802772522 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.00118803977966 s calculating bounds 
+    calculating infill 
+6.91413879395e-06 s for calculating zigzag pattern 
+0.000198841094971 s for calculating zigzag + rotating 
+0.000798940658569 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  17 
+0.107592821121 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0117030143738 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000623941421509 s for generating Gcode 
+0.00086498260498 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.00144505500793 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.00071907043457 s calculating bounds 
+    calculating infill 
+7.15255737305e-06 s for calculating zigzag pattern 
+0.000168085098267 s for calculating zigzag + rotating 
+0.00260519981384 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  25 
+0.110676050186 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0120599269867 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000638961791992 s for generating Gcode 
+0.000905990600586 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.00078296661377 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000608921051025 s calculating bounds 
+    calculating infill 
+6.19888305664e-06 s for calculating zigzag pattern 
+0.000158071517944 s for calculating zigzag + rotating 
+0.00118899345398 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  13 
+0.107748031616 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0115740299225 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000457048416138 s for generating Gcode 
+0.000647068023682 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.000878095626831 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000586986541748 s calculating bounds 
+    calculating infill 
+1.00135803223e-05 s for calculating zigzag pattern 
+0.000196933746338 s for calculating zigzag + rotating 
+0.0020158290863 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  21 
+0.109583854675 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0107169151306 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000418186187744 s for generating Gcode 
+0.000586986541748 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.000979900360107 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000615119934082 s calculating bounds 
+    calculating infill 
+7.86781311035e-06 s for calculating zigzag pattern 
+0.000165939331055 s for calculating zigzag + rotating 
+0.0040009021759 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  29 
+0.115010023117 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.00852990150452 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000468015670776 s for generating Gcode 
+0.000727891921997 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.0010199546814 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000426054000854 s calculating bounds 
+    calculating infill 
+1.09672546387e-05 s for calculating zigzag pattern 
+0.00017786026001 s for calculating zigzag + rotating 
+0.00195598602295 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  17 
+0.109200000763 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0117990970612 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000401973724365 s for generating Gcode 
+0.000570058822632 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.00103116035461 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.00065803527832 s calculating bounds 
+    calculating infill 
+8.10623168945e-06 s for calculating zigzag pattern 
+0.000172138214111 s for calculating zigzag + rotating 
+0.00349116325378 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  35 
+0.112609148026 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0114982128143 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000586032867432 s for generating Gcode 
+0.000740051269531 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.000880002975464 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000663042068481 s calculating bounds 
+    calculating infill 
+1.09672546387e-05 s for calculating zigzag pattern 
+0.000251054763794 s for calculating zigzag + rotating 
+0.0057201385498 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  39 
+0.114856958389 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.00939083099365 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000491857528687 s for generating Gcode 
+0.000684022903442 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.00161290168762 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000922918319702 s calculating bounds 
+    calculating infill 
+1.69277191162e-05 s for calculating zigzag pattern 
+0.000194072723389 s for calculating zigzag + rotating 
+0.016606092453 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  53 
+0.122262001038 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0110578536987 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000581026077271 s for generating Gcode 
+0.000765085220337 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.00213313102722 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.0014328956604 s calculating bounds 
+    calculating infill 
+2.50339508057e-05 s for calculating zigzag pattern 
+0.000581979751587 s for calculating zigzag + rotating 
+0.0279140472412 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  89 
+0.135608911514 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.00958609580994 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000704050064087 s for generating Gcode 
+0.000885009765625 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.000988960266113 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000554084777832 s calculating bounds 
+    calculating infill 
+8.10623168945e-06 s for calculating zigzag pattern 
+0.000282049179077 s for calculating zigzag + rotating 
+0.00389719009399 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  29 
+0.110889196396 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0124340057373 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000949859619141 s for generating Gcode 
+0.00134778022766 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.000777006149292 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000380992889404 s calculating bounds 
+    calculating infill 
+5.00679016113e-06 s for calculating zigzag pattern 
+0.0001540184021 s for calculating zigzag + rotating 
+0.00076699256897 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  11 
+0.108696937561 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0104370117188 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000527858734131 s for generating Gcode 
+0.00068998336792 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.000653982162476 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000535011291504 s calculating bounds 
+    calculating infill 
+8.82148742676e-06 s for calculating zigzag pattern 
+0.000159978866577 s for calculating zigzag + rotating 
+0.000566959381104 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  9 
+0.108458995819 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.010185956955 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.00056004524231 s for generating Gcode 
+0.000739097595215 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.00068187713623 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000364065170288 s calculating bounds 
+    calculating infill 
+4.05311584473e-06 s for calculating zigzag pattern 
+0.000149965286255 s for calculating zigzag + rotating 
+0.000558137893677 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  9 
+0.107465982437 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.012932062149 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000514030456543 s for generating Gcode 
+0.000679969787598 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.000648021697998 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.00033712387085 s calculating bounds 
+    calculating infill 
+3.81469726562e-06 s for calculating zigzag pattern 
+0.000153779983521 s for calculating zigzag + rotating 
+0.000594854354858 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  9 
+0.109694957733 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.01331615448 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000411987304688 s for generating Gcode 
+0.000573873519897 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.000753879547119 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000431060791016 s calculating bounds 
+    calculating infill 
+4.05311584473e-06 s for calculating zigzag pattern 
+0.000150918960571 s for calculating zigzag + rotating 
+0.000582933425903 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  9 
+0.107728004456 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0120458602905 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.00042200088501 s for generating Gcode 
+0.000571966171265 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.00107789039612 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000410079956055 s calculating bounds 
+    calculating infill 
+5.96046447754e-06 s for calculating zigzag pattern 
+0.000168085098267 s for calculating zigzag + rotating 
+0.000671148300171 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  9 
+0.106770992279 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0126509666443 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000411033630371 s for generating Gcode 
+0.00056791305542 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.000771045684814 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000363111495972 s calculating bounds 
+    calculating infill 
+4.05311584473e-06 s for calculating zigzag pattern 
+0.000143051147461 s for calculating zigzag + rotating 
+0.000610113143921 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  9 
+0.109067201614 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.00912594795227 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000663042068481 s for generating Gcode 
+0.001384973526 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.00121593475342 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000450134277344 s calculating bounds 
+    calculating infill 
+5.96046447754e-06 s for calculating zigzag pattern 
+0.000162839889526 s for calculating zigzag + rotating 
+0.000887870788574 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  11 
+0.107950925827 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0120041370392 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000488996505737 s for generating Gcode 
+0.000750780105591 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.00111103057861 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.00037693977356 s calculating bounds 
+    calculating infill 
+5.00679016113e-06 s for calculating zigzag pattern 
+0.000168085098267 s for calculating zigzag + rotating 
+0.000797033309937 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  11 
+0.112369060516 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0101401805878 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000514984130859 s for generating Gcode 
+0.000686883926392 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.000824928283691 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000510931015015 s calculating bounds 
+    calculating infill 
+5.00679016113e-06 s for calculating zigzag pattern 
+0.000169992446899 s for calculating zigzag + rotating 
+0.000929832458496 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  13 
+0.107450962067 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0129950046539 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000640869140625 s for generating Gcode 
+0.000837802886963 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.000872850418091 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.00059700012207 s calculating bounds 
+    calculating infill 
+5.00679016113e-06 s for calculating zigzag pattern 
+0.000189065933228 s for calculating zigzag + rotating 
+0.0010290145874 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  13 
+0.110903978348 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0117890834808 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000645875930786 s for generating Gcode 
+0.000825881958008 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.000808954238892 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000530958175659 s calculating bounds 
+    calculating infill 
+5.00679016113e-06 s for calculating zigzag pattern 
+0.000140905380249 s for calculating zigzag + rotating 
+0.00088906288147 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  13 
+0.109124898911 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.00961017608643 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000946044921875 s for generating Gcode 
+0.00115203857422 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.000852108001709 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000382900238037 s calculating bounds 
+    calculating infill 
+5.96046447754e-06 s for calculating zigzag pattern 
+0.000181913375854 s for calculating zigzag + rotating 
+0.000982046127319 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  13 
+0.107759952545 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0122411251068 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000617027282715 s for generating Gcode 
+0.00080394744873 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.000911951065063 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000402212142944 s calculating bounds 
+    calculating infill 
+1.78813934326e-05 s for calculating zigzag pattern 
+0.000192880630493 s for calculating zigzag + rotating 
+0.00641393661499 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  75 
+0.113914966583 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0111179351807 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.00129699707031 s for generating Gcode 
+0.00151896476746 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.00144004821777 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000797986984253 s calculating bounds 
+    calculating infill 
+1.19209289551e-05 s for calculating zigzag pattern 
+0.000231981277466 s for calculating zigzag + rotating 
+0.00831007957458 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  35 
+0.116353034973 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0124778747559 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000563859939575 s for generating Gcode 
+0.000802993774414 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.000941038131714 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000503063201904 s calculating bounds 
+    calculating infill 
+1.59740447998e-05 s for calculating zigzag pattern 
+0.000288009643555 s for calculating zigzag + rotating 
+0.00462698936462 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  35 
+0.113182067871 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0110268592834 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000952005386353 s for generating Gcode 
+0.00117492675781 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.000920057296753 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000396966934204 s calculating bounds 
+    calculating infill 
+1.4066696167e-05 s for calculating zigzag pattern 
+0.000194072723389 s for calculating zigzag + rotating 
+0.00492000579834 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  57 
+0.112967014313 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0109808444977 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000756025314331 s for generating Gcode 
+0.00105714797974 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.000627994537354 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000339031219482 s calculating bounds 
+    calculating infill 
+1.50203704834e-05 s for calculating zigzag pattern 
+0.00020694732666 s for calculating zigzag + rotating 
+0.00404787063599 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  59 
+0.111654996872 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0130760669708 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000626802444458 s for generating Gcode 
+0.000885963439941 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.00066089630127 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000341176986694 s calculating bounds 
+    calculating infill 
+1.50203704834e-05 s for calculating zigzag pattern 
+0.000212907791138 s for calculating zigzag + rotating 
+0.00384998321533 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  59 
+0.111192941666 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0112481117249 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000836133956909 s for generating Gcode 
+0.00101613998413 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.000732898712158 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000359058380127 s calculating bounds 
+    calculating infill 
+1.4066696167e-05 s for calculating zigzag pattern 
+0.000186920166016 s for calculating zigzag + rotating 
+0.0039439201355 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  59 
+0.111376047134 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.00997185707092 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000813961029053 s for generating Gcode 
+0.00116801261902 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.00131702423096 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000399827957153 s calculating bounds 
+    calculating infill 
+1.97887420654e-05 s for calculating zigzag pattern 
+0.000324964523315 s for calculating zigzag + rotating 
+0.00471496582031 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  57 
+0.111387968063 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0126328468323 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000646114349365 s for generating Gcode 
+0.000869989395142 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.00114703178406 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000425815582275 s calculating bounds 
+    calculating infill 
+5.96046447754e-06 s for calculating zigzag pattern 
+0.000223875045776 s for calculating zigzag + rotating 
+0.00156998634338 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  17 
+0.108067989349 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.013463973999 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000458002090454 s for generating Gcode 
+0.000711917877197 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.000653982162476 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000447034835815 s calculating bounds 
+    calculating infill 
+1.50203704834e-05 s for calculating zigzag pattern 
+0.000169038772583 s for calculating zigzag + rotating 
+0.0048770904541 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  57 
+0.112302064896 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0126600265503 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000642061233521 s for generating Gcode 
+0.000898122787476 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.000711917877197 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000418901443481 s calculating bounds 
+    calculating infill 
+1.4066696167e-05 s for calculating zigzag pattern 
+0.000178098678589 s for calculating zigzag + rotating 
+0.00489807128906 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  57 
+0.111424922943 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0129489898682 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000607013702393 s for generating Gcode 
+0.000801086425781 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.00140905380249 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.00081992149353 s calculating bounds 
+    calculating infill 
+8.10623168945e-06 s for calculating zigzag pattern 
+0.000180006027222 s for calculating zigzag + rotating 
+0.00628209114075 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  37 
+0.114326000214 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0148239135742 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.00050687789917 s for generating Gcode 
+0.000676870346069 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.00186705589294 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.00113701820374 s calculating bounds 
+    calculating infill 
+1.50203704834e-05 s for calculating zigzag pattern 
+0.000219106674194 s for calculating zigzag + rotating 
+0.0294570922852 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  79 
+0.137051105499 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0115098953247 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000771045684814 s for generating Gcode 
+0.000976085662842 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.000787019729614 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000452041625977 s calculating bounds 
+    calculating infill 
+1.28746032715e-05 s for calculating zigzag pattern 
+0.000173807144165 s for calculating zigzag + rotating 
+0.00542283058167 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  59 
+0.11362695694 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.013011932373 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000638008117676 s for generating Gcode 
+0.00090503692627 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.000738143920898 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000442028045654 s calculating bounds 
+    calculating infill 
+1.50203704834e-05 s for calculating zigzag pattern 
+0.000181198120117 s for calculating zigzag + rotating 
+0.0055570602417 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  55 
+0.113713026047 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0122981071472 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000591039657593 s for generating Gcode 
+0.000756978988647 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.000818967819214 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000416040420532 s calculating bounds 
+    calculating infill 
+1.50203704834e-05 s for calculating zigzag pattern 
+0.000200986862183 s for calculating zigzag + rotating 
+0.00553393363953 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  55 
+0.113708019257 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0147378444672 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000699043273926 s for generating Gcode 
+0.000946044921875 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.000761032104492 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.00040602684021 s calculating bounds 
+    calculating infill 
+1.38282775879e-05 s for calculating zigzag pattern 
+0.000228881835938 s for calculating zigzag + rotating 
+0.0055718421936 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  55 
+0.114372014999 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0121049880981 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000723838806152 s for generating Gcode 
+0.000902891159058 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.00109004974365 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000507831573486 s calculating bounds 
+    calculating infill 
+7.86781311035e-06 s for calculating zigzag pattern 
+0.000236988067627 s for calculating zigzag + rotating 
+0.00267601013184 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  21 
+0.110231876373 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0114150047302 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000913143157959 s for generating Gcode 
+0.00125002861023 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.000818014144897 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000455141067505 s calculating bounds 
+    calculating infill 
+1.09672546387e-05 s for calculating zigzag pattern 
+0.000277996063232 s for calculating zigzag + rotating 
+0.00354504585266 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  27 
+0.11106801033 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0119071006775 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000649929046631 s for generating Gcode 
+0.00111389160156 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.000855922698975 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000550031661987 s calculating bounds 
+    calculating infill 
+1.8835067749e-05 s for calculating zigzag pattern 
+0.000210046768188 s for calculating zigzag + rotating 
+0.00547194480896 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  55 
+0.11264705658 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0125489234924 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.00112986564636 s for generating Gcode 
+0.00133895874023 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.000877141952515 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000685930252075 s calculating bounds 
+    calculating infill 
+3.00407409668e-05 s for calculating zigzag pattern 
+0.000339031219482 s for calculating zigzag + rotating 
+0.00594806671143 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  61 
+0.11705493927 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0136208534241 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000732898712158 s for generating Gcode 
+0.000941038131714 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.00091290473938 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000450849533081 s calculating bounds 
+    calculating infill 
+2.38418579102e-05 s for calculating zigzag pattern 
+0.000275850296021 s for calculating zigzag + rotating 
+0.0137169361115 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  103 
+0.120069980621 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0138561725616 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000956058502197 s for generating Gcode 
+0.00129199028015 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.00274705886841 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.00162315368652 s calculating bounds 
+    calculating infill 
+1.19209289551e-05 s for calculating zigzag pattern 
+0.000188827514648 s for calculating zigzag + rotating 
+0.024405002594 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  67 
+0.131927013397 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.015743970871 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.00065803527832 s for generating Gcode 
+0.00094199180603 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.00137186050415 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000813007354736 s calculating bounds 
+    calculating infill 
+9.77516174316e-06 s for calculating zigzag pattern 
+0.00141882896423 s for calculating zigzag + rotating 
+0.0121428966522 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  49 
+0.119020938873 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0121409893036 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000545024871826 s for generating Gcode 
+0.000797986984253 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.000782012939453 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000629901885986 s calculating bounds 
+    calculating infill 
+1.78813934326e-05 s for calculating zigzag pattern 
+0.000241041183472 s for calculating zigzag + rotating 
+0.00662302970886 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  73 
+0.113617897034 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0145330429077 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000711917877197 s for generating Gcode 
+0.000941038131714 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.000672101974487 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000612020492554 s calculating bounds 
+    calculating infill 
+2.47955322266e-05 s for calculating zigzag pattern 
+0.000484943389893 s for calculating zigzag + rotating 
+0.00574684143066 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  73 
+0.113539934158 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0138490200043 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000818014144897 s for generating Gcode 
+0.00105714797974 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.00073504447937 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000339984893799 s calculating bounds 
+    calculating infill 
+1.59740447998e-05 s for calculating zigzag pattern 
+0.000203132629395 s for calculating zigzag + rotating 
+0.00509119033813 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  73 
+0.11409497261 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0130159854889 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.00066614151001 s for generating Gcode 
+0.000846147537231 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.000613927841187 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000441074371338 s calculating bounds 
+    calculating infill 
+1.69277191162e-05 s for calculating zigzag pattern 
+0.000202894210815 s for calculating zigzag + rotating 
+0.00531005859375 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  73 
+0.113802909851 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0122628211975 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000888109207153 s for generating Gcode 
+0.00106406211853 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.000814914703369 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000387907028198 s calculating bounds 
+    calculating infill 
+2.09808349609e-05 s for calculating zigzag pattern 
+0.000277996063232 s for calculating zigzag + rotating 
+0.00636196136475 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  73 
+0.113857984543 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0131449699402 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000729084014893 s for generating Gcode 
+0.000986099243164 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.000869989395142 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000458002090454 s calculating bounds 
+    calculating infill 
+1.62124633789e-05 s for calculating zigzag pattern 
+0.000335216522217 s for calculating zigzag + rotating 
+0.00645804405212 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  73 
+0.11562204361 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0127019882202 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.00073504447937 s for generating Gcode 
+0.00100111961365 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.00385499000549 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000458955764771 s calculating bounds 
+    calculating infill 
+2.71797180176e-05 s for calculating zigzag pattern 
+0.000325202941895 s for calculating zigzag + rotating 
+0.00867104530334 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  73 
+0.115872144699 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0128879547119 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000731945037842 s for generating Gcode 
+0.00102806091309 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.000859975814819 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000517129898071 s calculating bounds 
+    calculating infill 
+1.78813934326e-05 s for calculating zigzag pattern 
+0.000241994857788 s for calculating zigzag + rotating 
+0.00676298141479 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  73 
+0.116741895676 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0139989852905 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.00078296661377 s for generating Gcode 
+0.00111484527588 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.00149512290955 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000690937042236 s calculating bounds 
+    calculating infill 
+9.05990600586e-06 s for calculating zigzag pattern 
+0.000159025192261 s for calculating zigzag + rotating 
+0.00517702102661 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  29 
+0.113126993179 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0149178504944 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000488042831421 s for generating Gcode 
+0.000648975372314 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.000956058502197 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000559091567993 s calculating bounds 
+    calculating infill 
+1.69277191162e-05 s for calculating zigzag pattern 
+0.000293016433716 s for calculating zigzag + rotating 
+0.00680494308472 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  73 
+0.114029884338 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0149669647217 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000658988952637 s for generating Gcode 
+0.000839948654175 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.000756978988647 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.00041389465332 s calculating bounds 
+    calculating infill 
+1.78813934326e-05 s for calculating zigzag pattern 
+0.000309944152832 s for calculating zigzag + rotating 
+0.00712490081787 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  73 
+0.11462688446 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0142579078674 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000736951828003 s for generating Gcode 
+0.000935077667236 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.00102114677429 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000557899475098 s calculating bounds 
+    calculating infill 
+2.19345092773e-05 s for calculating zigzag pattern 
+0.000205993652344 s for calculating zigzag + rotating 
+0.00680184364319 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  73 
+0.11400103569 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0129821300507 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000746011734009 s for generating Gcode 
+0.000946044921875 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.00128316879272 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000801086425781 s calculating bounds 
+    calculating infill 
+1.12056732178e-05 s for calculating zigzag pattern 
+0.000169992446899 s for calculating zigzag + rotating 
+0.00760912895203 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  45 
+0.116680145264 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0156390666962 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000550985336304 s for generating Gcode 
+0.00107789039612 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.000847816467285 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000442028045654 s calculating bounds 
+    calculating infill 
+1.81198120117e-05 s for calculating zigzag pattern 
+0.00032114982605 s for calculating zigzag + rotating 
+0.00689911842346 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  73 
+0.115230083466 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0165810585022 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000869989395142 s for generating Gcode 
+0.00117993354797 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.000831842422485 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000523090362549 s calculating bounds 
+    calculating infill 
+1.21593475342e-05 s for calculating zigzag pattern 
+0.000227212905884 s for calculating zigzag + rotating 
+0.00409722328186 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  37 
+0.111869096756 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0143401622772 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000600814819336 s for generating Gcode 
+0.000816822052002 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.00079607963562 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000396966934204 s calculating bounds 
+    calculating infill 
+1.62124633789e-05 s for calculating zigzag pattern 
+0.000226020812988 s for calculating zigzag + rotating 
+0.00690221786499 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  73 
+0.114328145981 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0138289928436 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000766038894653 s for generating Gcode 
+0.00101709365845 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.000848770141602 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000479936599731 s calculating bounds 
+    calculating infill 
+2.19345092773e-05 s for calculating zigzag pattern 
+0.000198841094971 s for calculating zigzag + rotating 
+0.00839686393738 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  71 
+0.116064786911 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0150721073151 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.00074291229248 s for generating Gcode 
+0.000954866409302 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.00129795074463 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000715017318726 s calculating bounds 
+    calculating infill 
+1.90734863281e-05 s for calculating zigzag pattern 
+0.000550031661987 s for calculating zigzag + rotating 
+0.00486707687378 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  19 
+0.112555027008 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0165770053864 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.00048303604126 s for generating Gcode 
+0.000638961791992 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.00113797187805 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.00071907043457 s calculating bounds 
+    calculating infill 
+1.81198120117e-05 s for calculating zigzag pattern 
+0.000241041183472 s for calculating zigzag + rotating 
+0.00617694854736 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  55 
+0.115148067474 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0144009590149 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000781059265137 s for generating Gcode 
+0.00112509727478 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.00126910209656 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.000521898269653 s calculating bounds 
+    calculating infill 
+1.31130218506e-05 s for calculating zigzag pattern 
+0.000179052352905 s for calculating zigzag + rotating 
+0.00645399093628 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  55 
+0.115523099899 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0137808322906 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000952959060669 s for generating Gcode 
+0.00117206573486 s for path selection 
+    start csp transformation 
+csp legth:  1 
+    finished csp transformation 
+0.00132918357849 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.00092601776123 s calculating bounds 
+    calculating infill 
+1.31130218506e-05 s for calculating zigzag pattern 
+0.000255107879639 s for calculating zigzag + rotating 
+0.0144340991974 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  51 
+0.121634960175 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.015750169754 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.000579833984375 s for generating Gcode 
+0.000897884368896 s for path selection 
+    start csp transformation 
+csp legth:  70 
+    finished csp transformation 
+0.0150101184845 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.0264229774475 s calculating bounds 
+    calculating infill 
+8.39233398438e-05 s for calculating zigzag pattern 
+0.000349044799805 s for calculating zigzag + rotating 
+1.92715001106 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  2651 
+9.24716711044 s for calculating infill 
+offset_y:  0 
+    drawing curve 
+0.0230259895325 s for drawing curve 
+    drawing curve 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+0.0115151405334 s for generating Gcode 
+=================================================================== 
+Finished filling area 09.09.2018 15:28:37 
+=================================================================== 
+19.0917608738 s for infill 
+    Found orientation points in 'None' layer: [[[100.0, 100.0], [100.0, 0.0, 0.0]], [[0.0, 100.0], [0.0, 0.0, 0.0]]] 
+=================================================================== 
+Start doing parameters 09.09.2018 15:28:37 
+=================================================================== 
+Total number of points  21 
+Number of removed points:  9 
+Total number of points  15 
+Number of removed points:  9 
+Total number of points  41 
+Number of removed points:  14 
+Total number of points  15 
+Number of removed points:  1 
+Total number of points  36 
+Number of removed points:  18 
+Total number of points  36 
+Number of removed points:  8 
+Total number of points  19 
+Number of removed points:  1 
+Total number of points  46 
+Number of removed points:  17 
+Total number of points  33 
+Number of removed points:  5 
+Total number of points  78 
+Number of removed points:  22 
+Total number of points  117 
+Number of removed points:  34 
+Total number of points  38 
+Number of removed points:  13 
+Total number of points  23 
+Number of removed points:  9 
+Total number of points  17 
+Number of removed points:  5 
+Total number of points  17 
+Number of removed points:  5 
+Total number of points  17 
+Number of removed points:  5 
+Total number of points  23 
+Number of removed points:  9 
+Total number of points  23 
+Number of removed points:  9 
+Total number of points  23 
+Number of removed points:  9 
+Total number of points  25 
+Number of removed points:  9 
+Total number of points  25 
+Number of removed points:  9 
+Total number of points  25 
+Number of removed points:  9 
+Total number of points  25 
+Number of removed points:  9 
+Total number of points  25 
+Number of removed points:  9 
+Total number of points  25 
+Number of removed points:  9 
+Total number of points  25 
+Number of removed points:  9 
+Total number of points  51 
+Number of removed points:  5 
+Total number of points  29 
+Number of removed points:  7 
+Total number of points  23 
+Number of removed points:  9 
+Total number of points  17 
+Number of removed points:  5 
+Total number of points  17 
+Number of removed points:  5 
+Total number of points  17 
+Number of removed points:  5 
+Total number of points  19 
+Number of removed points:  7 
+Total number of points  28 
+Number of removed points:  16 
+Total number of points  19 
+Number of removed points:  7 
+Total number of points  23 
+Number of removed points:  9 
+Total number of points  62 
+Number of removed points:  17 
+Total number of points  98 
+Number of removed points:  19 
+Total number of points  25 
+Number of removed points:  11 
+Total number of points  25 
+Number of removed points:  11 
+Total number of points  25 
+Number of removed points:  9 
+Total number of points  25 
+Number of removed points:  9 
+Total number of points  39 
+Number of removed points:  20 
+Total number of points  27 
+Number of removed points:  8 
+Total number of points  25 
+Number of removed points:  9 
+Total number of points  25 
+Number of removed points:  9 
+Total number of points  25 
+Number of removed points:  9 
+Total number of points  150 
+Number of removed points:  35 
+Total number of points  66 
+Number of removed points:  23 
+Total number of points  23 
+Number of removed points:  9 
+Total number of points  17 
+Number of removed points:  5 
+Total number of points  17 
+Number of removed points:  5 
+Total number of points  17 
+Number of removed points:  5 
+Total number of points  23 
+Number of removed points:  9 
+Total number of points  23 
+Number of removed points:  9 
+Total number of points  23 
+Number of removed points:  9 
+Total number of points  25 
+Number of removed points:  9 
+Total number of points  55 
+Number of removed points:  25 
+Total number of points  25 
+Number of removed points:  9 
+Total number of points  25 
+Number of removed points:  9 
+Total number of points  25 
+Number of removed points:  9 
+Total number of points  53 
+Number of removed points:  8 
+Total number of points  25 
+Number of removed points:  9 
+Total number of points  24 
+Number of removed points:  1 
+Total number of points  25 
+Number of removed points:  9 
+Total number of points  25 
+Number of removed points:  9 
+Total number of points  62 
+Number of removed points:  30 
+Total number of points  43 
+Number of removed points:  11 
+Total number of points  39 
+Number of removed points:  15 
+Total number of points  65 
+Number of removed points:  3 
+Total number of points  1814 
+Number of removed points:  588 
+    Laser parameters: {'feed': 1100, 'penetration feed': 1100, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
+    working on curve 
+=================================================================== 
+Finished doing parameters 09.09.2018 15:28:42 
+=================================================================== 
+5.26813292503 s for parameters 

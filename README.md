@@ -54,11 +54,13 @@ https://github.com/nevir/readable-licenses/blob/master/markdown/GPLv2-LICENSE.md
 
 ## Open Bugs
 - Scaling factor needs to be Set to 1
-- displayed units need to be set to mm
+- displayed units needs to be set to mm
 
 ## Features to be implemented / tested
+- Make Laser On/Off command configurable
+- remove G00 instructions witout actual coordinates --> implemented but untested
 - make offsets work
-- check if *Passes* feature works
+- check if *Passes* feature works --> should work on contours and infill --> currently untestet on machine
 - make a help section in the ui with the step by step instructions
 - performance improvements / multithreading
 

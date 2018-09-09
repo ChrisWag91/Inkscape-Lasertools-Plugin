@@ -11,4 +11,5 @@ inkex.pyc
 simplepath.pyc
 simplestyle.pyc
 simpletransform.pyc
+*.ngc
 

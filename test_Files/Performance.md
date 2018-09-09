@@ -92,3 +92,34 @@
 ### Results
 - 5.63703203201 s for infill 
 - 15.0216479301 s for parameters 
+
+# Test Removing emty G00 Instructions
+
+
+## Test With empty G00 Instructions
+### Settings
+- Beam with: 0.35
+- Passes: 1
+- Create log: true
+- Multithreading: true
+
+### Results
+- 11695 Lines of G-Code
+- 8.39188909531 s for infill
+- 19.0251300335 s for parameters
+
+## Test Without empty G00 Instructions
+### Settings
+- Beam with: 0.35
+- Passes: 1
+- Create log: true
+- Multithreading: true
+
+### Results
+- 10247 Lines of G-Code
+- 8.09686088562 s for infill
+- 18.9610948563 s for parameters 
+
+## Conclusion
+no significant perfomance impact; generates cleaner code
+modification untested
