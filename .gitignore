@@ -12,4 +12,5 @@ simplepath.pyc
 simplestyle.pyc
 simpletransform.pyc
 *.ngc
+log.txt
 
