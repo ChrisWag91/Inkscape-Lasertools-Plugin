@@ -64,10 +64,12 @@ if "errormsg" not in dir(inkex):
 
 gcode = ""
 
-enableMultithreading = False
 noOfThreads = 4
 csp = []
 profiling = True  # Disable if not debuging
+
+if profiling:
+    import lsprofcalltree
 
 timestamp = datetime.datetime.fromtimestamp
 math.pi2 = math.pi*2
@@ -1614,7 +1616,7 @@ class laser_gcode(inkex.Effect):
                             checkIfLineInsideShape, splitted_line)
 
                         pool.close()
-                        pool.join()  
+                        pool.join()
 
                     else:
                         while i < len(splitted_line):
@@ -2000,10 +2002,11 @@ class laser_gcode(inkex.Effect):
                                 for b in xrange(bits):  # divide line into bits
                                     x1 = x1a+ny*(b*bitlen+bit0)
                                     y1 = y1a-nx*(b*bitlen+bit0)
+                                    
+                                    print_("calling get_biggest with parameters ", x1, y1, nx, ny)
                                     jjmin, iimin = get_biggest(
-                                        x1, y1, nx, ny)
-                                    # print_("i,j,jjmin,iimin,w",i,j,jjmin,iimin,w)
-                                    # print_("jjmin,iimin ", jjmin, iimin)
+                                        x1, y1, nx, ny)                                    
+                                    print_("Results for jjmin,iimin ", jjmin, iimin)
 
                                     if reflex:  # just after a reflex corner
                                         reflex = False
@@ -2177,7 +2180,7 @@ class laser_gcode(inkex.Effect):
         if self.options.add_contours:
             self.get_info()
             self.selected_paths = self.paths
-            '''
+            #'''
             if profiling:
                 if os.path.isfile(self.options.directory+"performance.prof"):
                     os.remove(self.options.directory+"/performance.prof")
@@ -2191,7 +2194,7 @@ class laser_gcode(inkex.Effect):
                 kFile = open(self.options.directory+"/performance.prof", 'w+')
                 kProfile.output(kFile)
                 kFile.close()
-            '''
+            #'''
             self.engraving()
 
 

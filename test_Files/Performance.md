@@ -122,4 +122,4 @@
 
 ## Conclusion
 no significant perfomance impact; generates cleaner code
-modification untested
+
