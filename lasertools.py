@@ -65,7 +65,7 @@ gcode = ""
 
 noOfThreads = 4
 csp = []
-profiling = True  # Disable if not debuging
+profiling = False  # Disable if not debuging
 
 if profiling:
     import lsprofcalltree
@@ -354,7 +354,7 @@ def csp_subpath_line_to(subpath, points):
 
 
 ################################################################################
-# Area Fill stuff
+# Area Fill Stuff
 ################################################################################
 
 def point_inside_csp(p, csp, on_the_path=True):
