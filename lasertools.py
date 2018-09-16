@@ -49,7 +49,6 @@ import numpy
 import gettext
 _ = gettext.gettext
 
-
 # Check if inkex has errormsg (0.46 version doesnot have one.) Could be removed later.
 if "errormsg" not in dir(inkex):
     inkex.errormsg = lambda msg: sys.stderr.write(
@@ -1708,58 +1707,6 @@ class laser_gcode(inkex.Effect):
             return (cosBis/costurn, sinBis/costurn, sinturn)
             # end bisect
 
-        def get_radius_to_line(x1, y1, nx1, ny1, nx2, ny2, x2, y2, nx23, ny23, x3, y3, nx3, ny3):
-
-            global max_dist
-
-            # Start by converting coordinates to be relative to x1,y1
-            x2, y2 = x2-x1, y2-y1
-            x3, y3 = x3-x1, y3-y1
-
-            # Make sure the line in question is facing x1,y1 and vice versa
-            dist = -x2*nx23-y2*ny23
-            if dist < 0:
-                return max_dist
-            denom = 1.-nx23*nx1-ny23*ny1
-            if denom < engraving_tolerance:
-                return max_dist
-
-            # radius and centre are:
-            r = dist/denom
-            cx = r*nx1
-            cy = r*ny1
-            # if c is not between the angle bisectors at the ends of the line, ignore
-            # Use vector cross products. Not sure if I need the .0001 safety margins:
-            if (x2-cx)*ny2 > (y2-cy)*nx2 + 0.0001:
-                return max_dist
-            if (x3-cx)*ny3 < (y3-cy)*nx3 - 0.0001:
-                return max_dist
-            return min(r, max_dist)
-            # end of get_radius_to_line
-
-        def get_radius_to_point(x1, y1, nx, ny, x2, y2):
-
-            global max_dist
-            # Start by converting coordinates to be relative to x1,y1
-            x2, y2 = x2-x1, y2-y1
-            denom = nx**2+ny**2-1
-            if denom <= engraving_tolerance:  # Not a corner bisector
-                if denom == -1:  # Find circle centre x1,y1
-                    return math.sqrt(x2**2+y2**2)
-                # if x2,y2 not in front of the normal...
-                if x2*nx+y2*ny <= 0:
-                    return max_dist
-                # print_("Straight",x1,y1,nx,ny,x2,y2)
-                return (x2**2+y2**2)/(2*(x2*nx+y2*ny))
-            # It is a corner bisector, so..
-            discriminator = (x2*nx+y2*ny)**2 - denom*(x2**2+y2**2)
-            if discriminator < 0:
-                return max_dist  # this part irrelevant
-            r = (x2*nx+y2*ny - math.sqrt(discriminator))/denom
-            # print_("Corner",x1,y1,nx,ny,x1+x2,y1+y2,discriminator,r)
-            return min(r, max_dist)
-            # end of get_radius_to_point
-
         def bez_divide(a, b, c, d):
 
             bx = b[0]-a[0]
@@ -1787,58 +1734,7 @@ class laser_gcode(inkex.Effect):
             return bez_divide(a, [abx, aby], [abcx, abcy], m) + bez_divide(m, [bcdx, bcdy], [cdx, cdy], d)
             # end of bez_divide
 
-        def get_biggest(x1, y1, nx, ny):
-
-            global nlLT, i, j
-            n1 = nlLT[j][i-1]  # current node
-            jjmin = -1
-            iimin = -1
-
-            for jj in xrange(0, len(nlLT)):  # for every subpath of this object
-                for ii in xrange(0, len(nlLT[jj])):  # for every point and line
-                    if nlLT[jj][ii-1][2]:  # if a point
-                        if jj == j:  # except this one
-                            if abs(ii-i) < 3 or abs(ii-i) > len(nlLT[j])-3:
-                                continue
-                        t1 = get_radius_to_point(
-                            x1, y1, nx, ny, nlLT[jj][ii-1][0][0], nlLT[jj][ii-1][0][1])
-
-                        # print_("Try pt   i,ii,t1,x1,y1",i,ii,t1,x1,y1)
-                    else:  # doing a line
-                        if jj == j:  # except this one
-                            if abs(ii-i) < 2 or abs(ii-i) == len(nlLT[j])-1:
-                                continue
-                            if abs(ii-i) == 2 and nlLT[j][(ii+i)/2-1][3] <= 0:
-                                continue
-                            if (abs(ii-i) == len(nlLT[j])-2) and nlLT[j][-1][3] <= 0:
-                                continue
-                        nx2, ny2 = nlLT[jj][ii-2][1]
-                        x2, y2 = nlLT[jj][ii-1][0]
-                        nx23, ny23 = nlLT[jj][ii-1][1]
-                        x3, y3 = nlLT[jj][ii][0]
-                        nx3, ny3 = nlLT[jj][ii][1]
-                        if nlLT[jj][ii-2][3] > 0:  # acute, so use normal, not bisector
-                            nx2 = nx23
-                            ny2 = ny23
-                        if nlLT[jj][ii][3] > 0:  # acute, so use normal, not bisector
-                            nx3 = nx23
-                            ny3 = ny23
-                        x23min, x23max = min(x2, x3), max(x2, x3)
-                        y23min, y23max = min(y2, y3), max(y2, y3)
-                        # see if line in range
-                        if n1[2] == False and (x23max < x1 or x23min > x1 or y23max < 1 or y23min > y1):
-                            continue
-                        t1 = get_radius_to_line(
-                            x1, y1, nx, ny, nx2, ny2, x2, y2, nx23, ny23, x3, y3, nx3, ny3)
-                        # print_("Try line i,ii,t1,x1,y1",i,ii,t1,x1,y1)
-                    if 0 <= t1:
-                        iimin = ii
-                        jjmin = jj
-                        #print_("iimin, jjmin:", ii, jj)
-            return (jjmin, iimin)
-            # end of get_biggest
-
-        def save_point(x, y, i, j, ii, jj):
+        def save_point(x, y, i, j):
 
             global cspm
 
@@ -1846,10 +1742,10 @@ class laser_gcode(inkex.Effect):
             y = round(y, 3)  # round to 3 decimals
 
             if len(cspm) > 1:
-                _, xy1, _, i1, j1, ii1, jj1 = cspm[-1]
-                if i == i1 and j == j1 and ii == ii1 and jj == jj1:  # one match
-                    _, xy2, _, i1, j1, ii1, jj1 = cspm[-2]
-                    if i == i1 and j == j1 and ii == ii1 and jj == jj1:  # two matches. Now test linearity
+                _, xy1, _, i1, j1 = cspm[-1]
+                if i == i1 and j == j1:  # one match
+                    _, xy2, _, i1, j1 = cspm[-2]
+                    if i == i1 and j == j1:  # two matches. Now test linearity
                         length1 = math.hypot(xy1[0]-x, xy1[1]-y)
                         length2 = math.hypot(xy2[0]-x, xy2[1]-y)
                         length12 = math.hypot(xy2[0]-xy1[0], xy2[1]-xy1[1])
@@ -1859,7 +1755,7 @@ class laser_gcode(inkex.Effect):
                                 (xy2[0]-x)*(xy1[1]-y)-(xy1[0]-x)*(xy2[1]-y))/length2
                             if xydist < engraving_tolerance:  # so far so good
                                 cspm.pop()
-            cspm += [[[x, y], [x, y], [x, y], i, j, ii, jj]]
+            cspm += [[[x, y], [x, y], [x, y], i, j]]
 
             # end of save_point
 
@@ -2002,25 +1898,15 @@ class laser_gcode(inkex.Effect):
                                 for b in xrange(bits):  # divide line into bits
                                     x1 = x1a+ny*(b*bitlen+bit0)
                                     y1 = y1a-nx*(b*bitlen+bit0)
-                                    
-                                    print_("calling get_biggest with parameters ", x1, y1, nx, ny)
-                                    jjmin, iimin = get_biggest(
-                                        x1, y1, nx, ny)                                    
-                                    print_("Results for jjmin,iimin ", jjmin, iimin)
 
                                     if reflex:  # just after a reflex corner
                                         reflex = False
                                     if n1[2] == True:  # We're at a corner
                                         if n1[3] > 0:  # acute
-                                            save_point(
-                                                x1, y1, i, j, iimin, jjmin)
-                                            save_point(
-                                                x1, y1, i, j, iimin, jjmin)
-                                    # acute corner coming up
-                                    elif b > 0 and n2[3] > 0 and not self.options.engraving_draw_calculation_paths:
-                                        if jjmin == j and iimin == i+2:
-                                            break
-                                    save_point(x1, y1, i, j, iimin, jjmin)
+                                            save_point(x1, y1, i, j)
+                                            save_point(x1, y1, i, j)
+
+                                    save_point(x1, y1, i, j)
 
                                 # LT end of for each bit of this line
                                 if n1[2] == True and n1[3] < 0:  # reflex angle
