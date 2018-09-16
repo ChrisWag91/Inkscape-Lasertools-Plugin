@@ -1,12 +1,12 @@
 events: Ticks
-summary: 12097
+summary: 29521
 fi=<string>
 fn=<module> <string>:1
-1 6
+1 1
 cfn=engraving lasertools.py:1682
 cfi=lasertools.py
 calls=1 1682
-1 12091
+1 29520
 
 fi=/usr/lib/python2.7/site-packages/numpy/linalg/linalg.py
 fn=isComplexType /usr/lib/python2.7/site-packages/numpy/linalg/linalg.py:113
@@ -210,115 +210,115 @@ fn=('~', 0, '<time.strftime>')
 
 fi=/usr/share/inkscape/extensions/simplepath.py
 fn=lexPath /usr/share/inkscape/extensions/simplepath.py:24
-24 12
-cfn=compile /usr/lib/python2.7/re.py:192
-cfi=/usr/lib/python2.7/re.py
-calls=567 192
-24 1
+24 7
 cfn=('~', 0, '<len>')
 cfi=~
-calls=189 0
+calls=1 0
 24 0
-cfn=('~', 0, "<method 'end' of '_sre.SRE_Match' objects>")
-cfi=~
-calls=35889 0
-24 2
+cfn=compile /usr/lib/python2.7/re.py:192
+cfi=/usr/lib/python2.7/re.py
+calls=3 192
+24 0
 cfn=('~', 0, "<method 'match' of '_sre.SRE_Pattern' objects>")
 cfi=~
-calls=35667 0
-24 11
+calls=23356 0
+24 5
+cfn=('~', 0, "<method 'end' of '_sre.SRE_Match' objects>")
+cfi=~
+calls=23627 0
+24 1
 
 fi=/usr/share/inkscape/extensions/simplepath.py
 fn=parsePath /usr/share/inkscape/extensions/simplepath.py:73
-73 20
+73 10
 cfn=('~', 0, "<method 'islower' of 'str' objects>")
 cfi=~
-calls=11426 0
-73 0
-cfn=('~', 0, "<method 'isupper' of 'str' objects>")
-cfi=~
-calls=1641 0
-73 0
-cfn=('~', 0, "<method 'append' of 'list' objects>")
-cfi=~
-calls=13668 0
-73 1
-cfn=('~', 0, "<method 'lower' of 'str' objects>")
-cfi=~
-calls=1641 0
+calls=7603 0
 73 0
 cfn=('~', 0, "<method 'upper' of 'str' objects>")
 cfi=~
-calls=34877 0
-73 2
-cfn=lexPath /usr/share/inkscape/extensions/simplepath.py:24
-cfi=/usr/share/inkscape/extensions/simplepath.py
-calls=12215 24
-73 27
+calls=22995 0
+73 1
 cfn=('~', 0, "<method 'insert' of 'list' objects>")
 cfi=~
-calls=1 0
+calls=6 0
+73 0
+cfn=lexPath /usr/share/inkscape/extensions/simplepath.py:24
+cfi=/usr/share/inkscape/extensions/simplepath.py
+calls=7877 24
+73 14
+cfn=('~', 0, "<method 'lower' of 'str' objects>")
+cfi=~
+calls=1152 0
+73 0
+cfn=('~', 0, "<method 'isupper' of 'str' objects>")
+cfi=~
+calls=1152 0
+73 0
+cfn=('~', 0, "<method 'append' of 'list' objects>")
+cfi=~
+calls=9033 0
 73 0
 
 fi=/usr/share/inkscape/extensions/simplepath.py
 fn=formatPath /usr/share/inkscape/extensions/simplepath.py:165
-165 20
+165 5
 cfn=('~', 0, "<method 'join' of 'str' objects>")
 cfi=~
-calls=11816 0
-165 1
+calls=3160 0
+165 0
 
 fi=/usr/share/inkscape/extensions/cubicsuperpath.py
 fn=CubicSuperPath /usr/share/inkscape/extensions/cubicsuperpath.py:100
-100 2
+100 1
 cfn=('~', 0, "<method 'append' of 'list' objects>")
 cfi=~
-calls=2430 0
+calls=1483 0
 100 0
 
 fi=/usr/share/inkscape/extensions/cubicsuperpath.py
 fn=unCubicSuperPath /usr/share/inkscape/extensions/cubicsuperpath.py:153
-153 10
-cfn=('~', 0, "<method 'append' of 'list' objects>")
-cfi=~
-calls=11627 0
-153 0
+153 3
 cfn=('~', 0, '<len>')
 cfi=~
-calls=189 0
+calls=54 0
 153 0
 cfn=('~', 0, '<range>')
 cfi=~
-calls=189 0
+calls=54 0
+153 0
+cfn=('~', 0, "<method 'append' of 'list' objects>")
+cfi=~
+calls=3106 0
 153 0
 
 fi=/usr/share/inkscape/extensions/cubicsuperpath.py
 fn=parsePath /usr/share/inkscape/extensions/cubicsuperpath.py:162
 162 0
-cfn=CubicSuperPath /usr/share/inkscape/extensions/cubicsuperpath.py:100
-cfi=/usr/share/inkscape/extensions/cubicsuperpath.py
-calls=189 100
-162 2
 cfn=parsePath /usr/share/inkscape/extensions/simplepath.py:73
 cfi=/usr/share/inkscape/extensions/simplepath.py
-calls=189 73
-162 52
+calls=1 73
+162 26
+cfn=CubicSuperPath /usr/share/inkscape/extensions/cubicsuperpath.py:100
+cfi=/usr/share/inkscape/extensions/cubicsuperpath.py
+calls=1 100
+162 1
 
 fi=/usr/share/inkscape/extensions/cubicsuperpath.py
 fn=formatPath /usr/share/inkscape/extensions/cubicsuperpath.py:165
-165 1
+165 0
 cfn=unCubicSuperPath /usr/share/inkscape/extensions/cubicsuperpath.py:153
 cfi=/usr/share/inkscape/extensions/cubicsuperpath.py
-calls=189 153
-165 10
+calls=54 153
+165 3
 cfn=formatPath /usr/share/inkscape/extensions/simplepath.py:165
 cfi=/usr/share/inkscape/extensions/simplepath.py
-calls=189 165
-165 22
+calls=54 165
+165 5
 
 fi=/usr/share/inkscape/extensions/bezmisc.py
 fn=bezierparameterize /usr/share/inkscape/extensions/bezmisc.py:58
-58 2
+58 1
 
 fi=/usr/share/inkscape/extensions/simpletransform.py
 fn=parseTransform /usr/share/inkscape/extensions/simpletransform.py:26
@@ -362,7 +362,7 @@ fn=composeTransform /usr/share/inkscape/extensions/simpletransform.py:96
 
 fi=~
 fn=('~', 0, '<math.atan2>')
-0  1
+0  0
 
 fi=~
 fn=('~', 0, '<math.copysign>')
@@ -370,35 +370,35 @@ fn=('~', 0, '<math.copysign>')
 
 fi=~
 fn=('~', 0, '<math.hypot>')
-0  8
+0  3
 
 fi=~
 fn=('~', 0, '<math.sqrt>')
-0  4
+0  15
 
 fi=lasertools.py
 fn=biarc lasertools.py:643
-643 46
+643 13
 cfn=__init__ lasertools.py:589
 cfi=lasertools.py
-calls=45752 589
-643 13
+calls=12208 589
+643 3
 cfn=__sub__ lasertools.py:597
 cfi=lasertools.py
-calls=34314 597
-643 47
+calls=9156 597
+643 19
 cfn=__neg__ lasertools.py:599
 cfi=lasertools.py
-calls=11438 599
-643 6
+calls=3052 599
+643 1
 cfn=angle lasertools.py:625
 cfi=lasertools.py
-calls=22876 625
-643 6
+calls=6104 625
+643 1
 cfn=mag lasertools.py:609
 cfi=lasertools.py
-calls=22876 609
-643 6
+calls=6104 609
+643 1
 
 fi=lasertools.py
 fn=export_gcode lasertools.py:964
@@ -406,12 +406,12 @@ fn=export_gcode lasertools.py:964
 cfn=('~', 0, "<method 'write' of 'file' objects>")
 cfi=~
 calls=1 0
-964 2
-cfn=('~', 0, "<method 'close' of 'file' objects>")
+964 0
+cfn=('~', 0, '<open>')
 cfi=~
 calls=1 0
 964 0
-cfn=('~', 0, '<open>')
+cfn=('~', 0, "<method 'close' of 'file' objects>")
 cfi=~
 calls=1 0
 964 0
@@ -422,39 +422,39 @@ calls=1 0
 
 fi=lasertools.py
 fn=parse_curve lasertools.py:1013
-1013 27
-cfn=transform_csp lasertools.py:1303
+1013 6
+cfn=biarc lasertools.py:643
 cfi=lasertools.py
-calls=1 1303
-1013 36
-cfn=('~', 0, '<max>')
-cfi=~
-calls=17766 0
-1013 1
+calls=3052 643
+1013 41
 cfn=('~', 0, '<len>')
 cfi=~
-calls=568 0
+calls=163 0
+1013 0
+cfn=('~', 0, '<max>')
+cfi=~
+calls=1431 0
 1013 0
 cfn=('~', 0, '<range>')
 cfi=~
-calls=23254 0
-1013 2
-cfn=biarc lasertools.py:643
+calls=6212 0
+1013 0
+cfn=transform_csp lasertools.py:1303
 cfi=lasertools.py
-calls=11438 643
-1013 126
+calls=1 1303
+1013 9
 
 fi=lasertools.py
 fn=draw_curve lasertools.py:1047
-1047 50
+1047 13
 cfn=addNS /usr/share/inkscape/extensions/inkex.py:132
 cfi=/usr/share/inkscape/extensions/inkex.py
-calls=11438 132
-1047 12
+calls=3052 132
+1047 3
 cfn=transform lasertools.py:1223
 cfi=lasertools.py
-calls=11819 1223
-1047 6
+calls=3163 1223
+1047 1
 cfn=formatStyle /usr/share/inkscape/extensions/simplestyle.py:181
 cfi=/usr/share/inkscape/extensions/simplestyle.py
 calls=2 181
@@ -466,31 +466,31 @@ calls=2 174
 cfn=get_defs lasertools.py:1361
 cfi=lasertools.py
 calls=1 1361
-1047 21
+1047 4
 
 fi=lasertools.py
 fn=c lasertools.py:1156
-1156 29
-cfn=('~', 0, '<round>')
-cfi=~
-calls=23254 0
-1156 12
+1156 8
 cfn=('~', 0, '<len>')
 cfi=~
-calls=69762 0
-1156 2
+calls=18636 0
+1156 0
 cfn=('~', 0, '<range>')
 cfi=~
-calls=23254 0
-1156 2
+calls=6212 0
+1156 0
+cfn=('~', 0, '<round>')
+cfi=~
+calls=6212 0
+1156 3
 cfn=('~', 0, "<method 'rstrip' of 'str' objects>")
 cfi=~
-calls=23254 0
-1156 2
+calls=6212 0
+1156 0
 
 fi=lasertools.py
 fn=generate_gcode lasertools.py:1149
-1149 7
+1149 2
 cfn=print_ lasertools.py:574
 cfi=lasertools.py
 calls=2 574
@@ -505,8 +505,8 @@ calls=1 0
 1149 0
 cfn=c lasertools.py:1156
 cfi=lasertools.py
-calls=11627 1156
-1149 48
+calls=3106 1156
+1149 13
 
 fi=lasertools.py
 fn=get_transforms lasertools.py:1202
@@ -518,11 +518,7 @@ calls=2 26
 
 fi=lasertools.py
 fn=transform lasertools.py:1223
-1223 21
-cfn=('~', 0, '<max>')
-cfi=~
-calls=1 0
-1223 0
+1223 6
 cfn=('~', 0, '<min>')
 cfi=~
 calls=1 0
@@ -531,9 +527,13 @@ cfn=('~', 0, '<len>')
 cfi=~
 calls=3 0
 1223 0
-cfn=det /usr/lib/python2.7/site-packages/numpy/linalg/linalg.py:1970
-cfi=/usr/lib/python2.7/site-packages/numpy/linalg/linalg.py
-calls=1 1970
+cfn=('~', 0, '<max>')
+cfi=~
+calls=1 0
+1223 0
+cfn=('~', 0, '<range>')
+cfi=~
+calls=5 0
 1223 0
 cfn=('~', 0, "<method 'index' of 'list' objects>")
 cfi=~
@@ -543,9 +543,9 @@ cfn=('~', 0, '<numpy.core.multiarray.array>')
 cfi=~
 calls=2 0
 1223 0
-cfn=('~', 0, '<range>')
-cfi=~
-calls=5 0
+cfn=det /usr/lib/python2.7/site-packages/numpy/linalg/linalg.py:1970
+cfi=/usr/lib/python2.7/site-packages/numpy/linalg/linalg.py
+calls=1 1970
 1223 0
 cfn=solve /usr/lib/python2.7/site-packages/numpy/linalg/linalg.py:319
 cfi=/usr/lib/python2.7/site-packages/numpy/linalg/linalg.py
@@ -562,91 +562,91 @@ calls=1 468
 
 fi=lasertools.py
 fn=transform_csp lasertools.py:1303
-1303 20
+1303 5
 cfn=('~', 0, '<len>')
 cfi=~
-calls=12007 0
+calls=3216 0
+1303 0
+cfn=('~', 0, '<range>')
+cfi=~
+calls=55 0
 1303 0
 cfn=transform lasertools.py:1223
 cfi=lasertools.py
-calls=34881 1223
-1303 15
-cfn=('~', 0, '<range>')
-cfi=~
-calls=190 0
-1303 0
+calls=9318 1223
+1303 4
 
 fi=lasertools.py
 fn=recursive lasertools.py:1364
-1364 7
+1364 1
 cfn=addNS /usr/share/inkscape/extensions/inkex.py:132
 cfi=/usr/share/inkscape/extensions/inkex.py
-calls=15524 132
-1364 14
+calls=2924 132
+1364 2
 cfn=recursive lasertools.py:1364
 cfi=lasertools.py
-calls=195 1364
-1364 21
+calls=6 1364
+1364 4
 
 fi=lasertools.py
 fn=print_ lasertools.py:574
-574 211
+574 76
 cfn=isdir /usr/lib/python2.7/genericpath.py:46
 cfi=/usr/lib/python2.7/genericpath.py
-calls=23939 46
-574 1824
+calls=6063 46
+574 571
 cfn=('~', 0, "<method 'write' of 'file' objects>")
 cfi=~
-calls=118915 0
-574 270
-cfn=('~', 0, "<method 'close' of 'file' objects>")
-cfi=~
-calls=23939 0
-574 1411
-cfn=('~', 0, "<method 'encode' of 'str' objects>")
-cfi=~
-calls=94976 0
-574 107
+calls=30287 0
+574 66
 cfn=('~', 0, '<open>')
 cfi=~
-calls=23939 0
-574 2292
+calls=6063 0
+574 544
+cfn=('~', 0, "<method 'close' of 'file' objects>")
+cfi=~
+calls=6063 0
+574 628
+cfn=('~', 0, "<method 'encode' of 'str' objects>")
+cfi=~
+calls=24224 0
+574 37
 
 fi=lasertools.py
 fn=__init__ lasertools.py:589
-589 27
+589 7
 
 fi=lasertools.py
 fn=__sub__ lasertools.py:597
-597 36
+597 16
 cfn=__init__ lasertools.py:589
 cfi=lasertools.py
-calls=34314 589
-597 10
+calls=9156 589
+597 2
 
 fi=lasertools.py
 fn=__neg__ lasertools.py:599
-599 3
+599 0
 cfn=__init__ lasertools.py:589
 cfi=lasertools.py
-calls=11438 589
-599 3
+calls=3052 589
+599 0
 
 fi=lasertools.py
 fn=mag lasertools.py:609
-609 4
+609 1
 cfn=('~', 0, '<math.hypot>')
 cfi=~
-calls=22876 0
-609 1
+calls=6104 0
+609 0
 
 fi=lasertools.py
 fn=angle lasertools.py:625
-625 4
+625 1
 cfn=('~', 0, '<math.atan2>')
 cfi=~
-calls=22876 0
-625 1
+calls=6104 0
+625 0
 
 fi=lasertools.py
 fn=get_defs lasertools.py:1361
@@ -654,191 +654,183 @@ fn=get_defs lasertools.py:1361
 cfn=recursive lasertools.py:1364
 cfi=lasertools.py
 calls=1 1364
-1361 21
+1361 4
 
 fi=lasertools.py
 fn=bisect lasertools.py:1688
-1688 9
+1688 2
 cfn=('~', 0, '<math.sqrt>')
 cfi=~
-calls=8370 0
+calls=2782 0
 1688 0
 cfn=('~', 0, '<max>')
 cfi=~
-calls=8370 0
-1688 1
+calls=2782 0
+1688 0
 cfn=('~', 0, '<math.copysign>')
 cfi=~
-calls=1345 0
+calls=291 0
 1688 0
 cfn=('~', 0, '<abs>')
 cfi=~
-calls=16743 0
+calls=5567 0
 1688 0
 
 fi=lasertools.py
 fn=get_radius_to_line lasertools.py:1711
-1711 298
+1711 2989
 cfn=('~', 0, '<min>')
 cfi=~
-calls=9855 0
-1711 0
+calls=171508 0
+1711 14
 
 fi=lasertools.py
 fn=get_radius_to_point lasertools.py:1740
-1740 533
-cfn=('~', 0, '<math.sqrt>')
-cfi=~
-calls=51360 0
-1740 3
+1740 3823
 cfn=('~', 0, '<min>')
 cfi=~
-calls=51360 0
-1740 4
+calls=324065 0
+1740 27
+cfn=('~', 0, '<math.sqrt>')
+cfi=~
+calls=324065 0
+1740 15
 
 fi=lasertools.py
 fn=bez_divide lasertools.py:1763
-1763 8
+1763 2
 cfn=bez_divide lasertools.py:1763
 cfi=lasertools.py
-calls=3272 1763
-1763 4
+calls=216 1763
+1763 0
 cfn=('~', 0, '<math.hypot>')
 cfi=~
-calls=5103 0
+calls=1399 0
 1763 0
 cfn=('~', 0, '<abs>')
 cfi=~
-calls=8640 0
+calls=2690 0
 1763 0
 
 fi=lasertools.py
 fn=get_biggest lasertools.py:1790
-1790 3516
-cfn=get_radius_to_point lasertools.py:1740
-cfi=lasertools.py
-calls=1167464 1740
-1790 542
-cfn=('~', 0, '<max>')
-cfi=~
-calls=2359566 0
-1790 213
-cfn=get_radius_to_line lasertools.py:1711
-cfi=lasertools.py
-calls=825825 1711
-1790 299
+1790 17106
 cfn=('~', 0, '<min>')
 cfi=~
-calls=2359566 0
-1790 226
+calls=17399100 0
+1790 1511
 cfn=('~', 0, '<len>')
 cfi=~
-calls=3557858 0
-1790 157
+calls=3588412 0
+1790 158
+cfn=get_radius_to_line lasertools.py:1711
+cfi=lasertools.py
+calls=8000894 1711
+1790 3003
+cfn=get_radius_to_point lasertools.py:1740
+cfi=lasertools.py
+calls=8409833 1740
+1790 3865
+cfn=('~', 0, '<max>')
+cfi=~
+calls=17399100 0
+1790 1448
 cfn=('~', 0, '<abs>')
 cfi=~
-calls=7126642 0
-1790 274
+calls=6834375 0
+1790 252
 
 fi=lasertools.py
 fn=save_point lasertools.py:1841
-1841 46
-cfn=('~', 0, '<round>')
-cfi=~
-calls=23568 0
-1841 51
+1841 14
 cfn=('~', 0, '<len>')
 cfi=~
-calls=11784 0
-1841 2
-cfn=('~', 0, "<method 'pop' of 'list' objects>")
-cfi=~
-calls=346 0
+calls=3052 0
 1841 0
 cfn=('~', 0, '<math.hypot>')
 cfi=~
-calls=1050 0
+calls=39 0
 1841 0
-cfn=('~', 0, '<abs>')
+cfn=('~', 0, '<round>')
 cfi=~
-calls=346 0
-1841 0
+calls=6104 0
+1841 24
 
 fi=lasertools.py
 fn=engraving lasertools.py:1682
-1682 157
+1682 55
+cfn=('~', 0, '<min>')
+cfi=~
+calls=2877 0
+1682 1
 cfn=print_ lasertools.py:574
 cfi=lasertools.py
-calls=23937 574
-1682 6118
-cfn=save_point lasertools.py:1841
-cfi=lasertools.py
-calls=11784 1841
-1682 101
-cfn=('~', 0, '<time.strftime>')
+calls=6061 574
+1682 1923
+cfn=('~', 0, '<len>')
 cfi=~
-calls=2 0
+calls=1718 0
 1682 0
 cfn=get_biggest lasertools.py:1790
 cfi=lasertools.py
-calls=11776 1790
-1682 5231
-cfn=('~', 0, "<method 'append' of 'list' objects>")
-cfi=~
-calls=189 0
-1682 0
+calls=3026 1790
+1682 27347
+cfn=save_point lasertools.py:1841
+cfi=lasertools.py
+calls=3052 1841
+1682 39
+cfn=csp_normalized_normal lasertools.py:324
+cfi=lasertools.py
+calls=2540 324
+1682 6
 cfn=bez_divide lasertools.py:1763
 cfi=lasertools.py
-calls=1831 1763
-1682 9
-cfn=('~', 0, '<min>')
-cfi=~
-calls=8354 0
-1682 3
-cfn=addNS /usr/share/inkscape/extensions/inkex.py:132
-cfi=/usr/share/inkscape/extensions/inkex.py
-calls=379 132
+calls=1183 1763
 1682 2
+cfn=bisect lasertools.py:1688
+cfi=lasertools.py
+calls=2782 1688
+1682 3
+cfn=('~', 0, '<math.hypot>')
+cfi=~
+calls=8580 0
+1682 3
 cfn=parsePath /usr/share/inkscape/extensions/cubicsuperpath.py:162
 cfi=/usr/share/inkscape/extensions/cubicsuperpath.py
-calls=189 162
-1682 55
-cfn=('~', 0, '<len>')
+calls=1 162
+1682 28
+cfn=('~', 0, '<time.strftime>')
 cfi=~
-calls=3565 0
+calls=2 0
 1682 0
 cfn=('~', 0, '<time.time>')
 cfi=~
 calls=2 0
 1682 0
-cfn=csp_normalized_normal lasertools.py:324
-cfi=lasertools.py
-calls=3726 324
-1682 11
-cfn=formatPath /usr/share/inkscape/extensions/cubicsuperpath.py:165
-cfi=/usr/share/inkscape/extensions/cubicsuperpath.py
-calls=189 165
-1682 34
-cfn=('~', 0, '<math.hypot>')
-cfi=~
-calls=23787 0
-1682 5
-cfn=bisect lasertools.py:1688
-cfi=lasertools.py
-calls=8370 1688
-1682 12
+cfn=addNS /usr/share/inkscape/extensions/inkex.py:132
+cfi=/usr/share/inkscape/extensions/inkex.py
+calls=56 132
+1682 0
 cfn=('~', 0, '<range>')
 cfi=~
-calls=3656 0
+calls=1349 0
+1682 0
+cfn=('~', 0, "<method 'append' of 'list' objects>")
+cfi=~
+calls=58 0
 1682 0
 cfn=('~', 0, '<abs>')
 cfi=~
-calls=2702 0
+calls=1810 0
 1682 0
+cfn=formatPath /usr/share/inkscape/extensions/cubicsuperpath.py:165
+cfi=/usr/share/inkscape/extensions/cubicsuperpath.py
+calls=54 165
+1682 9
 cfn=parse_curve lasertools.py:1013
 cfi=lasertools.py
 calls=1 1013
-1682 194
+1682 58
 cfn=get_transforms lasertools.py:1202
 cfi=lasertools.py
 calls=2 1202
@@ -846,23 +838,23 @@ calls=2 1202
 cfn=draw_curve lasertools.py:1047
 cfi=lasertools.py
 calls=1 1047
-1682 90
+1682 22
 cfn=generate_gcode lasertools.py:1149
 cfi=lasertools.py
 calls=1 1149
-1682 57
+1682 16
 cfn=export_gcode lasertools.py:964
 cfi=lasertools.py
 calls=1 964
-1682 3
+1682 1
 
 fi=/usr/share/inkscape/extensions/inkex.py
 fn=addNS /usr/share/inkscape/extensions/inkex.py:132
-132 26
+132 5
 cfn=('~', 0, '<len>')
 cfi=~
-calls=54682 0
-132 2
+calls=12064 0
+132 0
 
 fi=/usr/share/inkscape/extensions/simplestyle.py
 fn=parseStyle /usr/share/inkscape/extensions/simplestyle.py:174
@@ -894,38 +886,38 @@ calls=2 0
 
 fi=lasertools.py
 fn=csp_normalized_slope lasertools.py:285
-285 6
-cfn=('~', 0, '<math.sqrt>')
-cfi=~
-calls=3726 0
-285 0
+285 3
 cfn=bezierparameterize /usr/share/inkscape/extensions/bezmisc.py:58
 cfi=/usr/share/inkscape/extensions/bezmisc.py
-calls=3726 58
-285 2
+calls=2540 58
+285 1
+cfn=('~', 0, '<math.sqrt>')
+cfi=~
+calls=2540 0
+285 0
 cfn=('~', 0, '<abs>')
 cfi=~
-calls=3790 0
+calls=2715 0
 285 0
 
 fi=lasertools.py
 fn=csp_normalized_normal lasertools.py:324
-324 2
+324 0
 cfn=csp_normalized_slope lasertools.py:285
 cfi=lasertools.py
-calls=3726 285
-324 9
+calls=2540 285
+324 5
 
 fi=/usr/lib/python2.7/re.py
 fn=match /usr/lib/python2.7/re.py:138
 138 0
-cfn=_compile /usr/lib/python2.7/re.py:230
-cfi=/usr/lib/python2.7/re.py
-calls=2 230
-138 0
 cfn=('~', 0, "<method 'match' of '_sre.SRE_Pattern' objects>")
 cfi=~
 calls=2 0
+138 0
+cfn=_compile /usr/lib/python2.7/re.py:230
+cfi=/usr/lib/python2.7/re.py
+calls=2 230
 138 0
 
 fi=/usr/lib/python2.7/re.py
@@ -933,7 +925,7 @@ fn=compile /usr/lib/python2.7/re.py:192
 192 0
 cfn=_compile /usr/lib/python2.7/re.py:230
 cfi=/usr/lib/python2.7/re.py
-calls=567 230
+calls=3 230
 192 0
 
 fi=/usr/lib/python2.7/re.py
@@ -942,35 +934,35 @@ fn=_compile /usr/lib/python2.7/re.py:230
 
 fi=/usr/lib/python2.7/stat.py
 fn=S_IFMT /usr/lib/python2.7/stat.py:24
-24 6
+24 2
 
 fi=/usr/lib/python2.7/stat.py
 fn=S_ISDIR /usr/lib/python2.7/stat.py:40
-40 16
+40 5
 cfn=S_IFMT /usr/lib/python2.7/stat.py:24
 cfi=/usr/lib/python2.7/stat.py
-calls=23939 24
-40 6
+calls=6063 24
+40 2
 
 fi=/usr/lib/python2.7/genericpath.py
 fn=isdir /usr/lib/python2.7/genericpath.py:46
-46 37
+46 17
 cfn=S_ISDIR /usr/lib/python2.7/stat.py:40
 cfi=/usr/lib/python2.7/stat.py
-calls=23939 40
-46 22
+calls=6063 40
+46 8
 cfn=('~', 0, '<posix.stat>')
 cfi=~
-calls=23939 0
-46 1763
+calls=6063 0
+46 545
 
 fi=~
 fn=('~', 0, '<posix.stat>')
-0  1763
+0  545
 
 fi=~
 fn=('~', 0, '<abs>')
-0  276
+0  253
 
 fi=~
 fn=('~', 0, '<getattr>')
@@ -982,27 +974,27 @@ fn=('~', 0, '<issubclass>')
 
 fi=~
 fn=('~', 0, '<len>')
-0  165
+0  160
 
 fi=~
 fn=('~', 0, '<max>')
-0  216
+0  1448
 
 fi=~
 fn=('~', 0, '<min>')
-0  236
+0  1555
 
 fi=~
 fn=('~', 0, '<open>')
-0  2293
+0  544
 
 fi=~
 fn=('~', 0, '<range>')
-0  5
+0  1
 
 fi=~
 fn=('~', 0, '<round>')
-0  64
+0  28
 
 fi=~
 fn=('~', 0, "<method 'group' of '_sre.SRE_Match' objects>")
@@ -1010,15 +1002,15 @@ fn=('~', 0, "<method 'group' of '_sre.SRE_Match' objects>")
 
 fi=~
 fn=('~', 0, "<method 'end' of '_sre.SRE_Match' objects>")
-0  2
+0  1
 
 fi=~
 fn=('~', 0, "<method 'match' of '_sre.SRE_Pattern' objects>")
-0  11
+0  5
 
 fi=~
 fn=('~', 0, "<method 'join' of 'str' objects>")
-0  1
+0  0
 
 fi=~
 fn=('~', 0, "<method 'split' of 'str' objects>")
@@ -1030,7 +1022,7 @@ fn=('~', 0, "<method 'lower' of 'str' objects>")
 
 fi=~
 fn=('~', 0, "<method 'upper' of 'str' objects>")
-0  2
+0  1
 
 fi=~
 fn=('~', 0, "<method 'islower' of 'str' objects>")
@@ -1046,7 +1038,7 @@ fn=('~', 0, "<method 'replace' of 'str' objects>")
 
 fi=~
 fn=('~', 0, "<method 'rstrip' of 'str' objects>")
-0  2
+0  0
 
 fi=~
 fn=('~', 0, "<method 'strip' of 'str' objects>")
@@ -1054,7 +1046,7 @@ fn=('~', 0, "<method 'strip' of 'str' objects>")
 
 fi=~
 fn=('~', 0, "<method 'encode' of 'str' objects>")
-0  107
+0  37
 
 fi=~
 fn=('~', 0, "<method 'get' of 'dict' objects>")
@@ -1066,14 +1058,10 @@ fn=('~', 0, "<method 'iteritems' of 'dict' objects>")
 
 fi=~
 fn=('~', 0, "<method 'append' of 'list' objects>")
-0  2
-
-fi=~
-fn=('~', 0, "<method 'insert' of 'list' objects>")
 0  0
 
 fi=~
-fn=('~', 0, "<method 'pop' of 'list' objects>")
+fn=('~', 0, "<method 'insert' of 'list' objects>")
 0  0
 
 fi=~
@@ -1082,9 +1070,9 @@ fn=('~', 0, "<method 'index' of 'list' objects>")
 
 fi=~
 fn=('~', 0, "<method 'write' of 'file' objects>")
-0  273
+0  67
 
 fi=~
 fn=('~', 0, "<method 'close' of 'file' objects>")
-0  1411
+0  628
 
