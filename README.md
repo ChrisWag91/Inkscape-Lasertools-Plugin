@@ -61,6 +61,8 @@ https://github.com/nevir/readable-licenses/blob/master/markdown/GPLv2-LICENSE.md
 - make offsets work
 - make a help section in the ui with the step by step instructions
 - performance improvements / multithreading
+- implement checks for Scaling factor and display unit
+- make text objects work
 
 *******************************************************************************************************************************
 
