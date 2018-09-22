@@ -55,6 +55,7 @@ https://github.com/nevir/readable-licenses/blob/master/markdown/GPLv2-LICENSE.md
 ## Open Bugs
 - Scaling factor needs to be Set to 1
 - displayed units needs to be set to mm
+- sometimes small areas of an complicated path object get marked inversely
 
 ## Features to be implemented / tested
 - Make Laser On/Off command configurable
