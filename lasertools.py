@@ -25,12 +25,11 @@ import simplepath
 import cubicsuperpath
 import bezmisc
 import simpletransform
+from simpletransform import composeTransform, fuseTransform, parseTransform, applyTransformToPath, applyTransformToPoint, formatTransform
 
 from multiprocessing import Pool
 
 import cProfile
-# import lsprofcalltree #Comment out if not profiling
-
 import sys
 sys.path.append('/usr/share/inkscape/extensions')
 
@@ -51,9 +50,7 @@ if "errormsg" not in dir(inkex):
 
 
 ################################################################################
-###
 # Styles and additional parameters
-###
 ################################################################################
 
 gcode = ""
@@ -952,6 +949,7 @@ class Polygon:
 # ApplyTransform class
 ################################################################################
 
+
 class ApplyTransform(inkex.Effect):
     def __init__(self):
         inkex.Effect.__init__(self)
@@ -960,10 +958,11 @@ class ApplyTransform(inkex.Effect):
         self.getselected()
 
         if self.selected:
-            for id, shape in self.selected.items():
+            for _, shape in self.selected.items():
                 self.recursiveFuseTransform(shape, parseTransform(None))
         else:
-            self.recursiveFuseTransform(self.document.getroot(), parseTransform(None))
+            self.recursiveFuseTransform(
+                self.document.getroot(), parseTransform(None))
 
     @staticmethod
     def objectToPath(node):
@@ -979,7 +978,8 @@ class ApplyTransform(inkex.Effect):
         return node
 
     def recursiveFuseTransform(self, node, transf=[[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]]):
-        transf = composeTransform(transf, parseTransform(node.get("transform", None)))
+        transf = composeTransform(
+            transf, parseTransform(node.get("transform", None)))
 
         if 'transform' in node.attrib:
             del node.attrib['transform']
@@ -991,11 +991,13 @@ class ApplyTransform(inkex.Effect):
 
             if 'stroke-width' in style:
                 try:
-                    stroke_width = self.unittouu(style.get('stroke-width').strip())
+                    stroke_width = self.unittouu(
+                        style.get('stroke-width').strip())
                     # pixelsnap ext assumes scaling is similar in x and y
                     # and uses the x scale...
                     # let's try to be a bit smarter
-                    stroke_width *= math.sqrt(transf[0][0]**2 + transf[1][1]**2)
+                    stroke_width *= math.sqrt(transf[0]
+                                              [0]**2 + transf[1][1]**2)
                     style['stroke-width'] = str(stroke_width)
                     update = True
                 except AttributeError:
@@ -1017,12 +1019,12 @@ class ApplyTransform(inkex.Effect):
                           inkex.addNS('polyline', 'svg')]:
             points = node.get('points')
             points = points.strip().split(' ')
-            for k,p in enumerate(points):
+            for k, p in enumerate(points):
                 if ',' in p:
                     p = p.split(',')
-                    p = [float(p[0]),float(p[1])]
+                    p = [float(p[0]), float(p[1])]
                     applyTransformToPoint(transf, p)
-                    p = [str(p[0]),str(p[1])]
+                    p = [str(p[0]), str(p[1])]
                     p = ','.join(p)
                     points[k] = p
             points = ' '.join(points)
@@ -1038,9 +1040,9 @@ class ApplyTransform(inkex.Effect):
             self.recursiveFuseTransform(child, transf)
 
 
-if __name__ == '__main__':
-    e = ApplyTransform()
-    e.affect()
+# if __name__ == '__main__':
+#    e = ApplyTransform()
+#    e.affect()
 
 ################################################################################
 # Gcodetools class
@@ -1233,6 +1235,7 @@ class laser_gcode(inkex.Effect):
 # Generates Gcode on given curve.
 # Crve defenitnion [start point, type = {'arc','line','move','end'}, arc center, arc angle, end point, [zstart, zend]]
 ################################################################################
+
     def generate_gcode(self, curve, layer, depth):
         tool = self.tools
         global doc_height
@@ -2005,7 +2008,7 @@ class laser_gcode(inkex.Effect):
                                 # print_("cspm",cspm, "/n")
 
                                 if self.options.engraving_draw_calculation_paths == True:
-                                    node = inkex.etree.SubElement(engraving_group, inkex.addNS('path', 'svg'),                                         {
+                                    node = inkex.etree.SubElement(engraving_group, inkex.addNS('path', 'svg'), {
                                         "d":     cubicsuperpath.formatPath([cspm]),
                                         'style':    styles["biarc_style"]['biarc1'],
                                         "lasertools": "Engraving calculation paths",
@@ -2154,7 +2157,7 @@ class laser_gcode(inkex.Effect):
         if self.options.add_contours:
             self.get_info()
             self.selected_paths = self.paths
-            #'''
+
             if profiling:
                 if os.path.isfile(self.options.directory+"performance.prof"):
                     os.remove(self.options.directory+"/performance.prof")
@@ -2168,9 +2171,12 @@ class laser_gcode(inkex.Effect):
                 kFile = open(self.options.directory+"/performance.prof", 'w+')
                 kProfile.output(kFile)
                 kFile.close()
-            #'''
+
             self.engraving()
 
+
+if __name__ == '__main__':
+    e = ApplyTransform()
 
 e = laser_gcode()
 e.affect()
