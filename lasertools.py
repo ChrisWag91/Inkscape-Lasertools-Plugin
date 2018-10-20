@@ -1,16 +1,9 @@
 #!/usr/bin/env python
 """
 Modified by Christoph Wagner 2017
-Modified by Jay Johnson 2015, J Tech Photonics, Inc., jtechphotonics.com
-modified by Adam Polak 2014, polakiumengineering.org
 
-based on Copyright (C) 2009 Nick Drobchenko, nick@cnc-club.ru
-based on gcode.py (C) 2007 hugomatic...
-based on addnodes.py (C) 2005,2007 Aaron Spike, aaron@ekips.org
-based on dots.py (C) 2005 Aaron Spike, aaron@ekips.org
-based on interp.py (C) 2005 Aaron Spike, aaron@ekips.org
-based on bezmisc.py (C) 2005 Aaron Spike, aaron@ekips.org
-based on cubicsuperpath.py (C) 2005 Aaron Spike, aaron@ekips.org
+based on gcodetools, https://github.com/cnc-club/gcodetools
+based on inkscape-applytransforms, https://github.com/Klowner/inkscape-applytransforms
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -38,10 +31,12 @@ from multiprocessing import Pool
 import cProfile
 # import lsprofcalltree #Comment out if not profiling
 
+import sys
+sys.path.append('/usr/share/inkscape/extensions')
+
 import os
 import math
 import re
-import sys
 import time
 import datetime
 import cmath
@@ -953,6 +948,99 @@ class Polygon:
                     del edges[p]
         self.draw(color="Green", width=.1)
 
+################################################################################
+# ApplyTransform class
+################################################################################
+
+class ApplyTransform(inkex.Effect):
+    def __init__(self):
+        inkex.Effect.__init__(self)
+
+    def effect(self):
+        self.getselected()
+
+        if self.selected:
+            for id, shape in self.selected.items():
+                self.recursiveFuseTransform(shape, parseTransform(None))
+        else:
+            self.recursiveFuseTransform(self.document.getroot(), parseTransform(None))
+
+    @staticmethod
+    def objectToPath(node):
+        if node.tag == inkex.addNS('g', 'svg'):
+            return node
+
+        if node.tag == inkex.addNS('path', 'svg') or node.tag == 'path':
+            for attName in node.attrib.keys():
+                if ("sodipodi" in attName) or ("inkscape" in attName):
+                    del node.attrib[attName]
+            return node
+
+        return node
+
+    def recursiveFuseTransform(self, node, transf=[[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]]):
+        transf = composeTransform(transf, parseTransform(node.get("transform", None)))
+
+        if 'transform' in node.attrib:
+            del node.attrib['transform']
+
+        if 'style' in node.attrib:
+            style = node.attrib.get('style')
+            style = simplestyle.parseStyle(style)
+            update = False
+
+            if 'stroke-width' in style:
+                try:
+                    stroke_width = self.unittouu(style.get('stroke-width').strip())
+                    # pixelsnap ext assumes scaling is similar in x and y
+                    # and uses the x scale...
+                    # let's try to be a bit smarter
+                    stroke_width *= math.sqrt(transf[0][0]**2 + transf[1][1]**2)
+                    style['stroke-width'] = str(stroke_width)
+                    update = True
+                except AttributeError:
+                    pass
+
+            if update:
+                style = simplestyle.formatStyle(style)
+                node.attrib['style'] = style
+
+        node = ApplyTransform.objectToPath(node)
+
+        if 'd' in node.attrib:
+            d = node.get('d')
+            p = cubicsuperpath.parsePath(d)
+            applyTransformToPath(transf, p)
+            node.set('d', cubicsuperpath.formatPath(p))
+
+        elif node.tag in [inkex.addNS('polygon', 'svg'),
+                          inkex.addNS('polyline', 'svg')]:
+            points = node.get('points')
+            points = points.strip().split(' ')
+            for k,p in enumerate(points):
+                if ',' in p:
+                    p = p.split(',')
+                    p = [float(p[0]),float(p[1])]
+                    applyTransformToPoint(transf, p)
+                    p = [str(p[0]),str(p[1])]
+                    p = ','.join(p)
+                    points[k] = p
+            points = ' '.join(points)
+            node.set('points', points)
+
+        elif node.tag in [inkex.addNS('rect', 'svg'),
+                          inkex.addNS('text', 'svg'),
+                          inkex.addNS('image', 'svg'),
+                          inkex.addNS('use', 'svg')]:
+            node.set('transform', formatTransform(transf))
+
+        for child in node.getchildren():
+            self.recursiveFuseTransform(child, transf)
+
+
+if __name__ == '__main__':
+    e = ApplyTransform()
+    e.affect()
 
 ################################################################################
 # Gcodetools class
