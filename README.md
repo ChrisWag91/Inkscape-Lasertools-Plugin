@@ -53,14 +53,16 @@ https://github.com/nevir/readable-licenses/blob/master/markdown/GPLv2-LICENSE.md
 *******************************************************************************************************************************
 
 ## Open Bugs
+- Fix infill glitches which appear on some paths
 - Scaling factor needs to be Set to 1
-- displayed units needs to be set to mm
+- Displayed units needs to be set to mm
 
 ## Features to be implemented / tested
+- Automatically convert text to paths 
 - Make Laser On/Off command configurable
-- make offsets work
-- make a help section in the ui with the step by step instructions
-- performance improvements / multithreading
+- Make offsets work
+- Make a help section in the ui with the step by step instructions
+- Performance improvements / multithreading
 
 *******************************************************************************************************************************
 

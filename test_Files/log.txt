@@ -1,6 +1,6 @@
 ===================================================================
 Lasertools log file.
-Started at 20.10.2018 07:26:16.
+Started at 20.10.2018 07:57:53.
 /mnt/Daten/GoogleDrive/Projekte/02_Progerammier Projekte/P017_Inkscape_Lasertools/Inkscape-Lasertools-Plugin/test_Files//log.txt
 ===================================================================
 
@@ -12,60 +12,60 @@ translate 0
     Found orientation points in 'None' layer: [[[100.0, 400.0], [100.0, 0.0, 0.0]], [[0.0, 400.0], [0.0, 0.0, 0.0]]] 
     Found orientation points in 'None' layer: [[[100.0, 400.0], [100.0, 0.0, 0.0]], [[0.0, 400.0], [0.0, 0.0, 0.0]]] 
 =================================================================== 
-Start filling area 20.10.2018 07:26:16 
+Start filling area 20.10.2018 07:57:53 
 =================================================================== 
 Checking direcrory: '/mnt/Daten/GoogleDrive/Projekte/02_Progerammier Projekte/P017_Inkscape_Lasertools/Inkscape-Lasertools-Plugin/test_Files/' 
-Testing writing rights on '/mnt/Daten/GoogleDrive/Projekte/02_Progerammier Projekte/P017_Inkscape_Lasertools/Inkscape-Lasertools-Plugin/test_Files/output_0006.ngc' 
+Testing writing rights on '/mnt/Daten/GoogleDrive/Projekte/02_Progerammier Projekte/P017_Inkscape_Lasertools/Inkscape-Lasertools-Plugin/test_Files/output_0015.ngc' 
     selecting paths 
-0.000746965408325 s for path selection 
+0.000756025314331 s for path selection 
     start csp transformation 
 csp legth:  421 
     finished csp transformation 
-0.109516859055 s for transformation 
+0.107762098312 s for transformation 
     calculate bounds 
     finished calculating bounds 
-0.0628139972687 s calculating bounds 
+0.0702390670776 s calculating bounds 
     calculating infill 
-0.0001060962677 s for calculating zigzag pattern 
-0.000553131103516 s for calculating zigzag + rotating 
-13.2430670261 s for calculating zigzag + rotating + intersections 
+0.000104904174805 s for calculating zigzag pattern 
+0.000479936599731 s for calculating zigzag + rotating 
+12.9456908703 s for calculating zigzag + rotating + intersections 
 number of splitted lines:  8410 
-83.864397049 s for calculating infill 
+83.3666059971 s for calculating infill 
 offset_y:  0 
     drawing curve 
-0.0344090461731 s for drawing curve 
+0.0340459346771 s for drawing curve 
     drawing curve 
     Laser parameters: {'feed': 1000, 'penetration feed': 1000, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
     working on curve 
-0.0370841026306 s for generating Gcode 
-0.037379026413 s for path selection 
+0.0375850200653 s for generating Gcode 
+0.0379040241241 s for path selection 
     start csp transformation 
 csp legth:  2 
     finished csp transformation 
-0.00342106819153 s for transformation 
+0.00365996360779 s for transformation 
     calculate bounds 
     finished calculating bounds 
-0.00281882286072 s calculating bounds 
+0.00335597991943 s calculating bounds 
     calculating infill 
-0.000130176544189 s for calculating zigzag pattern 
-0.000620126724243 s for calculating zigzag + rotating 
-0.244730234146 s for calculating zigzag + rotating + intersections 
+0.000216007232666 s for calculating zigzag pattern 
+0.00174903869629 s for calculating zigzag + rotating 
+0.230335950851 s for calculating zigzag + rotating + intersections 
 number of splitted lines:  1493 
-0.455107212067 s for calculating infill 
+0.44124007225 s for calculating infill 
 offset_y:  0 
     drawing curve 
-0.017067193985 s for drawing curve 
+0.0171489715576 s for drawing curve 
     drawing curve 
     Laser parameters: {'feed': 1000, 'penetration feed': 1000, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
     working on curve 
-0.00694584846497 s for generating Gcode 
+0.00773286819458 s for generating Gcode 
 =================================================================== 
-Finished filling area 20.10.2018 07:27:45 
+Finished filling area 20.10.2018 07:59:23 
 =================================================================== 
-89.1173639297 s for infill 
+89.173625946 s for infill 
     Found orientation points in 'None' layer: [[[100.0, 400.0], [100.0, 0.0, 0.0]], [[0.0, 400.0], [0.0, 0.0, 0.0]]] 
 =================================================================== 
-Start doing parameters 20.10.2018 07:27:45 
+Start doing parameters 20.10.2018 07:59:23 
 =================================================================== 
 Total number of points  7115 
 Number of removed points:  830 
@@ -74,6 +74,6 @@ Number of removed points:  4
     Laser parameters: {'feed': 1000, 'penetration feed': 1000, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver', 'gcode after path': 'S1', 'id': 'Laser Engraver'} 
     working on curve 
 =================================================================== 
-Finished doing parameters 20.10.2018 07:27:45 
+Finished doing parameters 20.10.2018 07:59:23 
 =================================================================== 
-0.802579164505 s for parameters 
+0.777544021606 s for parameters 
