@@ -2007,6 +2007,9 @@ class laser_gcode(inkex.Effect):
 
     @staticmethod
     def objectToPath(node):
+
+        #print_("convertring node to path:", node.tag)
+
         if node.tag == inkex.addNS('g', 'svg'):
             return node
 
@@ -2019,6 +2022,9 @@ class laser_gcode(inkex.Effect):
         return node
 
     def recursiveFuseTransform(self, node, transf=[[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]]):
+
+        #print_("transforming Node:", node.tag)
+
         transf = composeTransform(
             transf, parseTransform(node.get("transform", None)))
 
@@ -2131,6 +2137,7 @@ class laser_gcode(inkex.Effect):
             #    _("Orientation points have not been defined! A default set of orientation points has been automatically added."), "warning")
             self.orientation(self.layers[min(0, len(self.layers)-1)])
             self.get_info()
+  
 
         self.tools = {
             "name": "Laser Engraver",
@@ -2144,6 +2151,7 @@ class laser_gcode(inkex.Effect):
 
         self.get_info()
 
+        print_("Applying all transformations")
         self.applytransforms()
 
         if self.options.add_infill:

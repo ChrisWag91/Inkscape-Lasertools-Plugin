@@ -17,6 +17,8 @@ alt="Detailed Youtube Video" width="240" height="180" border="10" /></a>
 ************************************************************************************
 **step by step instructions:**
 
+If you work from a picture (.png, .jpeg ...):
+
 1. import picture to Inkscape
 2. set the size of the page to the size you want your engraving to be [under File/Document Properties/Page]
 3. **IMPORTANT:** set *Display Units* and *Units* to *mm* and set *Scale x* to 1 [under File/Document Properties/Page]
@@ -27,8 +29,21 @@ alt="Detailed Youtube Video" width="240" height="180" border="10" /></a>
 8. **IMPORTANT:** the calculation takes some time, so be patient
 9. finished
 
+If you work from a svg file:
+
+1. ungroup all objects
+2. convert all objects to paths (especially text) using [Path/Object to Path] or [Path/Stroke to Path]
+3. set the size of the page to the size you want your engraving to be [under File/Document Properties/Page]
+4. **IMPORTANT:** set *Display Units* and *Units* to *mm* and set *Scale x* to 1 [under File/Document Properties/Page]
+5. convert your picture to vector graphics [Path/Trace Bitmap]
+6. open Lasertools and set your parameters [under Extensions/Lasertools]
+7. click Apply
+8. **IMPORTANT:** the calculation takes some time, so be patient
+9. finished
+
+As of now, the first method seems to be more reliable.
+
 Make sure the specified directory exists.
-Only use the Live Preview for smaller engravings.
 Calculating the Gcode can take quite some time on larger engravings. I would advice to test with a small engraving.
 
 *******************************************************************************************************************************
