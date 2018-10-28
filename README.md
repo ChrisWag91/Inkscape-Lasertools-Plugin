@@ -71,6 +71,7 @@ https://github.com/nevir/readable-licenses/blob/master/markdown/GPLv2-LICENSE.md
 - Fix infill glitches which appear on some paths
 - Scaling factor needs to be Set to 1
 - Displayed units needs to be set to mm
+- Multithreading currently disabled on Windows systems
 
 ## Features to be implemented / tested
 - Automatically convert text to paths 

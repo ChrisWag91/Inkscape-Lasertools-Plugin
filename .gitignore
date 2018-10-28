@@ -13,4 +13,6 @@ simplestyle.pyc
 simpletransform.pyc
 *.ngc
 log.txt
-
+.vscode
+.idea
+.gitignore

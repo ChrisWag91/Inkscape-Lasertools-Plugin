@@ -43,7 +43,6 @@ import numpy
 import gettext
 _ = gettext.gettext
 
-# Check if inkex has errormsg (0.46 version doesnot have one.) Could be removed later.
 if "errormsg" not in dir(inkex):
     inkex.errormsg = lambda msg: sys.stderr.write(
         (str(msg) + "\n").encode("UTF-8"))
@@ -57,7 +56,8 @@ gcode = ""
 
 noOfThreads = 4
 csp = []
-profiling = False  # Disable if not debuging
+profiling = False  # Disable if not debugging
+debug = False      # Disable if not debugging
 
 if profiling:
     import lsprofcalltree
@@ -1602,7 +1602,7 @@ class laser_gcode(inkex.Effect):
 
                     finalLines = []
 
-                    if self.options.multi_thread:
+                    if self.options.multi_thread and os.name != 'nt': #Mutitheading not working on Windows; temporarily disabled
                         pool = Pool(processes=noOfThreads)
                         finalLines = pool.map(
                             checkIfLineInsideShape, splitted_line)
@@ -1873,7 +1873,7 @@ class laser_gcode(inkex.Effect):
                                 x1a, y1a = n1[0]
                                 nx, ny = n1[1]
                                 x1b, y1b = n2[0]  # next point/end of this line
-                                if n1[2] == True:  # We're at a corner
+                                if n1[2]:  # We're at a corner
                                     bits = 1
                                     bit0 = 0
 
@@ -1894,7 +1894,7 @@ class laser_gcode(inkex.Effect):
 
                                     if reflex:  # just after a reflex corner
                                         reflex = False
-                                    if n1[2] == True:  # We're at a corner
+                                    if n1[2]:  # We're at a corner
                                         if n1[3] > 0:  # acute
                                             save_point(x1, y1, i, j)
                                             save_point(x1, y1, i, j)
@@ -1909,7 +1909,7 @@ class laser_gcode(inkex.Effect):
                                 cspm += [cspm[0]]
                                 # print_("cspm",cspm, "/n")
 
-                                if self.options.engraving_draw_calculation_paths == True:
+                                if self.options.engraving_draw_calculation_paths:
                                     node = inkex.etree.SubElement(engraving_group, inkex.addNS('path', 'svg'), {
                                         "d":     cubicsuperpath.formatPath([cspm]),
                                         'style':    styles["biarc_style"]['biarc1'],
@@ -2108,8 +2108,9 @@ class laser_gcode(inkex.Effect):
         options.self = self
         options.doc_root = self.document.getroot()
         global print_
+
         if self.options.log_create_log:
-            if (os.path.isdir(self.options.directory)):
+            if os.path.isdir(self.options.directory):
                 try:
                     if os.path.isfile(self.options.directory+"/log.txt"):
                         os.remove(self.options.directory+"/log.txt")
@@ -2132,12 +2133,18 @@ class laser_gcode(inkex.Effect):
             print_ = lambda *x: None
         self.get_info()
 
+        # wait to attatch debugger to process
+        if debug:
+            print_("Python version:", sys.version_info)
+            print_("Waiting for Debugger to be attached")
+            time.sleep(30)
+            print_("Starting Program")
+
         if self.orientation_points == {}:
             # self.error(
             #    _("Orientation points have not been defined! A default set of orientation points has been automatically added."), "warning")
             self.orientation(self.layers[min(0, len(self.layers)-1)])
             self.get_info()
-  
 
         self.tools = {
             "name": "Laser Engraver",
@@ -2146,7 +2153,7 @@ class laser_gcode(inkex.Effect):
             "feed": self.options.laser_speed,
             "gcode before path": ("G04 P" + self.options.power_delay + " " + self.options.laser_command),
             #"gcode after path": (self.options.laser_off_command + "\n" + "G00")
-            "gcode after path": (self.options.laser_off_command)
+            "gcode after path": self.options.laser_off_command
         }
 
         self.get_info()
@@ -2177,6 +2184,7 @@ class laser_gcode(inkex.Effect):
                 kFile.close()
 
             self.engraving()
+
 
 e = laser_gcode()
 e.affect()
