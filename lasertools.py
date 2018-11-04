@@ -65,9 +65,9 @@ if profiling:
 timestamp = datetime.datetime.fromtimestamp
 math.pi2 = math.pi*2
 doc_hight = 0
-straight_tolerance = 0.1
-straight_distance_tolerance = 0.1
-engraving_tolerance = 0.2
+straight_tolerance = 0.001
+straight_distance_tolerance = 0.001
+engraving_tolerance = 0.002
 options = {}
 cspm = []
 offset_y = 0
@@ -83,22 +83,12 @@ M02
 }
 
 styles = {
-    "loft_style": {
-        'main curve':    simplestyle.formatStyle({'stroke': '#88f', 'fill': 'none', 'stroke-width': '0.3', 'marker-end': 'none'}),
-    },
     "biarc_style": {
-        'biarc0':    simplestyle.formatStyle({'stroke': '#88f', 'fill': 'none', "marker-end": 'none', 'stroke-width': '0.3'}),
-        'biarc1':    simplestyle.formatStyle({'stroke': '#8f8', 'fill': 'none', "marker-end": 'none', 'stroke-width': '0.3'}),
-        'line':        simplestyle.formatStyle({'stroke': '#f88', 'fill': 'none', "marker-end": 'none', 'stroke-width': '0.3'}),
+        'biarc0':    simplestyle.formatStyle({'stroke': '#88f', 'fill': 'none', "marker-end": 'none', 'stroke-width': '0.1'}),
+        'biarc1':    simplestyle.formatStyle({'stroke': '#8f8', 'fill': 'none', "marker-end": 'none', 'stroke-width': '0.1'}),
+        'line':        simplestyle.formatStyle({'stroke': '#f88', 'fill': 'none', "marker-end": 'none', 'stroke-width': '0.1'}),
         'area':        simplestyle.formatStyle({'stroke': '#777', 'fill': 'none', "marker-end": 'none', 'stroke-width': '0.1'}),
-    },
-    "biarc_style_dark": {
-        'biarc0':    simplestyle.formatStyle({'stroke': '#33a', 'fill': 'none', "marker-end": 'none', 'stroke-width': '0.3'}),
-        'biarc1':    simplestyle.formatStyle({'stroke': '#3a3', 'fill': 'none', "marker-end": 'none', 'stroke-width': '0.3'}),
-        'line':        simplestyle.formatStyle({'stroke': '#a33', 'fill': 'none', "marker-end": 'none', 'stroke-width': '0.3'}),
-        'area':        simplestyle.formatStyle({'stroke': '#222', 'fill': 'none', "marker-end": 'none', 'stroke-width': '0.3'}),
-    },
-    "dxf_points":             simplestyle.formatStyle({"stroke": "#ff0000", "fill": "#ff0000"}),
+    }
 }
 
 ################################################################################
@@ -107,15 +97,21 @@ styles = {
 
 
 def checkIfLineInsideShape(splitted_line):
-    # print_("sl input", splitted_line)
     # check if the middle point of the first lines segment is inside the path.
     # and remove the subline if not.
     l1, l2 = splitted_line[0], splitted_line[1]
     p = [(l1[0]+l2[0])/2, (l1[1]+l2[1])/2]
+    # check for tangential points
+    pMod = [(l1[0]+l2[0])/2, ((l1[1]+l2[1])/2) + 0.1]
 
-    if point_inside_csp(p, csp):
-        return splitted_line
-
+    if l1 != l2:
+        if point_inside_csp(p, csp):
+            if point_inside_csp(pMod, csp):
+                return splitted_line
+            else:
+                return[]
+        else:
+            return []
     else:
         return []
 
@@ -355,7 +351,6 @@ def point_inside_csp(p, csp, on_the_path=True):
     ray_intersections_count = 0
 
     for subpath in csp:
-
         for i in range(1, len(subpath)):
             sp1, sp2 = subpath[i-1], subpath[i]
             ax, bx, cx, dx = csp_parameterize(sp1, sp2)[::2]
@@ -370,26 +365,33 @@ def point_inside_csp(p, csp, on_the_path=True):
                     pass
             else:
                 for t in csp_line_intersection([x, y], [x, y+5], sp1, sp2):
+
                     if t == 0 or t == 1:
                         # we've got another special case here
                         y1 = csp_at_t(sp1, sp2, t)[1]
+
                         if y1 == y:
                             # the point is on the path
                             return on_the_path
                         # if t == 0 we sould have considered this case previously.
+
                         if t == 1:
                             # we have to check the next segmant if it is on the same side of the ray
                             st_d = csp_normalized_slope(sp1, sp2, 1)[0]
+
                             if st_d == 0:
                                 st_d = csp_normalized_slope(sp1, sp2, 0.99)[0]
 
                             for j in range(1, len(subpath)+1):
+
                                 if (i+j) % len(subpath) == 0:
                                     continue  # skip the closing segment
+
                                 sp11, sp22 = subpath[(
                                     i-1+j) % len(subpath)], subpath[(i+j) % len(subpath)]
                                 ax1, bx1, cx1, dx1 = csp_parameterize(
                                     sp1, sp2)[::2]
+
                                 if ax1 == 0 and bx1 == 0 and cx1 == 0 and dx1 == x:
                                     continue  # this segment parallel to the ray, so skip it
                                 en_d = csp_normalized_slope(sp11, sp22, 0)[0]
@@ -401,72 +403,14 @@ def point_inside_csp(p, csp, on_the_path=True):
                                     break
                     else:
                         y1 = csp_at_t(sp1, sp2, t)[1]
-                        if y1 == y:
-                             # the point is on the path
-                            return on_the_path
-                        else:
-                            if y1 > y and 3*ax*t**2 + 2*bx*t + cx != 0:  # if it's 0 the path only touches the ray
-                                ray_intersections_count += 1
-    return ray_intersections_count % 2 == 1
 
-
-def point_inside_csp_vec(p, csp, on_the_path=True):
-
-    x, y = p
-    ray_intersections_count = 0
-    for subpath in csp:
-
-        for i in range(1, len(subpath)):
-            sp1, sp2 = subpath[i-1], subpath[i]
-            ax, bx, cx, dx = csp_parameterize(sp1, sp2)[::2]
-            if ax == 0 and bx == 0 and cx == 0 and dx == x:
-                # we've got a special case here
-                b = csp_true_bounds([[sp1, sp2]])
-                if b[1][1] <= y <= b[3][1]:
-                    # points is on the path
-                    return on_the_path
-                else:
-                    # we can skip this segment because it wont influence the answer.
-                    pass
-            else:
-                for t in csp_line_intersection([x, y], [x, y+5], sp1, sp2):
-                    if t == 0 or t == 1:
-                        # we've got another special case here
-                        y1 = csp_at_t(sp1, sp2, t)[1]
                         if y1 == y:
                             # the point is on the path
                             return on_the_path
-                        # if t == 0 we sould have considered this case previously.
-                        if t == 1:
-                            # we have to check the next segmant if it is on the same side of the ray
-                            st_d = csp_normalized_slope(sp1, sp2, 1)[0]
-                            if st_d == 0:
-                                st_d = csp_normalized_slope(sp1, sp2, 0.99)[0]
-
-                            for j in range(1, len(subpath)+1):
-                                if (i+j) % len(subpath) == 0:
-                                    continue  # skip the closing segment
-                                sp11, sp22 = subpath[(
-                                    i-1+j) % len(subpath)], subpath[(i+j) % len(subpath)]
-                                ax1, bx1, cx1, dx1 = csp_parameterize(
-                                    sp1, sp2)[::2]
-                                if ax1 == 0 and bx1 == 0 and cx1 == 0 and dx1 == x:
-                                    continue  # this segment parallel to the ray, so skip it
-                                en_d = csp_normalized_slope(sp11, sp22, 0)[0]
-                                if en_d == 0:
-                                    en_d = csp_normalized_slope(
-                                        sp11, sp22, 0.01)[0]
-                                if st_d*en_d <= 0:
-                                    ray_intersections_count += 1
-                                    break
-                    else:
-                        y1 = csp_at_t(sp1, sp2, t)[1]
-                        if y1 == y:
-                             # the point is on the path
-                            return on_the_path
                         else:
                             if y1 > y and 3*ax*t**2 + 2*bx*t + cx != 0:  # if it's 0 the path only touches the ray
                                 ray_intersections_count += 1
+
     return ray_intersections_count % 2 == 1
 
 
@@ -1481,6 +1425,7 @@ class laser_gcode(inkex.Effect):
                     area_group = inkex.etree.SubElement(
                         path.getparent(), inkex.addNS('g', 'svg'))
                     d = path.get('d')
+
                     if d == None:
                         print_("omitting non-path")
                         self.error(_("Warning: omitting non-path"),
@@ -1496,7 +1441,7 @@ class laser_gcode(inkex.Effect):
                     csp = csp_close_all_subpaths(csp)
                     csp = self.transform_csp(csp, layer)
 
-                    print_("csp legth: ", len(csp))
+                    print_("csp length: ", len(csp))
                     # print_("csp: ", csp)
 
                     print_("    finished csp transformation")
@@ -1554,6 +1499,8 @@ class laser_gcode(inkex.Effect):
                     print_(time.time() - timestamp,
                            "s for calculating zigzag pattern")
 
+                    # print_("lines from infill:", lines)
+
                     # Rotate created paths back
                     a = self.options.area_fill_angle
                     lines = [[[point[0]*math.cos(a) - point[1]*math.sin(a), point[0]*math.sin(
@@ -1565,7 +1512,7 @@ class laser_gcode(inkex.Effect):
 
                     # get the intersection points
                     splitted_line = [[lines[0][0]]]
-                    intersections = {}
+                    # intersections = {}
                     for l1, l2, in zip(lines[0], lines[0][1:]):
                         ints = []
 
@@ -1575,21 +1522,24 @@ class laser_gcode(inkex.Effect):
                             for j in range(1, len(csp[i])):
                                 sp1, sp2 = csp[i][j-1], csp[i][j]
                                 roots = csp_line_intersection(l1, l2, sp1, sp2)
+
                                 for t in roots:
                                     p = tuple(csp_at_t(sp1, sp2, t))
                                     if l1[0] == l2[0]:
                                         t1 = (p[1]-l1[1])/(l2[1]-l1[1])
                                     else:
                                         t1 = (p[0]-l1[0])/(l2[0]-l1[0])
+
                                     if 0 <= t1 <= 1:
                                         ints += [[t1, p[0], p[1], i, j, t]]
-                                        if p in intersections:
-                                            intersections[p] += [[i, j, t]]
-                                        else:
-                                            intersections[p] = [[i, j, t]]
-                                        # p = self.transform(p,layer,True)
-                                        # draw_pointer(p)
+
                         ints.sort()
+
+                        # mitigate vertical line glitch problem
+                        if len(ints) % 2 != 0:
+                            # print_("removing intersection: ", len(ints))
+                            ints = []
+
                         for i in ints:
                             splitted_line[-1] += [[i[1], i[2]]]
                             splitted_line += [[[i[1], i[2]]]]
@@ -1602,7 +1552,8 @@ class laser_gcode(inkex.Effect):
 
                     finalLines = []
 
-                    if self.options.multi_thread and os.name != 'nt': #Mutitheading not working on Windows; temporarily disabled
+                    # Mutitheading not working on Windows; temporarily disabled
+                    if self.options.multi_thread and os.name != 'nt':
                         pool = Pool(processes=noOfThreads)
                         finalLines = pool.map(
                             checkIfLineInsideShape, splitted_line)
@@ -1623,9 +1574,8 @@ class laser_gcode(inkex.Effect):
                             del finalLines[i]
                         else:
                             i += 1
-
-                    # print_("splitted_line: ", splitted_line)
-                    # print_("final_line: ", finalLines)
+                    print_("number of final lines: ", len(finalLines))
+                    #print_("final_line: ", finalLines)
 
                     splitted_line = finalLines
 
@@ -1634,18 +1584,12 @@ class laser_gcode(inkex.Effect):
                     csp_line = csp_from_polyline(splitted_line)
                     csp_line = self.transform_csp(csp_line, layer, True)
 
-                    #print_("g test", self.get_transforms(layer))
-                    #print_("Layer: ", layer)
-
                     if self.get_transforms(layer) != []:
                         offset_y = self.get_transforms(layer)[1][2]
                     else:
                         offset_y = 0
 
-                    print_("offset_y: ", offset_y)
-                    #print_("csp_line: ", csp_line, "/n")
                     curve = self.parse_curve(csp_line, layer)
-                    #print_("curve: ", curve, "/n")
 
                     print_("    drawing curve")
                     timestamp = time.time()
@@ -1653,7 +1597,6 @@ class laser_gcode(inkex.Effect):
                     self.draw_curve(curve, layer, area_group)
 
                     print_(time.time() - timestamp, "s for drawing curve")
-                    print_("    drawing curve")
                     timestamp = time.time()
 
                     gcode += self.generate_gcode(curve, layer, 0)
@@ -2008,7 +1951,7 @@ class laser_gcode(inkex.Effect):
     @staticmethod
     def objectToPath(node):
 
-        #print_("convertring node to path:", node.tag)
+        # print_("convertring node to path:", node.tag)
 
         if node.tag == inkex.addNS('g', 'svg'):
             return node
@@ -2023,7 +1966,7 @@ class laser_gcode(inkex.Effect):
 
     def recursiveFuseTransform(self, node, transf=[[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]]):
 
-        #print_("transforming Node:", node.tag)
+        # print_("transforming Node:", node.tag)
 
         transf = composeTransform(
             transf, parseTransform(node.get("transform", None)))
