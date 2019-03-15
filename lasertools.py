@@ -912,8 +912,10 @@ class laser_gcode(inkex.Effect):
                                      dest="file",                                default="output.ngc",                   help="File name")
         self.OptionParser.add_option("",   "--add-numeric-suffix-to-filename",  action="store", type="inkbool",
                                      dest="add_numeric_suffix_to_filename",      default=False,                          help="Add numeric suffix to file name")
+        self.OptionParser.add_option("",   "--laser-command-perimeter",         action="store", type="string",
+                                     dest="laser_command_perimeter",             default="S100",                         help="Laser gcode command Perimeter")
         self.OptionParser.add_option("",   "--laser-command",                   action="store", type="string",
-                                     dest="laser_command",                       default="S100",                         help="Laser gcode command")
+                                     dest="laser_command",                       default="S100",                         help="Laser gcode command infill")
         self.OptionParser.add_option("",   "--laser-off-command",               action="store", type="string",
                                      dest="laser_off_command",                   default="S1",                           help="Laser gcode end command")
         self.OptionParser.add_option("",   "--laser-beam-with",                 action="store", type="float",
@@ -1082,8 +1084,7 @@ class laser_gcode(inkex.Effect):
 # Crve defenitnion [start point, type = {'arc','line','move','end'}, arc center, arc angle, end point, [zstart, zend]]
 ################################################################################
 
-    def generate_gcode(self, curve, layer, depth):
-        tool = self.tools
+    def generate_gcode(self, curve, layer, depth, tool):
         global doc_height
         global offset_y
 
@@ -1599,7 +1600,8 @@ class laser_gcode(inkex.Effect):
                     print_(time.time() - timestamp, "s for drawing curve")
                     timestamp = time.time()
 
-                    gcode += self.generate_gcode(curve, layer, 0)
+                    gcode += self.generate_gcode(curve,
+                                                 layer, 0, self.tool_infill)
 
                     print_(time.time() - timestamp, "s for generating Gcode")
 
@@ -1870,7 +1872,8 @@ class laser_gcode(inkex.Effect):
                     else:
                         offset_y = 0
 
-                    gcode += self.generate_gcode(curve, layer, 0)
+                    gcode += self.generate_gcode(curve,
+                                                 layer, 0, self.tool_perimeter)
 
         if gcode != '':
             self.export_gcode(gcode)
@@ -2089,13 +2092,21 @@ class laser_gcode(inkex.Effect):
             self.orientation(self.layers[min(0, len(self.layers)-1)])
             self.get_info()
 
-        self.tools = {
-            "name": "Laser Engraver",
-            "id": "Laser Engraver",
+        self.tool_infill = {
+            "name": "Laser Engraver Infill",
+            "id": "Laser Engraver Infill",
             "penetration feed": self.options.laser_speed,
             "feed": self.options.laser_speed,
             "gcode before path": ("G04 P" + self.options.power_delay + " " + self.options.laser_command),
-            #"gcode after path": (self.options.laser_off_command + "\n" + "G00")
+            "gcode after path": self.options.laser_off_command
+        }
+
+        self.tool_perimeter = {
+            "name": "Laser Engraver Perimeter",
+            "id": "Laser Engraver Perimeter",
+            "penetration feed": self.options.laser_speed,
+            "feed": self.options.laser_speed,
+            "gcode before path": ("G04 P" + self.options.power_delay + " " + self.options.laser_command_perimeter),
             "gcode after path": self.options.laser_off_command
         }
 
