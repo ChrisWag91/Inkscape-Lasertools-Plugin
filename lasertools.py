@@ -39,7 +39,7 @@ import re
 import time
 import datetime
 import cmath
-import numpy
+import numpy as np
 import gettext
 _ = gettext.gettext
 
@@ -106,14 +106,15 @@ def checkIfLineInsideShape(splitted_line):
 
     if l1 != l2:
         if point_inside_csp(p, csp):
-            if point_inside_csp(pMod, csp):
+            if point_inside_csp(pMod, csp) and len(splitted_line) == 2:
                 return splitted_line
+
             else:
-                return[]
+                return[[0, 0], [0, 0]]
         else:
-            return []
+            return [[0, 0], [0, 0]]
     else:
-        return []
+        return [[0, 0], [0, 0]]
 
 
 def csp_segment_to_bez(sp1, sp2):
@@ -944,9 +945,13 @@ class laser_gcode(inkex.Effect):
                                      dest="add_contours",                        default=True,                           help="Add contour to Gcode paths")
         self.OptionParser.add_option("",   "--add-infill",                      action="store", type="inkbool",
                                      dest="add_infill",                          default=True,                           help="Add infill to Gcode paths")
+        self.OptionParser.add_option("",   "--remove-tiny-infill-paths",        action="store", type="inkbool",
+                                     dest="remove_tiny_infill_paths",            default=True,                           help="Remove tiny infill paths from Gcode")
         self.OptionParser.add_option("",   "--multi_thread",                      action="store", type="inkbool",
                                      dest="multi_thread",                          default=True,                           help="Activate multithreading support")
 
+
+# remove-tiny-infill-paths
     def parse_curve(self, p, layer, w=None, f=None):
 
         c = []
@@ -1131,8 +1136,8 @@ class laser_gcode(inkex.Effect):
                 g += "G01" + c(si[0]) + "\n"
                 lg = 'G01'
 
-        if si[1] == 'end':
-            g += tool['gcode after path'] + "\n"
+            if si[1] == 'end':
+                g += tool['gcode after path'] + "\n"
 
         return g
 
@@ -1188,7 +1193,7 @@ class laser_gcode(inkex.Effect):
                     #    Zcoordinates definition taken from Orientatnion point 1 and 2
                     self.Zcoordinates[layer] = [
                         max(points[0][1][2], points[1][1][2]), min(points[0][1][2], points[1][1][2])]
-                    matrix = numpy.array([
+                    matrix = np.array([
                         [points[0][0][0], points[0][0][1], 1, 0, 0, 0, 0, 0, 0],
                         [0, 0, 0, points[0][0][0],
                          points[0][0][1], 1, 0, 0, 0],
@@ -1208,13 +1213,13 @@ class laser_gcode(inkex.Effect):
                          [0][0], points[2][0][1], 1]
                     ])
 
-                    if numpy.linalg.det(matrix) != 0:
-                        m = numpy.linalg.solve(matrix,
-                                               numpy.array(
-                                                   [[points[0][1][0]], [points[0][1][1]], [1], [points[1][1][0]], [
-                                                       points[1][1][1]], [1], [points[2][1][0]], [points[2][1][1]], [1]]
-                                               )
-                                               ).tolist()
+                    if np.linalg.det(matrix) != 0:
+                        m = np.linalg.solve(matrix,
+                                            np.array(
+                                                [[points[0][1][0]], [points[0][1][1]], [1], [points[1][1][0]], [
+                                                    points[1][1][1]], [1], [points[2][1][0]], [points[2][1][1]], [1]]
+                                            )
+                                            ).tolist()
                         self.transform_matrix[layer] = [
                             [m[j*3+i][0] for i in range(3)] for j in range(3)]
 
@@ -1223,7 +1228,7 @@ class laser_gcode(inkex.Effect):
                 else:
                     self.error(_("Orientation points are wrong! (if there are two orientation points they sould not be the same. If there are three orientation points they should not be in a straight line.)"), "wrong_orientation_points")
 
-            self.transform_matrix_reverse[layer] = numpy.linalg.inv(
+            self.transform_matrix_reverse[layer] = np.linalg.inv(
                 self.transform_matrix[layer]).tolist()
             # print_(self.transform_matrix)
             # print_(self.transform_matrix_reverse)
@@ -1564,21 +1569,30 @@ class laser_gcode(inkex.Effect):
 
                     else:
                         while i < len(splitted_line):
-                            finalLines += [checkIfLineInsideShape(
-                                splitted_line[i])]
+                            finalLines += [checkIfLineInsideShape(splitted_line[i])]
                             i += 1
+
                     i = 0
 
                     # remove empty elements
-                    while i < len(finalLines):
-                        if finalLines[i] == [] or finalLines[i] == [[]]:
-                            del finalLines[i]
-                        else:
-                            i += 1
-                    print_("number of final lines: ", len(finalLines))
                     #print_("final_line: ", finalLines)
+                    np_finalLines = np.array(finalLines, dtype=np.float32)
+                    index_zeros = np.argwhere(np_finalLines == [[0, 0], [0, 0]])
+                    np_finalLines = np.delete(np_finalLines, index_zeros, axis=0)
 
-                    splitted_line = finalLines
+                    #print_("np_final_line: ", np_finalLines)
+                    print_("number of final lines: ", len(np_finalLines))
+
+                    if options.remove_tiny_infill_paths:
+                        start_coords = np.array(np_finalLines[:, 0])
+                        end_coords = np.array(np_finalLines[:, 1])
+
+                        distances = np.array(end_coords[:, 1]-start_coords[:, 1])
+
+                        np_finalLines = (np_finalLines[distances > 3 * options.laser_beam_with])
+                        #print_("final_line: ", np_finalLines)
+
+                    splitted_line = np_finalLines
 
                     print_(time.time() - timestamp, "s for calculating infill")
 
