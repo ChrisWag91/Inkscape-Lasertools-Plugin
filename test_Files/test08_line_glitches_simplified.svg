@@ -7,16 +7,16 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   version="1.2"
-   id="Layer_1"
-   x="0px"
-   y="0px"
-   viewBox="0 0 172.238 180.994"
-   xml:space="preserve"
-   sodipodi:docname="test08_line_glitches_simplified.svg"
-   inkscape:version="0.92.2 2405546, 2018-03-11"
+   height="180.994"
    width="172.23801"
-   height="180.994"><sodipodi:namedview
+   inkscape:version="0.92.4 5da689c313, 2019-01-14"
+   sodipodi:docname="test08_line_glitches_simplified.svg"
+   xml:space="preserve"
+   viewBox="0 0 172.238 180.994"
+   y="0px"
+   x="0px"
+   id="Layer_1"
+   version="1.2"><sodipodi:namedview
    pagecolor="#ffffff"
    bordercolor="#666666"
    borderopacity="1"
@@ -26,22 +26,22 @@
    inkscape:pageopacity="0"
    inkscape:pageshadow="2"
    inkscape:window-width="1920"
-   inkscape:window-height="1015"
+   inkscape:window-height="1051"
    id="namedview283"
    showgrid="false"
    units="px"
-   inkscape:zoom="32"
-   inkscape:cx="65.346636"
-   inkscape:cy="48.772803"
-   inkscape:window-x="0"
+   inkscape:zoom="5.6568543"
+   inkscape:cx="74.942437"
+   inkscape:cy="15.135777"
+   inkscape:window-x="1920"
    inkscape:window-y="0"
    inkscape:window-maximized="1"
-   inkscape:current-layer="g1209"
+   inkscape:current-layer="Layer_1"
    inkscape:document-units="mm"
    scale-x="3.77953" /><metadata
    id="metadata287"><rdf:RDF><cc:Work
        rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
-         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title /></cc:Work></rdf:RDF></metadata><defs
    id="defs285" />
 
 
@@ -61,57 +61,7 @@
 
 
 
-<g
-   gcodetools="Gcodetools orientation group"
-   id="g16988"><g
-     gcodetools="Gcodetools orientation point (2 points)"
-     id="g16980"><path
-   d="m 0,180.994 c 0,0 2.9375,-6.34375 2.9375,-6.34375 0,0 0.8125,1.90625 0.8125,1.90625 0,0 6.843749,-6.84374 6.843749,-6.84374 0,0 0,0 0,0 0,0 0.6875,0.6875 0.6875,0.6875 0,0 -6.8437504,6.84375 -6.8437504,6.84375 0,0 1.90625,0.8125 1.90625,0.8125 0,0 -6.3437486,2.93749 -6.3437486,2.93749 0,0 0,0 0,0"
-   gcodetools="Gcodetools orientation point arrow"
-   style="fill:#000000;stroke:none"
-   id="path16976"
-   inkscape:connector-curvature="0" /><text
-   gcodetools="Gcodetools orientation point text"
-   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10px;fill:#000000;fill-opacity:1;stroke:none"
-   x="0"
-   y="180.994"
-   xml:space="preserve"
-   id="text16978">(0.0; 0.0; 0.0)</text>
-
-
-
-
-
-
-
-
-
-
-</g><g
-     gcodetools="Gcodetools orientation point (2 points)"
-     id="g16986"><path
-   d="m 100,180.994 c 0,0 2.9375,-6.34375 2.9375,-6.34375 0,0 0.8125,1.90625 0.8125,1.90625 0,0 6.84375,-6.84374 6.84375,-6.84374 0,0 0,0 0,0 0,0 0.6875,0.6875 0.6875,0.6875 0,0 -6.84375,6.84375 -6.84375,6.84375 0,0 1.90625,0.8125 1.90625,0.8125 0,0 -6.34375,2.93749 -6.34375,2.93749 0,0 0,0 0,0"
-   gcodetools="Gcodetools orientation point arrow"
-   style="fill:#000000;stroke:none"
-   id="path16982"
-   inkscape:connector-curvature="0" /><text
-   gcodetools="Gcodetools orientation point text"
-   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10px;fill:#000000;fill-opacity:1;stroke:none"
-   x="100"
-   y="180.994"
-   xml:space="preserve"
-   id="text16984">(100.0; 0.0; 0.0)</text>
-
-
-
-
-
-
-
-
-
-
-</g></g><path
+<path
    id="path270"
    d="m 74.0625,126.13281 c -0.521543,0.31219 -0.935733,0.67691 -1.255859,1.03125 -1.093788,1.20703 -1.544922,2.3834 -1.544922,5.44141 0,3.08493 0.451134,4.26443 1.544922,5.4707 0.320169,0.35438 0.734216,0.71935 1.255859,1.03125 0,0 0,-12.97461 0,-12.97461 0,0 0,0 0,0"
    style="fill:#0099b0;fill-rule:evenodd;stroke-width:1.12009358"

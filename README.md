@@ -69,6 +69,7 @@ https://github.com/nevir/readable-licenses/blob/master/markdown/GPLv2-LICENSE.md
 
 ## Open Bugs
 - Fix infill glitches which appear on some paths
+    - Workaround: make Path/Difference or Path Union operation which does not change the shape. That will fix the glitch.
 - Scaling factor needs to be Set to 1
 - Displayed units needs to be set to mm
 - Multithreading currently disabled on Windows systems

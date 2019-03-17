@@ -1,0 +1,70 @@
+===================================================================
+Lasertools log file.
+Started at 16.03.2019 09:10:51.
+//mnt/Daten/GoogleDrive/Projekte/02_Progerammier Projekte/P017_Inkscape_Lasertools/Inkscape-Lasertools-Plugin/test_Files//log.txt
+===================================================================
+
+Python version: sys.version_info(major=2, minor=7, micro=15, releaselevel='final', serial=0) 
+Waiting for Debugger to be attached 
+Starting Program 
+entering orientations 
+Document height: 100.0 
+orientation_scale < 0 ===> switching to mm units=1.0000000000 
+('using orientation scale', 1, 'i=', [[0.0, 0.0, 0.0], [100.0, 0.0, 0.0]]) 
+translate 0 
+    Found orientation points in 'None' layer: [[[100.0, 100.0], [100.0, 0.0, 0.0]], [[0.0, 100.0], [0.0, 0.0, 0.0]]] 
+    Found orientation points in 'None' layer: [[[100.0, 100.0], [100.0, 0.0, 0.0]], [[0.0, 100.0], [0.0, 0.0, 0.0]]] 
+Applying all transformations 
+=================================================================== 
+Start filling area 16.03.2019 09:11:21 
+=================================================================== 
+Checking direcrory: '//mnt/Daten/GoogleDrive/Projekte/02_Progerammier Projekte/P017_Inkscape_Lasertools/Inkscape-Lasertools-Plugin/test_Files/' 
+Testing writing rights on '//mnt/Daten/GoogleDrive/Projekte/02_Progerammier Projekte/P017_Inkscape_Lasertools/Inkscape-Lasertools-Plugin/test_Files/P0099_Coaster_Recamans_CAM_0011.ngc' 
+    selecting paths 
+0.000411987304688 s for path selection 
+    start csp transformation 
+csp length:  469 
+    finished csp transformation 
+0.115601062775 s for transformation 
+    calculate bounds 
+    finished calculating bounds 
+0.0820729732513 s calculating bounds 
+    calculating infill 
+0.000210046768188 s for calculating zigzag pattern 
+0.000859022140503 s for calculating zigzag + rotating 
+32.0076770782 s for calculating zigzag + rotating + intersections 
+number of splitted lines:  18643 
+number of final lines:  9232 
+329.059237003 s for calculating infill 
+    drawing curve 
+0.0212399959564 s for drawing curve 
+    Laser parameters: {'feed': 1500, 'penetration feed': 1500, 'gcode before path': 'G04 P0 S60', 'name': 'Laser Engraver Infill', 'gcode after path': 'S1', 'id': 'Laser Engraver Infill'} 
+    working on curve 
+0.0195488929749 s for generating Gcode 
+=================================================================== 
+Finished filling area 16.03.2019 09:16:52 
+=================================================================== 
+331.146036148 s for infill 
+    Found orientation points in 'None' layer: [[[100.0, 100.0], [100.0, 0.0, 0.0]], [[0.0, 100.0], [0.0, 0.0, 0.0]]] 
+=================================================================== 
+Start doing parameters 16.03.2019 09:16:52 
+=================================================================== 
+Total number of points  8148 
+Number of removed points:  875 
+    Laser parameters: {'feed': 1500, 'penetration feed': 1500, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver Perimeter', 'gcode after path': 'S1', 'id': 'Laser Engraver Perimeter'} 
+    working on curve 
+=================================================================== 
+Finished doing parameters 16.03.2019 09:16:53 
+=================================================================== 
+1.02712512016 s for parameters 
+=================================================================== 
+Start doing parameters 16.03.2019 09:16:53 
+=================================================================== 
+Total number of points  8148 
+Number of removed points:  875 
+    Laser parameters: {'feed': 1500, 'penetration feed': 1500, 'gcode before path': 'G04 P0 S100', 'name': 'Laser Engraver Perimeter', 'gcode after path': 'S1', 'id': 'Laser Engraver Perimeter'} 
+    working on curve 
+=================================================================== 
+Finished doing parameters 16.03.2019 09:16:54 
+=================================================================== 
+0.868170022964 s for parameters 
