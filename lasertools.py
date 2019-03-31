@@ -57,7 +57,7 @@ gcode = ""
 noOfThreads = 4
 csp = []
 profiling = True    # Disable if not debugging
-debug = True         # Disable if not debugging
+debug = False        # Disable if not debugging
 
 if profiling:
     import lsprofcalltree
@@ -85,11 +85,10 @@ M02
 
 styles = {
     "biarc_style": {
-        'biarc0':    simplestyle.formatStyle({'stroke': '#88f', 'fill': 'none', "marker-end": 'none', 'stroke-width': '0.1'}),
-        'biarc1':    simplestyle.formatStyle({'stroke': '#8f8', 'fill': 'none', "marker-end": 'none', 'stroke-width': '0.1'}),
         'line':        simplestyle.formatStyle({'stroke': '#f88', 'fill': 'none', "marker-end": 'none', 'stroke-width': '0.1'}),
-        'area':        simplestyle.formatStyle({'stroke': '#777', 'fill': 'none', "marker-end": 'none', 'stroke-width': '0.1'}),
+        'biarc1':        simplestyle.formatStyle({'stroke': '#8f8', 'fill': 'none', "marker-end": 'none', 'stroke-width': '0.5'})
     }
+
 }
 
 ################################################################################
@@ -560,51 +559,6 @@ class P:
 
     def l2(self): return self.x*self.x + self.y*self.y
 
-
-################################################################################
-# Biarc function
-# Calculates biarc approximation of cubic super path segment
-# splits segment if needed or approximates it with straight line
-################################################################################
-
-def biarc2d(sp1, sp2, depth=0):
-
-    # print_("sp1 ", sp1)
-    # print_("sp2 ", sp2)
-
-    P0, P4 = P(sp1[1]), P(sp2[1])
-    TS, TE, v = (P(sp1[2])-P0), -(P(sp2[0])-P4), P0 - P4
-    tsa, tea = TS.angle(), TE.angle()
-    if TE.mag() < straight_distance_tolerance and TS.mag() < straight_distance_tolerance:
-        # Both tangents are zerro - line straight
-        return [[sp1[1], 'line', sp2[1]]]
-    if TE.mag() < straight_distance_tolerance:
-        TE = -(TS+v).unit()
-        r = TS.mag()/v.mag()*2
-    elif TS.mag() < straight_distance_tolerance:
-        TS = -(TE+v).unit()
-        r = 1/(TE.mag()/v.mag()*2)
-    else:
-        r = TS.mag()/TE.mag()
-    TS, TE = TS.unit(), TE.unit()
-    tang_are_parallel = ((tsa-tea) % math.pi < straight_tolerance or math.pi -
-                         (tsa-tea) % math.pi < straight_tolerance)
-    if (tang_are_parallel and
-        ((v.mag() < straight_distance_tolerance or TE.mag() < straight_distance_tolerance or TS.mag() < straight_distance_tolerance) or
-         1-abs(TS*v/(TS.mag()*v.mag())) < straight_tolerance)):
-                # Both tangents are parallel and start and end are the same - line straight
-                # or one of tangents still smaller then tollerance
-
-                # Both tangents and v are parallel - line straight
-        return [[sp1[1], 'line', sp2[1]]]
-
-    c, b, a = v*v, 2*v*(r*TS+TE), 2*r*(TS*TE-1)
-    asmall = abs(a) < 10**-10
-    if not asmall:
-        discr = b*b-4*a*c
-        if discr < 0:
-            raise ValueError(a, b, c, discr)
-
 ################################################################################
 # Polygon class
 ################################################################################
@@ -935,9 +889,48 @@ class laser_gcode(inkex.Effect):
         c = []
         if len(p) == 0:
             return []
+
         p = self.transform_csp(p, layer)
 
+        '''
+        # this code is intended to replace the code below.
+        # At the Moment there is a problem with muliple paths, where the fist/last path will not be generated
+        #TODO: Fix that
+        print_("p_pre_Trans ", p)
+        
+        print_("p_post_Trans ", p)
+        startPoints = np.zeros(shape=[len(p), 2])
+        endPoints = np.zeros(shape=[len(p), 2])
+
+        # reduce Array size
+        for i in range(0, len(p)):
+            elRed = np.array(p[i])
+            elRed = elRed[:, 0]
+            startPoints[i] = elRed[0]
+            endPoints[i] = elRed[-1]
+
+        print_("StartPoints", startPoints)
+        print_("EndPoints", endPoints)
+        print_("elRed", elRed)
+
+        sortedPoints = np.array(self.sort_points(
+            startPoints[:, 0], startPoints[:, 1], endPoints[:, 0], endPoints[:, 1]))
+
+        for point in sortedPoints:
+            ind = np.argwhere(startPoints == point[0])[0, 0]
+            elRed = np.array(p[ind])
+            elRed = elRed[:, 0]
+
+            c += [[[point[0], point[1]], 'move']]
+
+            for i in range(1, len(elRed)):
+                c += [[[elRed[i-1, 0], elRed[i-1, 1]], 'line', [elRed[i, 0], elRed[i, 1]]]]
+
+            c += [[[elRed[-1, 0], elRed[-1, 1]], 'end']]
+
         # Sort to reduce Rapid distance
+        '''
+
         k = range(1, len(p))
         keys = [0]
         while len(k) > 0:
@@ -951,18 +944,18 @@ class laser_gcode(inkex.Effect):
         for k in keys:
             subpath = p[k]
             c += [[[subpath[0][1][0], subpath[0][1][1]], 'move']]
-            #print_([[[subpath[0][1][0], subpath[0][1][1]], 'move']])
+            # print_([[[subpath[0][1][0], subpath[0][1][1]], 'move']])
             for i in range(1, len(subpath)):
                 # print_("subpath: ", subpath[i-1])
                 sp1 = [[subpath[i-1][j][0], subpath[i-1][j][1]]
                        for j in range(3)]
                 sp2 = [[subpath[i][j][0], subpath[i][j][1]] for j in range(3)]
-                c += biarc2d(sp1, sp2)
-                #print_("sp1: ", sp1)
-                #print_("biarc2d: ", str(biarc2d(sp1, sp2)))
+                c += [[[sp1[0][0], sp1[0][1]], 'line', [sp2[0][0], sp2[0][1]]]]
+                # print_("sp1: ", sp1)
             c += [[[subpath[-1][1][0], subpath[-1][1][1]], 'end']]
-            #print_([[[subpath[-1][1][0], subpath[-1][1][1]], 'end']])
+            # print_([[[subpath[-1][1][0], subpath[-1][1][1]], 'end']])
         # print_("Curve: " + str(c))
+
         return c
 
     def parse_curve2d(self, p, layer):
@@ -973,14 +966,12 @@ class laser_gcode(inkex.Effect):
         p = self.transform_csp(p, layer)
         # print_("p: ", p)
         np_p = np.array(p)
-        #print_("len p Slice: ", len(np_p[:, 0, 0, 0]))
+        # print_("len p Slice: ", len(np_p[:, 0, 0, 0]))
         sortedToolpaths = self.sort_points(np_p[:, 0, 0, 0], np_p[:, 0, 0, 1], np_p[:, 1, 0, 0], np_p[:, 1, 0, 1])
 
         for path in sortedToolpaths:
             c += [[[path[0], path[1]], 'move']]
-            # TODO improve biarc2D function
-            c += biarc2d([[path[0], path[1]], [path[0], path[1]], [path[0], path[1]]],
-                         [[path[2], path[3]], [path[2], path[3]], [path[2], path[3]]])
+            c += [[[path[0], path[1]], 'line', [path[2], path[3]]]]
             c += [[[path[2], path[3]], 'end']]
 
         return c
@@ -1007,11 +998,11 @@ class laser_gcode(inkex.Effect):
 
             distances = np.array([np.add(xDist, yDist), np.add(xDistInv, yDistInv)])
             distances = np.abs(distances)
-            #print_("Distances: ", distances)
+            # print_("Distances: ", distances)
 
             minInd = np.unravel_index(np.argmin(distances, axis=None), distances.shape)
-            #print_("minInd: ", minInd)
-            #print_("minDist: ", distances[minInd])
+            # print_("minInd: ", minInd)
+            # print_("minDist: ", distances[minInd])
 
             if minInd[0] == 0:
                 sortedList[i] = [xpos[minInd[1]], ypos[minInd[1]], xposInv[minInd[1]], yposInv[minInd[1]]]
@@ -1036,7 +1027,7 @@ class laser_gcode(inkex.Effect):
 
         self.get_defs()
         # Add marker to defs if it doesnot exists
-
+        '''
         for i in [0, 1]:
             style['biarc%s_r' % i] = simplestyle.parseStyle(
                 style['biarc%s' % i])
@@ -1044,7 +1035,7 @@ class laser_gcode(inkex.Effect):
             del(style['biarc%s_r' % i]["marker-end"])
             style['biarc%s_r' % i] = simplestyle.formatStyle(
                 style['biarc%s_r' % i])
-
+        '''
         if group == None:
             group = inkex.etree.SubElement(self.layers[min(1, len(
                 self.layers)-1)], inkex.addNS('g', 'svg'), {"gcodetools": "Preview group"})
@@ -1659,9 +1650,6 @@ class laser_gcode(inkex.Effect):
                     else:
                         offset_y = 0
 
-                    # for el in csp_line:
-                        # print_("Curve: ", el)
-
                     curve = self.parse_curve2d(csp_line, layer)
 
                     print_("    drawing curve")
@@ -1924,18 +1912,25 @@ class laser_gcode(inkex.Effect):
                             if len(cspm) != 0:
                                 cspm += [cspm[0]]
                                 # print_("cspm",cspm, "/n")
-
+                                '''
                                 if self.options.engraving_draw_calculation_paths:
                                     node = inkex.etree.SubElement(engraving_group, inkex.addNS('path', 'svg'), {
                                         "d":     cubicsuperpath.formatPath([cspm]),
                                         'style':    styles["biarc_style"]['biarc1'],
                                         "lasertools": "Engraving calculation paths",
                                     })
-
+                                '''
+                                # for entr in cspm:
+                                #    print_("cspm ", entr)
                                 cspe += [cspm]
 
                 if cspe != []:
+
+                    # for entr in cspe:
+                        #    print_("cspe ", entr)
                     curve = self.parse_curve(cspe, layer)
+                    # for entr in curve:
+                    #    print_("curve ", entr)
                     self.draw_curve(curve, layer, engraving_group)
 
                     if self.get_transforms(layer) != []:
@@ -1943,7 +1938,10 @@ class laser_gcode(inkex.Effect):
                     else:
                         offset_y = 0
 
-                    gcode += self.generate_gcode(curve, layer, self.tool_perimeter)
+                    tempGcode = self.generate_gcode(curve, layer, self.tool_perimeter)
+                    gcode += tempGcode
+
+                    print_("Gcode: ", tempGcode)
 
         if gcode != '':
             self.export_gcode(gcode)
