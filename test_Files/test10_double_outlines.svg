@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   inkscape:export-ydpi="89"
+   inkscape:export-xdpi="89"
+   inkscape:export-filename="/mnt/Daten/GoogleDrive/Projekte/05_CNC Projekte/P0100_Birthday_Boards/CAM/P0100_Birthday_Board_Felix_Setup.png"
+   sodipodi:docname="P0100_Birthday_Board_Felix_Test.svg"
+   inkscape:version="0.92.4 5da689c313, 2019-01-14"
+   id="svg8"
+   version="1.1"
+   viewBox="0 0 840 330"
+   height="330mm"
+   width="840mm">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.24748737"
+     inkscape:cx="1409.7453"
+     inkscape:cy="1020.9592"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer2"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1015"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="Layer 2"
+     style="display:inline;opacity:0.59899998"
+     transform="translate(0,-510)" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,33)"
+     style="display:inline">
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot846"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:192px;line-height:1.25;font-family:TimeBurner;-inkscape-font-specification:TimeBurner;letter-spacing:0px;word-spacing:0px;fill:#ff0000;fill-opacity:1;stroke:none"
+       transform="translate(-1.0583333,-1.0583333)"><flowRegion
+         id="flowRegion848"
+         style="font-size:192px;fill:#ff0000"><rect
+           id="rect850"
+           width="1482.9039"
+           height="1579.8785"
+           x="1870.8025"
+           y="439.31012"
+           style="font-size:192px;fill:#ff0000" /></flowRegion><flowPara
+         id="flowPara852" /></flowRoot>    <path
+       style="fill:#000000;stroke-width:0.08466666"
+       d="m 371.61351,142.56774 h 14.478 v 1.94733 1.94733 h -12.78467 -12.78466 v 8.72067 8.72067 h -1.69334 -1.69333 v -10.668 -10.668 z m 0,25.23066 h 14.478 v 1.94734 1.94733 h -12.78467 -12.78466 v 8.72067 8.72066 h -1.69334 -1.69333 v -10.668 -10.668 z"
+       id="path867"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccccccccccccccccccccccccc" />
+  </g>
+</svg>
