@@ -56,7 +56,7 @@ gcode = ""
 
 noOfThreads = 4
 csp = []
-profiling = True    # Disable if not debugging
+profiling = False    # Disable if not debugging
 debug = False        # Disable if not debugging
 
 if profiling:
@@ -107,12 +107,6 @@ def checkIfLineInsideShape(splitted_line):
     if l1 != l2:
         if point_inside_csp(p, csp):
             if point_inside_csp(pMod, csp) and len(splitted_line) == 2:
-
-                # TODO for Testing only
-                xDistance = splitted_line[0][0] - splitted_line[1][0]
-                if xDistance > 0.01 or xDistance < -0.01:
-                    print_("ERROR: ", splitted_line)
-
                 return splitted_line
 
             else:
@@ -773,18 +767,12 @@ class Polygon:
             last_edge = [(last[0][0]-last[1][0])/last[2],
                          (last[0][1]-last[1][1])/last[2]]
             for p in edges:
-                # draw_pointer(list(p[0])+[p[0][0]+last_edge[0]*40,p[0][1]+last_edge[1]*40], "Red", "line", width=1)
-                # print_("len(edges)=",len(edges))
                 cur = [(p[1][0]-p[0][0])/p[2], (p[1][1]-p[0][1])/p[2]]
                 cos, sin = dot(cur, last_edge),  cross(cur, last_edge)
-                # draw_pointer(list(p[0])+[p[0][0]+cur[0]*40,p[0][1]+cur[1]*40], "Orange", "line", width=1, comment = [sin,cos])
-                # print_("cos, sin=",cos,sin)
-                # print_("min_angle_before=",min_angle)
 
                 if angle_is_less(sin, cos, min_angle[0], min_angle[1]):
                     min_angle = [sin, cos]
                     next = p
-                # print_("min_angle=",min_angle)
 
             return next
 
@@ -811,8 +799,6 @@ class Polygon:
                     raise ValueError("Hull error")
                 loops1 += 1
                 next = get_closes_edge_by_angle(edges[last[1]], last)
-                # draw_pointer(next[0]+next[1],"Green","line", comment=i, width= 1)
-                # print_(next[0],"-",next[1])
 
                 last = next
                 poly += [list(last[0])]
@@ -892,12 +878,10 @@ class laser_gcode(inkex.Effect):
 
         p = self.transform_csp(p, layer)
 
-        '''
         # this code is intended to replace the code below.
         # At the Moment there is a problem with muliple paths, where the fist/last path will not be generated
-        #TODO: Fix that
-        print_("p_pre_Trans ", p)
-        
+        # TODO: Fix that
+        '''
         print_("p_post_Trans ", p)
         startPoints = np.zeros(shape=[len(p), 2])
         endPoints = np.zeros(shape=[len(p), 2])
@@ -1001,8 +985,6 @@ class laser_gcode(inkex.Effect):
             # print_("Distances: ", distances)
 
             minInd = np.unravel_index(np.argmin(distances, axis=None), distances.shape)
-            # print_("minInd: ", minInd)
-            # print_("minDist: ", distances[minInd])
 
             if minInd[0] == 0:
                 sortedList[i] = [xpos[minInd[1]], ypos[minInd[1]], xposInv[minInd[1]], yposInv[minInd[1]]]
@@ -1026,16 +1008,7 @@ class laser_gcode(inkex.Effect):
     def draw_curve(self, curve, layer, group=None, style=styles["biarc_style"]):
 
         self.get_defs()
-        # Add marker to defs if it doesnot exists
-        '''
-        for i in [0, 1]:
-            style['biarc%s_r' % i] = simplestyle.parseStyle(
-                style['biarc%s' % i])
-            style['biarc%s_r' % i]["marker-start"] = "none"
-            del(style['biarc%s_r' % i]["marker-end"])
-            style['biarc%s_r' % i] = simplestyle.formatStyle(
-                style['biarc%s_r' % i])
-        '''
+
         if group == None:
             group = inkex.etree.SubElement(self.layers[min(1, len(
                 self.layers)-1)], inkex.addNS('g', 'svg'), {"gcodetools": "Preview group"})
@@ -1636,7 +1609,7 @@ class laser_gcode(inkex.Effect):
                         end_coords = np.array(np_finalLines[:, 1])
 
                         distances = np.array(end_coords[:, 1]-start_coords[:, 1])
-
+                        distances = np.abs(distances)
                         np_finalLines = (np_finalLines[distances > tiny_infill_factor * options.laser_beam_with])
                         # print_("final_line: ", np_finalLines)
 
@@ -1938,10 +1911,7 @@ class laser_gcode(inkex.Effect):
                     else:
                         offset_y = 0
 
-                    tempGcode = self.generate_gcode(curve, layer, self.tool_perimeter)
-                    gcode += tempGcode
-
-                    print_("Gcode: ", tempGcode)
+                    gcode += self.generate_gcode(curve, layer, self.tool_perimeter)
 
         if gcode != '':
             self.export_gcode(gcode)

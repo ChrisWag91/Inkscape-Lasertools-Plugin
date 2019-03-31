@@ -12,7 +12,7 @@
    inkscape:export-ydpi="89"
    inkscape:export-xdpi="89"
    inkscape:export-filename="/mnt/Daten/GoogleDrive/Projekte/05_CNC Projekte/P0100_Birthday_Boards/CAM/P0100_Birthday_Board_Felix_Setup.png"
-   sodipodi:docname="P0100_Birthday_Board_Felix_Test.svg"
+   sodipodi:docname="test10_double_outlines.svg"
    inkscape:version="0.92.4 5da689c313, 2019-01-14"
    id="svg8"
    version="1.1"
@@ -28,15 +28,15 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.24748737"
-     inkscape:cx="1409.7453"
-     inkscape:cy="1020.9592"
+     inkscape:zoom="2.8"
+     inkscape:cx="1417.4641"
+     inkscape:cy="501.80966"
      inkscape:document-units="mm"
-     inkscape:current-layer="layer2"
+     inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="1920"
-     inkscape:window-height="1015"
-     inkscape:window-x="0"
+     inkscape:window-height="1051"
+     inkscape:window-x="1920"
      inkscape:window-y="0"
      inkscape:window-maximized="1" />
   <metadata
@@ -52,35 +52,69 @@
     </rdf:RDF>
   </metadata>
   <g
-     inkscape:groupmode="layer"
-     id="layer2"
-     inkscape:label="Layer 2"
      style="display:inline;opacity:0.59899998"
-     transform="translate(0,-510)" />
+     inkscape:label="Layer 2"
+     id="layer2"
+     inkscape:groupmode="layer" />
   <g
-     inkscape:label="Layer 1"
-     inkscape:groupmode="layer"
+     style="display:inline"
      id="layer1"
-     transform="translate(0,33)"
-     style="display:inline">
+     inkscape:groupmode="layer"
+     inkscape:label="Layer 1">
     <flowRoot
-       xml:space="preserve"
-       id="flowRoot846"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:192px;line-height:1.25;font-family:TimeBurner;-inkscape-font-specification:TimeBurner;letter-spacing:0px;word-spacing:0px;fill:#ff0000;fill-opacity:1;stroke:none"
-       transform="translate(-1.0583333,-1.0583333)"><flowRegion
-         id="flowRegion848"
-         style="font-size:192px;fill:#ff0000"><rect
-           id="rect850"
-           width="1482.9039"
-           height="1579.8785"
-           x="1870.8025"
+       id="flowRoot846"
+       xml:space="preserve"><flowRegion
+         style="font-size:192px;fill:#ff0000"
+         id="flowRegion848"><rect
+           transform="matrix(1.000000,0.000000,0.000000,1.000000,-1.058333,31.941667)"
+           style="font-size:192px;fill:#ff0000"
            y="439.31012"
-           style="font-size:192px;fill:#ff0000" /></flowRegion><flowPara
+           x="1870.8025"
+           height="1579.8785"
+           width="1482.9039"
+           id="rect850" /></flowRegion><flowPara
          id="flowPara852" /></flowRoot>    <path
-       style="fill:#000000;stroke-width:0.08466666"
-       d="m 371.61351,142.56774 h 14.478 v 1.94733 1.94733 h -12.78467 -12.78466 v 8.72067 8.72067 h -1.69334 -1.69333 v -10.668 -10.668 z m 0,25.23066 h 14.478 v 1.94734 1.94733 h -12.78467 -12.78466 v 8.72067 8.72066 h -1.69334 -1.69333 v -10.668 -10.668 z"
        id="path867"
-       inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cccccccccccccccccccccccccc" />
+       d="M371.61351 175.56774C371.61351 175.56774 386.09151 175.56774 386.09151 175.56774C386.09151 175.56774 386.09151 177.51507 386.09151 177.51507C386.09151 177.51507 386.09151 179.4624 386.09151 179.4624C386.09151 179.4624 373.30684 179.4624 373.30684 179.4624C373.30684 179.4624 360.52218 179.4624 360.52218 179.4624C360.52218 179.4624 360.52218 188.18307 360.52218 188.18307C360.52218 188.18307 360.52218 196.90374 360.52218 196.90374C360.52218 196.90374 358.82884 196.90374 358.82884 196.90374C358.82884 196.90374 357.13551 196.90374 357.13551 196.90374C357.13551 196.90374 357.13551 186.23574 357.13551 186.23574C357.13551 186.23574 357.13551 175.56774 357.13551 175.56774C357.13551 175.56774 371.61351 175.56774 371.61351 175.56774M371.61351 200.7984C371.61351 200.7984 386.09151 200.7984 386.09151 200.7984C386.09151 200.7984 386.09151 202.74574 386.09151 202.74574C386.09151 202.74574 386.09151 204.69307 386.09151 204.69307C386.09151 204.69307 373.30684 204.69307 373.30684 204.69307C373.30684 204.69307 360.52218 204.69307 360.52218 204.69307C360.52218 204.69307 360.52218 213.41374 360.52218 213.41374C360.52218 213.41374 360.52218 222.1344 360.52218 222.1344C360.52218 222.1344 358.82884 222.1344 358.82884 222.1344C358.82884 222.1344 357.13551 222.1344 357.13551 222.1344C357.13551 222.1344 357.13551 211.4664 357.13551 211.4664C357.13551 211.4664 357.13551 200.7984 357.13551 200.7984C357.13551 200.7984 371.61351 200.7984 371.61351 200.7984"
+       style="stroke-width:0.0316803454875;fill:#000000" />
+  </g>
+  <g
+     id="g1011"
+     gcodetools="Gcodetools orientation group">
+    <g
+       id="g1003"
+       gcodetools="Gcodetools orientation point (2 points)">
+      <path
+         id="path999"
+         style="stroke:none;fill:#000000;"
+         gcodetools="Gcodetools orientation point arrow"
+         d="M0.0 330.0C0.0 330.0 2.9375 323.65625 2.9375 323.65625C2.9375 323.65625 3.75 325.5625 3.75 325.5625C3.75 325.5625 10.5937486404 318.71875136 10.5937486404 318.71875136C10.5937486404 318.71875136 10.5937486404 318.71875136 10.5937486404 318.71875136C10.5937486404 318.71875136 11.2812486404 319.40625136 11.2812486404 319.40625136C11.2812486404 319.40625136 4.4374986404 326.25000136 4.4374986404 326.25000136C4.4374986404 326.25000136 6.3437486404 327.06250136 6.3437486404 327.06250136C6.3437486404 327.06250136 0.0 330.0 0.0 330.0C0.0 330.0 0.0 330.0 0.0 330.0" />
+      <text
+         id="text1001"
+         transform="matrix(1.000000,0.000000,0.000000,1.000000,0.000000,0.000000)"
+         xml:space="preserve"
+         y="330.0"
+         x="0.0"
+         style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;"
+         gcodetools="Gcodetools orientation point text">(0.0; 0.0; 0.0)</text>
+    </g>
+    <g
+       id="g1009"
+       gcodetools="Gcodetools orientation point (2 points)">
+      <path
+         id="path1005"
+         style="stroke:none;fill:#000000;"
+         gcodetools="Gcodetools orientation point arrow"
+         d="M100.0 330.0C100.0 330.0 102.9375 323.65625 102.9375 323.65625C102.9375 323.65625 103.75 325.5625 103.75 325.5625C103.75 325.5625 110.59374864 318.71875136 110.59374864 318.71875136C110.59374864 318.71875136 110.59374864 318.71875136 110.59374864 318.71875136C110.59374864 318.71875136 111.28124864 319.40625136 111.28124864 319.40625136C111.28124864 319.40625136 104.43749864 326.25000136 104.43749864 326.25000136C104.43749864 326.25000136 106.34374864 327.06250136 106.34374864 327.06250136C106.34374864 327.06250136 100.0 330.0 100.0 330.0C100.0 330.0 100.0 330.0 100.0 330.0" />
+      <text
+         id="text1007"
+         transform="matrix(1.000000,0.000000,0.000000,1.000000,0.000000,0.000000)"
+         xml:space="preserve"
+         y="330.0"
+         x="100.0"
+         style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;"
+         gcodetools="Gcodetools orientation point text">(100.0; 0.0; 0.0)</text>
+    </g>
   </g>
 </svg>
