@@ -65,7 +65,7 @@ if profiling:
 timestamp = datetime.datetime.fromtimestamp
 math.pi2 = math.pi*2
 doc_hight = 0
-tiny_infill_factor = 3  # x times the laser beam width
+tiny_infill_factor = 2  # x times the laser beam width will be removed
 straight_tolerance = 0.001
 straight_distance_tolerance = 0.001
 engraving_tolerance = 0.002
@@ -1610,7 +1610,7 @@ class laser_gcode(inkex.Effect):
 
                         distances = np.array(end_coords[:, 1]-start_coords[:, 1])
                         distances = np.abs(distances)
-                        np_finalLines = (np_finalLines[distances > tiny_infill_factor * options.laser_beam_with])
+                        np_finalLines = (np_finalLines[distances > (tiny_infill_factor * options.laser_beam_with)])
                         # print_("final_line: ", np_finalLines)
 
                     print_(time.time() - timestamp, "s for calculating infill")
