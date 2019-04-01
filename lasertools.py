@@ -39,7 +39,7 @@ import re
 import time
 import datetime
 import cmath
-import numpy
+import numpy as np
 import gettext
 _ = gettext.gettext
 
@@ -56,8 +56,8 @@ gcode = ""
 
 noOfThreads = 4
 csp = []
-profiling = False  # Disable if not debugging
-debug = False      # Disable if not debugging
+profiling = False    # Disable if not debugging
+debug = False        # Disable if not debugging
 
 if profiling:
     import lsprofcalltree
@@ -65,6 +65,7 @@ if profiling:
 timestamp = datetime.datetime.fromtimestamp
 math.pi2 = math.pi*2
 doc_hight = 0
+tiny_infill_factor = 2  # x times the laser beam width will be removed
 straight_tolerance = 0.001
 straight_distance_tolerance = 0.001
 engraving_tolerance = 0.002
@@ -84,11 +85,10 @@ M02
 
 styles = {
     "biarc_style": {
-        'biarc0':    simplestyle.formatStyle({'stroke': '#88f', 'fill': 'none', "marker-end": 'none', 'stroke-width': '0.1'}),
-        'biarc1':    simplestyle.formatStyle({'stroke': '#8f8', 'fill': 'none', "marker-end": 'none', 'stroke-width': '0.1'}),
         'line':        simplestyle.formatStyle({'stroke': '#f88', 'fill': 'none', "marker-end": 'none', 'stroke-width': '0.1'}),
-        'area':        simplestyle.formatStyle({'stroke': '#777', 'fill': 'none', "marker-end": 'none', 'stroke-width': '0.1'}),
+        'biarc1':        simplestyle.formatStyle({'stroke': '#8f8', 'fill': 'none', "marker-end": 'none', 'stroke-width': '0.5'})
     }
+
 }
 
 ################################################################################
@@ -106,35 +106,19 @@ def checkIfLineInsideShape(splitted_line):
 
     if l1 != l2:
         if point_inside_csp(p, csp):
-            if point_inside_csp(pMod, csp):
+            if point_inside_csp(pMod, csp) and len(splitted_line) == 2:
                 return splitted_line
+
             else:
-                return[]
+                return[[0, 0], [0, 0]]
         else:
-            return []
+            return [[0, 0], [0, 0]]
     else:
-        return []
+        return [[0, 0], [0, 0]]
 
 
 def csp_segment_to_bez(sp1, sp2):
     return sp1[1:]+sp2[:2]
-
-
-def csp_split(sp1, sp2, t=.5):
-    [x1, y1], [x2, y2], [x3, y3], [x4, y4] = sp1[1], sp1[2], sp2[0], sp2[1]
-    x12 = x1+(x2-x1)*t
-    y12 = y1+(y2-y1)*t
-    x23 = x2+(x3-x2)*t
-    y23 = y2+(y3-y2)*t
-    x34 = x3+(x4-x3)*t
-    y34 = y3+(y4-y3)*t
-    x1223 = x12+(x23-x12)*t
-    y1223 = y12+(y23-y12)*t
-    x2334 = x23+(x34-x23)*t
-    y2334 = y23+(y34-y23)*t
-    x = x1223+(x2334-x1223)*t
-    y = y1223+(y2334-y1223)*t
-    return [sp1[0], sp1[1], [x12, y12]], [[x1223, y1223], [x, y], [x2334, y2334]], [[x34, y34], sp2[1], sp2[2]]
 
 
 def csp_true_bounds(csp):
@@ -569,66 +553,11 @@ class P:
 
     def l2(self): return self.x*self.x + self.y*self.y
 
-
-################################################################################
-# Biarc function
-# Calculates biarc approximation of cubic super path segment
-# splits segment if needed or approximates it with straight line
-################################################################################
-def biarc(sp1, sp2, z1, z2, depth=0):
-    def biarc_split(sp1, sp2, z1, z2, depth):
-        if depth < options.biarc_max_split_depth:
-            sp1, sp2, sp3 = csp_split(sp1, sp2)
-            l1, l2 = cspseglength(sp1, sp2), cspseglength(sp2, sp3)
-            if l1+l2 == 0:
-                zm = z1
-            else:
-                zm = z1+(z2-z1)*l1/(l1+l2)
-            return biarc(sp1, sp2, z1, zm, depth+1)+biarc(sp2, sp3, zm, z2, depth+1)
-        else:
-            return [[sp1[1], 'line', 0, 0, sp2[1], [z1, z2]]]
-
-    P0, P4 = P(sp1[1]), P(sp2[1])
-    TS, TE, v = (P(sp1[2])-P0), -(P(sp2[0])-P4), P0 - P4
-    tsa, tea = TS.angle(), TE.angle()
-    if TE.mag() < straight_distance_tolerance and TS.mag() < straight_distance_tolerance:
-        # Both tangents are zerro - line straight
-        return [[sp1[1], 'line', 0, 0, sp2[1], [z1, z2]]]
-    if TE.mag() < straight_distance_tolerance:
-        TE = -(TS+v).unit()
-        r = TS.mag()/v.mag()*2
-    elif TS.mag() < straight_distance_tolerance:
-        TS = -(TE+v).unit()
-        r = 1/(TE.mag()/v.mag()*2)
-    else:
-        r = TS.mag()/TE.mag()
-    TS, TE = TS.unit(), TE.unit()
-    tang_are_parallel = ((tsa-tea) % math.pi < straight_tolerance or math.pi -
-                         (tsa-tea) % math.pi < straight_tolerance)
-    if (tang_are_parallel and
-        ((v.mag() < straight_distance_tolerance or TE.mag() < straight_distance_tolerance or TS.mag() < straight_distance_tolerance) or
-         1-abs(TS*v/(TS.mag()*v.mag())) < straight_tolerance)):
-                # Both tangents are parallel and start and end are the same - line straight
-                # or one of tangents still smaller then tollerance
-
-                # Both tangents and v are parallel - line straight
-        return [[sp1[1], 'line', 0, 0, sp2[1], [z1, z2]]]
-
-    c, b, a = v*v, 2*v*(r*TS+TE), 2*r*(TS*TE-1)
-    if v.mag() == 0:
-        return biarc_split(sp1, sp2, z1, z2, depth)
-    asmall, bsmall = abs(a) < 10**-10, abs(b) < 10**-10
-    if not asmall:
-        discr = b*b-4*a*c
-        if discr < 0:
-            raise ValueError(a, b, c, discr)
-    elif asmall and bsmall:
-        return biarc_split(sp1, sp2, z1, z2, depth)
-
-
 ################################################################################
 # Polygon class
 ################################################################################
+
+
 class Polygon:
     def __init__(self, polygon=None):
         self.polygon = [] if polygon == None else polygon[:]
@@ -838,18 +767,12 @@ class Polygon:
             last_edge = [(last[0][0]-last[1][0])/last[2],
                          (last[0][1]-last[1][1])/last[2]]
             for p in edges:
-                # draw_pointer(list(p[0])+[p[0][0]+last_edge[0]*40,p[0][1]+last_edge[1]*40], "Red", "line", width=1)
-                # print_("len(edges)=",len(edges))
                 cur = [(p[1][0]-p[0][0])/p[2], (p[1][1]-p[0][1])/p[2]]
                 cos, sin = dot(cur, last_edge),  cross(cur, last_edge)
-                # draw_pointer(list(p[0])+[p[0][0]+cur[0]*40,p[0][1]+cur[1]*40], "Orange", "line", width=1, comment = [sin,cos])
-                # print_("cos, sin=",cos,sin)
-                # print_("min_angle_before=",min_angle)
 
                 if angle_is_less(sin, cos, min_angle[0], min_angle[1]):
                     min_angle = [sin, cos]
                     next = p
-                # print_("min_angle=",min_angle)
 
             return next
 
@@ -876,8 +799,6 @@ class Polygon:
                     raise ValueError("Hull error")
                 loops1 += 1
                 next = get_closes_edge_by_angle(edges[last[1]], last)
-                # draw_pointer(next[0]+next[1],"Green","line", comment=i, width= 1)
-                # print_(next[0],"-",next[1])
 
                 last = next
                 poly += [list(last[0])]
@@ -912,8 +833,10 @@ class laser_gcode(inkex.Effect):
                                      dest="file",                                default="output.ngc",                   help="File name")
         self.OptionParser.add_option("",   "--add-numeric-suffix-to-filename",  action="store", type="inkbool",
                                      dest="add_numeric_suffix_to_filename",      default=False,                          help="Add numeric suffix to file name")
+        self.OptionParser.add_option("",   "--laser-command-perimeter",         action="store", type="string",
+                                     dest="laser_command_perimeter",             default="S100",                         help="Laser gcode command Perimeter")
         self.OptionParser.add_option("",   "--laser-command",                   action="store", type="string",
-                                     dest="laser_command",                       default="S100",                         help="Laser gcode command")
+                                     dest="laser_command",                       default="S100",                         help="Laser gcode command infill")
         self.OptionParser.add_option("",   "--laser-off-command",               action="store", type="string",
                                      dest="laser_off_command",                   default="S1",                           help="Laser gcode end command")
         self.OptionParser.add_option("",   "--laser-beam-with",                 action="store", type="float",
@@ -931,7 +854,7 @@ class laser_gcode(inkex.Effect):
         self.OptionParser.add_option("",   "--engraving-draw-calculation-paths", action="store", type="inkbool",
                                      dest="engraving_draw_calculation_paths",    default=True,                           help="Draw additional graphics to debug engraving path")
         self.OptionParser.add_option("",   "--biarc-max-split-depth",           action="store", type="int",             dest="biarc_max_split_depth",
-                                     default="10",                           help="Defines maximum depth of splitting while approximating using biarcs.")
+                                     default="2",                           help="Defines maximum depth of splitting while approximating using biarcs.")
         self.OptionParser.add_option("",   "--area-fill-angle",                 action="store", type="float",           dest="area_fill_angle",
                                      default="0",                            help="Fill area with lines heading this angle")
         self.OptionParser.add_option("",   "--area-fill-shift",                 action="store", type="float",
@@ -942,17 +865,56 @@ class laser_gcode(inkex.Effect):
                                      dest="add_contours",                        default=True,                           help="Add contour to Gcode paths")
         self.OptionParser.add_option("",   "--add-infill",                      action="store", type="inkbool",
                                      dest="add_infill",                          default=True,                           help="Add infill to Gcode paths")
+        self.OptionParser.add_option("",   "--remove-tiny-infill-paths",        action="store", type="inkbool",
+                                     dest="remove_tiny_infill_paths",            default=True,                           help="Remove tiny infill paths from Gcode")
         self.OptionParser.add_option("",   "--multi_thread",                      action="store", type="inkbool",
                                      dest="multi_thread",                          default=True,                           help="Activate multithreading support")
 
-    def parse_curve(self, p, layer, w=None, f=None):
+    def parse_curve(self, p, layer):
 
         c = []
         if len(p) == 0:
             return []
+
         p = self.transform_csp(p, layer)
 
+        # this code is intended to replace the code below.
+        # At the Moment there is a problem with muliple paths, where the fist/last path will not be generated
+        # TODO: Fix that
+        '''
+        print_("p_post_Trans ", p)
+        startPoints = np.zeros(shape=[len(p), 2])
+        endPoints = np.zeros(shape=[len(p), 2])
+
+        # reduce Array size
+        for i in range(0, len(p)):
+            elRed = np.array(p[i])
+            elRed = elRed[:, 0]
+            startPoints[i] = elRed[0]
+            endPoints[i] = elRed[-1]
+
+        print_("StartPoints", startPoints)
+        print_("EndPoints", endPoints)
+        print_("elRed", elRed)
+
+        sortedPoints = np.array(self.sort_points(
+            startPoints[:, 0], startPoints[:, 1], endPoints[:, 0], endPoints[:, 1]))
+
+        for point in sortedPoints:
+            ind = np.argwhere(startPoints == point[0])[0, 0]
+            elRed = np.array(p[ind])
+            elRed = elRed[:, 0]
+
+            c += [[[point[0], point[1]], 'move']]
+
+            for i in range(1, len(elRed)):
+                c += [[[elRed[i-1, 0], elRed[i-1, 1]], 'line', [elRed[i, 0], elRed[i, 1]]]]
+
+            c += [[[elRed[-1, 0], elRed[-1, 1]], 'end']]
+
         # Sort to reduce Rapid distance
+        '''
+
         k = range(1, len(p))
         keys = [0]
         while len(k) > 0:
@@ -960,37 +922,92 @@ class laser_gcode(inkex.Effect):
             dist = None
             for i in range(len(k)):
                 start = p[k[i]][0][1]
-                dist = max(
-                    (-((end[0]-start[0])**2+(end[1]-start[1])**2), i),   dist)
+                dist = max((-((end[0]-start[0])**2+(end[1]-start[1])**2), i),   dist)
             keys += [k[dist[1]]]
             del k[dist[1]]
         for k in keys:
             subpath = p[k]
-            c += [[[subpath[0][1][0], subpath[0][1][1]], 'move', 0, 0]]
+            c += [[[subpath[0][1][0], subpath[0][1][1]], 'move']]
+            # print_([[[subpath[0][1][0], subpath[0][1][1]], 'move']])
             for i in range(1, len(subpath)):
+                # print_("subpath: ", subpath[i-1])
                 sp1 = [[subpath[i-1][j][0], subpath[i-1][j][1]]
                        for j in range(3)]
                 sp2 = [[subpath[i][j][0], subpath[i][j][1]] for j in range(3)]
-                if w == None:
-                    c += biarc(sp1, sp2, 0, 0)
-                else:
-                    c += biarc(sp1, sp2, -f(w[k][i-1]), -f(w[k][i]))
-            c += [[[subpath[-1][1][0], subpath[-1][1][1]], 'end', 0, 0]]
-            # print_("Curve: " + str(c) + "/n")
+                c += [[[sp1[0][0], sp1[0][1]], 'line', [sp2[0][0], sp2[0][1]]]]
+                # print_("sp1: ", sp1)
+            c += [[[subpath[-1][1][0], subpath[-1][1][1]], 'end']]
+            # print_([[[subpath[-1][1][0], subpath[-1][1][1]], 'end']])
+        # print_("Curve: " + str(c))
+
         return c
+
+    def parse_curve2d(self, p, layer):
+
+        c = []
+        if len(p) == 0:
+            return []
+        p = self.transform_csp(p, layer)
+        # print_("p: ", p)
+        np_p = np.array(p)
+        # print_("len p Slice: ", len(np_p[:, 0, 0, 0]))
+        sortedToolpaths = self.sort_points(np_p[:, 0, 0, 0], np_p[:, 0, 0, 1], np_p[:, 1, 0, 0], np_p[:, 1, 0, 1])
+
+        for path in sortedToolpaths:
+            c += [[[path[0], path[1]], 'move']]
+            c += [[[path[0], path[1]], 'line', [path[2], path[3]]]]
+            c += [[[path[2], path[3]], 'end']]
+
+        return c
+
+    def sort_points(self, x1, y1, x2, y2):
+        sortedList = np.zeros((len(x1), 4))
+
+        xpos = np.array(x1[1:])
+        xposInv = np.array(x2[1:])
+        ypos = np.array(y1[1:])
+        yposInv = np.array(y2[1:])
+
+        sortedList[0] = [x1[0], y1[0], x2[0], y2[0]]
+        actXPos = x2[0]
+        actYPos = y2[0]
+
+        i = 1
+
+        while len(xpos) > 0:
+            xDist = np.abs(xpos - actXPos)
+            xDistInv = np.abs(xposInv - actXPos)
+            yDist = np.abs(ypos - actYPos)
+            yDistInv = np.abs(yposInv - actYPos)
+
+            distances = np.array([np.add(xDist, yDist), np.add(xDistInv, yDistInv)])
+            distances = np.abs(distances)
+            # print_("Distances: ", distances)
+
+            minInd = np.unravel_index(np.argmin(distances, axis=None), distances.shape)
+
+            if minInd[0] == 0:
+                sortedList[i] = [xpos[minInd[1]], ypos[minInd[1]], xposInv[minInd[1]], yposInv[minInd[1]]]
+                actXPos = xposInv[minInd[1]]
+                actYPos = yposInv[minInd[1]]
+
+            else:
+                sortedList[i] = [xposInv[minInd[1]], yposInv[minInd[1]], xpos[minInd[1]], ypos[minInd[1]]]
+                actXPos = xpos[minInd[1]]
+                actYPos = ypos[minInd[1]]
+
+            xpos = np.delete(xpos, minInd[1])
+            ypos = np.delete(ypos, minInd[1])
+            xposInv = np.delete(xposInv, minInd[1])
+            yposInv = np.delete(yposInv, minInd[1])
+
+            i = i+1
+
+        return sortedList
 
     def draw_curve(self, curve, layer, group=None, style=styles["biarc_style"]):
 
         self.get_defs()
-        # Add marker to defs if it doesnot exists
-
-        for i in [0, 1]:
-            style['biarc%s_r' % i] = simplestyle.parseStyle(
-                style['biarc%s' % i])
-            style['biarc%s_r' % i]["marker-start"] = "none"
-            del(style['biarc%s_r' % i]["marker-end"])
-            style['biarc%s_r' % i] = simplestyle.formatStyle(
-                style['biarc%s_r' % i])
 
         if group == None:
             group = inkex.etree.SubElement(self.layers[min(1, len(
@@ -998,13 +1015,14 @@ class laser_gcode(inkex.Effect):
 
         s = ''
         a, b, c = [0., 0.], [1., 0.], [0., 1.]
-        a, b, c = self.transform(a, layer, True), self.transform(
-            b, layer, True), self.transform(c, layer, True)
+        a, b, c = self.transform(a, layer, True), self.transform(b, layer, True), self.transform(c, layer, True)
 
-        for sk in curve:
-            si = sk[:]
-            si[0], si[2] = self.transform(si[0], layer, True), (self.transform(
-                si[2], layer, True) if type(si[2]) == type([]) and len(si[2]) == 2 else si[2])
+        for si in curve:
+
+            si[0] = self.transform(si[0], layer, True)
+            # print_("si ", si)
+            if len(si) == 3:
+                si[2] = self.transform(si[2], layer, True)
 
             if s != '':
                 if s[1] == 'line':
@@ -1082,8 +1100,7 @@ class laser_gcode(inkex.Effect):
 # Crve defenitnion [start point, type = {'arc','line','move','end'}, arc center, arc angle, end point, [zstart, zend]]
 ################################################################################
 
-    def generate_gcode(self, curve, layer, depth):
-        tool = self.tools
+    def generate_gcode(self, curve, layer, tool):
         global doc_height
         global offset_y
 
@@ -1114,6 +1131,11 @@ class laser_gcode(inkex.Effect):
             #    Creating Gcode for curve between s=curve[i-1] and si=curve[i] start at s[0] end at s[4]=si[0]
             s, si = curve[i-1], curve[i]
 
+            si[0] = self.transform(si[0], layer, True)
+            # print_("si ", si)
+            if len(si) == 3:
+                si[2] = self.transform(si[2], layer, True)
+
             s[0][1] = s[0][1] - offset_y
             si[0][1] = si[0][1] - offset_y
 
@@ -1121,19 +1143,20 @@ class laser_gcode(inkex.Effect):
             if s[1] == 'move':
                 g += "G00" + c(si[0]) + "\n" + tool['gcode before path'] + "\n"
                 lg = 'G00'
-            elif s[1] == 'end':
-                g += tool['gcode after path'] + "\n"
-                lg = 'G00'
             elif s[1] == 'line':
                 if lg == "G00":
                     g += "G01 " + feed + "\n"
                 g += "G01" + c(si[0]) + "\n"
                 lg = 'G01'
 
-        if si[1] == 'end':
-            g += tool['gcode after path'] + "\n"
+            if si[1] == 'end':
+                g += tool['gcode after path'] + "\n"
 
         return g
+
+        #     elif s[1] == 'end':
+        # g += tool['gcode after path'] + "\n"
+        # lg = 'G00'
 
     def get_transforms(self, g):
         root = self.document.getroot()
@@ -1187,7 +1210,7 @@ class laser_gcode(inkex.Effect):
                     #    Zcoordinates definition taken from Orientatnion point 1 and 2
                     self.Zcoordinates[layer] = [
                         max(points[0][1][2], points[1][1][2]), min(points[0][1][2], points[1][1][2])]
-                    matrix = numpy.array([
+                    matrix = np.array([
                         [points[0][0][0], points[0][0][1], 1, 0, 0, 0, 0, 0, 0],
                         [0, 0, 0, points[0][0][0],
                          points[0][0][1], 1, 0, 0, 0],
@@ -1207,13 +1230,13 @@ class laser_gcode(inkex.Effect):
                          [0][0], points[2][0][1], 1]
                     ])
 
-                    if numpy.linalg.det(matrix) != 0:
-                        m = numpy.linalg.solve(matrix,
-                                               numpy.array(
-                                                   [[points[0][1][0]], [points[0][1][1]], [1], [points[1][1][0]], [
-                                                       points[1][1][1]], [1], [points[2][1][0]], [points[2][1][1]], [1]]
-                                               )
-                                               ).tolist()
+                    if np.linalg.det(matrix) != 0:
+                        m = np.linalg.solve(matrix,
+                                            np.array(
+                                                [[points[0][1][0]], [points[0][1][1]], [1], [points[1][1][0]], [
+                                                    points[1][1][1]], [1], [points[2][1][0]], [points[2][1][1]], [1]]
+                                            )
+                                            ).tolist()
                         self.transform_matrix[layer] = [
                             [m[j*3+i][0] for i in range(3)] for j in range(3)]
 
@@ -1222,7 +1245,7 @@ class laser_gcode(inkex.Effect):
                 else:
                     self.error(_("Orientation points are wrong! (if there are two orientation points they sould not be the same. If there are three orientation points they should not be in a straight line.)"), "wrong_orientation_points")
 
-            self.transform_matrix_reverse[layer] = numpy.linalg.inv(
+            self.transform_matrix_reverse[layer] = np.linalg.inv(
                 self.transform_matrix[layer]).tolist()
             # print_(self.transform_matrix)
             # print_(self.transform_matrix_reverse)
@@ -1241,9 +1264,13 @@ class laser_gcode(inkex.Effect):
                 for j in range(len(csp_[i]))] for i in range(len(csp_))]
 
         for i in xrange(len(csp)):
+
             for j in xrange(len(csp[i])):
+                # print_("csp pre trans", csp[i][j])
                 for k in xrange(len(csp[i][j])):
                     csp[i][j][k] = self.transform(csp[i][j][k], layer, reverse)
+                # csp[i][j][0] = self.transform(csp[i][j][0], layer, reverse)
+                # print_("csp post trans", csp[i][j])
         return csp
 
 ################################################################################
@@ -1512,7 +1539,7 @@ class laser_gcode(inkex.Effect):
 
                     # get the intersection points
                     splitted_line = [[lines[0][0]]]
-                    # intersections = {}
+
                     for l1, l2, in zip(lines[0], lines[0][1:]):
                         ints = []
 
@@ -1563,25 +1590,32 @@ class laser_gcode(inkex.Effect):
 
                     else:
                         while i < len(splitted_line):
-                            finalLines += [checkIfLineInsideShape(
-                                splitted_line[i])]
+                            finalLines += [checkIfLineInsideShape(splitted_line[i])]
                             i += 1
+
                     i = 0
 
                     # remove empty elements
-                    while i < len(finalLines):
-                        if finalLines[i] == [] or finalLines[i] == [[]]:
-                            del finalLines[i]
-                        else:
-                            i += 1
-                    print_("number of final lines: ", len(finalLines))
-                    #print_("final_line: ", finalLines)
+                    # print_("final_line: ", finalLines)
+                    np_finalLines = np.array(finalLines, dtype=np.float32)
+                    index_zeros = np.argwhere(np_finalLines == [[0, 0], [0, 0]])
+                    np_finalLines = np.delete(np_finalLines, index_zeros, axis=0)
 
-                    splitted_line = finalLines
+                    # print_("np_final_line: ", np_finalLines)
+                    print_("number of final lines: ", len(np_finalLines))
+
+                    if options.remove_tiny_infill_paths:
+                        start_coords = np.array(np_finalLines[:, 0])
+                        end_coords = np.array(np_finalLines[:, 1])
+
+                        distances = np.array(end_coords[:, 1]-start_coords[:, 1])
+                        distances = np.abs(distances)
+                        np_finalLines = (np_finalLines[distances > (tiny_infill_factor * options.laser_beam_with)])
+                        # print_("final_line: ", np_finalLines)
 
                     print_(time.time() - timestamp, "s for calculating infill")
 
-                    csp_line = csp_from_polyline(splitted_line)
+                    csp_line = csp_from_polyline(np_finalLines)
                     csp_line = self.transform_csp(csp_line, layer, True)
 
                     if self.get_transforms(layer) != []:
@@ -1589,7 +1623,7 @@ class laser_gcode(inkex.Effect):
                     else:
                         offset_y = 0
 
-                    curve = self.parse_curve(csp_line, layer)
+                    curve = self.parse_curve2d(csp_line, layer)
 
                     print_("    drawing curve")
                     timestamp = time.time()
@@ -1599,7 +1633,7 @@ class laser_gcode(inkex.Effect):
                     print_(time.time() - timestamp, "s for drawing curve")
                     timestamp = time.time()
 
-                    gcode += self.generate_gcode(curve, layer, 0)
+                    gcode += self.generate_gcode(curve, layer, self.tool_infill)
 
                     print_(time.time() - timestamp, "s for generating Gcode")
 
@@ -1851,18 +1885,25 @@ class laser_gcode(inkex.Effect):
                             if len(cspm) != 0:
                                 cspm += [cspm[0]]
                                 # print_("cspm",cspm, "/n")
-
+                                '''
                                 if self.options.engraving_draw_calculation_paths:
                                     node = inkex.etree.SubElement(engraving_group, inkex.addNS('path', 'svg'), {
                                         "d":     cubicsuperpath.formatPath([cspm]),
                                         'style':    styles["biarc_style"]['biarc1'],
                                         "lasertools": "Engraving calculation paths",
                                     })
-
+                                '''
+                                # for entr in cspm:
+                                #    print_("cspm ", entr)
                                 cspe += [cspm]
 
                 if cspe != []:
-                    curve = self.parse_curve(cspe, layer, None, None)
+
+                    # for entr in cspe:
+                        #    print_("cspe ", entr)
+                    curve = self.parse_curve(cspe, layer)
+                    # for entr in curve:
+                    #    print_("curve ", entr)
                     self.draw_curve(curve, layer, engraving_group)
 
                     if self.get_transforms(layer) != []:
@@ -1870,7 +1911,7 @@ class laser_gcode(inkex.Effect):
                     else:
                         offset_y = 0
 
-                    gcode += self.generate_gcode(curve, layer, 0)
+                    gcode += self.generate_gcode(curve, layer, self.tool_perimeter)
 
         if gcode != '':
             self.export_gcode(gcode)
@@ -1894,14 +1935,12 @@ class laser_gcode(inkex.Effect):
         orientation_group = inkex.etree.SubElement(layer, inkex.addNS(
             'g', 'svg'), {"gcodetools": "Gcodetools orientation group"})
 
-        # translate == ['0', '-917.7043']
         if layer.get("transform") != None:
             translate = layer.get("transform").replace(
                 "translate(", "").replace(")", "").split(",")
         else:
             translate = [0, 0]
 
-        # doc height in pixels (38 mm == 143.62204724px)
         global doc_height
         doc_height = self.unittouu(self.document.getroot().xpath(
             '@height', namespaces=inkex.NSS)[0])
@@ -2089,13 +2128,21 @@ class laser_gcode(inkex.Effect):
             self.orientation(self.layers[min(0, len(self.layers)-1)])
             self.get_info()
 
-        self.tools = {
-            "name": "Laser Engraver",
-            "id": "Laser Engraver",
+        self.tool_infill = {
+            "name": "Laser Engraver Infill",
+            "id": "Laser Engraver Infill",
             "penetration feed": self.options.laser_speed,
             "feed": self.options.laser_speed,
             "gcode before path": ("G04 P" + self.options.power_delay + " " + self.options.laser_command),
-            #"gcode after path": (self.options.laser_off_command + "\n" + "G00")
+            "gcode after path": self.options.laser_off_command
+        }
+
+        self.tool_perimeter = {
+            "name": "Laser Engraver Perimeter",
+            "id": "Laser Engraver Perimeter",
+            "penetration feed": self.options.laser_speed,
+            "feed": self.options.laser_speed,
+            "gcode before path": ("G04 P" + self.options.power_delay + " " + self.options.laser_command_perimeter),
             "gcode after path": self.options.laser_off_command
         }
 

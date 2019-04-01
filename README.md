@@ -41,6 +41,12 @@ If you work from a svg file:
 8. **IMPORTANT:** the calculation takes some time, so be patient
 9. finished
 
+**Hint:**
+If you end up with very complex paths (paths with thousands of points) you can simplify the path before exporting it to Gcode.
+Use the function Path/Simplify.
+The amount of simplification can be set under Edit/Preferences/Behavior.
+A value of 0,0002 should work for most applications.
+
 As of now, the first method seems to be more reliable.
 
 Make sure the specified directory exists.
@@ -69,6 +75,7 @@ https://github.com/nevir/readable-licenses/blob/master/markdown/GPLv2-LICENSE.md
 
 ## Open Bugs
 - Fix infill glitches which appear on some paths
+    - Workaround: make Path/Difference or Path Union operation which does not change the shape. That will fix the glitch.
 - Scaling factor needs to be Set to 1
 - Displayed units needs to be set to mm
 - Multithreading currently disabled on Windows systems
