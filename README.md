@@ -45,7 +45,7 @@ If you work from a svg file:
 If you end up with very complex paths (paths with thousands of points) you can simplify the path before exporting it to Gcode.
 Use the function Path/Simplify.
 The amount of simplification can be set under Edit/Preferences/Behavior.
-A value of 0,0005 should work for most applications.
+A value of 0,0002 should work for most applications.
 
 As of now, the first method seems to be more reliable.
 
