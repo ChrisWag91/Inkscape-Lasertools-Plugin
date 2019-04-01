@@ -866,7 +866,7 @@ class laser_gcode(inkex.Effect):
         self.OptionParser.add_option("",   "--add-infill",                      action="store", type="inkbool",
                                      dest="add_infill",                          default=True,                           help="Add infill to Gcode paths")
         self.OptionParser.add_option("",   "--remove-tiny-infill-paths",        action="store", type="inkbool",
-                                     dest="remove_tiny_infill_paths",            default=True,                           help="Remove tiny infill paths from Gcode")
+                                     dest="remove_tiny_infill_paths",            default=False,                           help="Remove tiny infill paths from Gcode")
         self.OptionParser.add_option("",   "--multi_thread",                      action="store", type="inkbool",
                                      dest="multi_thread",                          default=True,                           help="Activate multithreading support")
 
