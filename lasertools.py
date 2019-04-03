@@ -1774,8 +1774,11 @@ class laser_gcode(inkex.Effect):
 
                         # LT: Create my own list. n1LT[j] is for subpath j
                         nlLT = []
+
+                        '''
                         noOfElements = 0
                         delElements = 0
+                                                
                         for j in xrange(len(cspi)):  # LT For each subpath...
                             # Remove zero length segments, assume closed path
                             i = 0
@@ -1791,6 +1794,8 @@ class laser_gcode(inkex.Effect):
 
                         print_("Total number of points ", noOfElements)
                         print_("Number of removed points: ", delElements)
+
+                        '''
 
                         for csp in cspi:
                             # print_("csp is",csp)
