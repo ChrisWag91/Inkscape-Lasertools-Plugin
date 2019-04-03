@@ -62,13 +62,13 @@ debug = False        # Disable if not debugging
 if profiling:
     import lsprofcalltree
 
-timestamp = datetime.datetime.fromtimestamp
+timestamp = datetime.datetime.now()
 math.pi2 = math.pi*2
 doc_hight = 0
 tiny_infill_factor = 2  # x times the laser beam width will be removed
-straight_tolerance = 0.001
-straight_distance_tolerance = 0.001
-engraving_tolerance = 0.002
+straight_tolerance = 0.0001
+straight_distance_tolerance = 0.0001
+engraving_tolerance = 0.0002
 options = {}
 cspm = []
 offset_y = 0
@@ -402,6 +402,7 @@ def csp_from_polyline(line):
     return [[[point[:] for _ in range(3)] for point in subline] for subline in line]
 
 
+'''
 def csp_close_all_subpaths(csp, tolerance=0.000001):
     for i in range(len(csp)):
         if point_to_point_d2(csp[i][0][1], csp[i][-1][1]) > tolerance**2:
@@ -411,11 +412,12 @@ def csp_close_all_subpaths(csp, tolerance=0.000001):
             if csp[i][0][1] != csp[i][-1][1]:
                 csp[i][-1][1] = csp[i][0][1][:]
     return csp
-
+'''
 
 ################################################################################
 # Some vector functions
 ################################################################################
+
 
 def normalize(x, y):
     l = math.sqrt(x**2+y**2)
@@ -498,6 +500,19 @@ def print_(*arg):
             f.write(s)
         f.write("\n")
         f.close()
+
+
+def print_debug(*arg):
+    if debug:
+        print_("DEBUG: ", *arg)
+
+
+def print_time(*arg):
+    global timestamp
+
+    time = datetime.datetime.now() - timestamp
+    print_(time, "   ", *arg)
+    timestamp = datetime.datetime.now()
 
 ################################################################################
 # Point (x,y) operations
@@ -1104,7 +1119,7 @@ class laser_gcode(inkex.Effect):
         global doc_height
         global offset_y
 
-        print_("    Laser parameters: " + str(tool))
+        print_debug("    Laser parameters: " + str(tool))
 
         def c(c):
             c = [c[i] if i < len(c) else None for i in range(6)]
@@ -1121,10 +1136,9 @@ class laser_gcode(inkex.Effect):
             self.last_used_tool == None
         except:
             self.last_used_tool = None
-        print_("    working on curve")
+
         # print_("Curve: " + str(curve) + "/n")
         g = ""
-
         lg, f = 'G00', "F%.1f" % tool['penetration feed']
 
         for i in range(1, len(curve)):
@@ -1429,7 +1443,6 @@ class laser_gcode(inkex.Effect):
         print_("===================================================================")
         print_("Start filling area", time.strftime("%d.%m.%Y %H:%M:%S"))
         print_("===================================================================")
-        timestamp2 = time.time()
 
         if len(self.selected_paths) <= 0:
             self.error(
@@ -1443,12 +1456,15 @@ class laser_gcode(inkex.Effect):
                 if self.options.laser_beam_with <= 0:
                     self.error(_("Laser beam with must be > 0!"))
 
-                print_("    selecting paths")
-                timestamp = time.time()
+                print_time("Time until path selection")
 
                 for path in self.selected_paths[layer]:
                     lines = []
-                    # print_(("doing path",    path.get("style"), path.get("d")))
+
+                    print_("")
+                    print_("Working on path: ")
+                    print_debug(path.get("style"), path.get("d"))
+
                     area_group = inkex.etree.SubElement(
                         path.getparent(), inkex.addNS('g', 'svg'))
                     d = path.get('d')
@@ -1459,22 +1475,17 @@ class laser_gcode(inkex.Effect):
                                    "selection_contains_objects_that_are_not_paths")
                         continue
 
-                    print_(time.time() - timestamp, "s for path selection")
-                    print_("    start csp transformation")
-                    timestamp = time.time()
+                    print_time("Time for path selection")
 
                     csp = cubicsuperpath.parsePath(d)
                     csp = self.apply_transforms(path, csp)
-                    csp = csp_close_all_subpaths(csp)
+                    # csp = csp_close_all_subpaths(csp)
                     csp = self.transform_csp(csp, layer)
 
-                    print_("csp length: ", len(csp))
+                    print_debug("csp length: ", len(csp))
                     # print_("csp: ", csp)
 
-                    print_("    finished csp transformation")
-                    print_(time.time() - timestamp, "s for transformation")
-                    print_("    calculate bounds")
-                    timestamp = time.time()
+                    print_time("Time for csp transformation")
 
                     # rotate the path to get bounds in defined direction.
                     a = - self.options.area_fill_angle
@@ -1490,8 +1501,7 @@ class laser_gcode(inkex.Effect):
                         b[k] = csp_at_t(rotated_path[i][j-1],
                                         rotated_path[i][j], t)[k % 2]
 
-                    print_("    finished calculating bounds")
-                    print_(time.time() - timestamp, "s calculating bounds")
+                    print_time("Time for calculating bounds")
 
                     # Zig-zag
                     r = self.options.laser_beam_with
@@ -1501,9 +1511,6 @@ class laser_gcode(inkex.Effect):
                         return
 
                     lines += [[]]
-
-                    print_("    calculating infill")
-                    timestamp = time.time()
 
                     i = b[0] - self.options.area_fill_shift*r
                     top = True
@@ -1523,8 +1530,7 @@ class laser_gcode(inkex.Effect):
                         top = not top
                         i += r
 
-                    print_(time.time() - timestamp,
-                           "s for calculating zigzag pattern")
+                    print_time("Time for calculating zigzag pattern")
 
                     # print_("lines from infill:", lines)
 
@@ -1534,8 +1540,7 @@ class laser_gcode(inkex.Effect):
                         a)+point[1]*math.cos(a)] for point in subpath] for subpath in lines]
 
                     # print_("lines: ", lines)
-                    print_(time.time() - timestamp,
-                           "s for calculating zigzag + rotating")
+                    print_time("Time for rotating")
 
                     # get the intersection points
                     splitted_line = [[lines[0][0]]]
@@ -1573,9 +1578,8 @@ class laser_gcode(inkex.Effect):
                         splitted_line[-1] += [l2]
                         i = 0
 
-                    print_(time.time() - timestamp,
-                           "s for calculating zigzag + rotating + intersections")
-                    print_("number of splitted lines: ", len(splitted_line))
+                    print_time("Time for calculating intersections")
+                    print_debug("number of splitted lines: ", len(splitted_line))
 
                     finalLines = []
 
@@ -1602,7 +1606,7 @@ class laser_gcode(inkex.Effect):
                     np_finalLines = np.delete(np_finalLines, index_zeros, axis=0)
 
                     # print_("np_final_line: ", np_finalLines)
-                    print_("number of final lines: ", len(np_finalLines))
+                    print_debug("number of final lines: ", len(np_finalLines))
 
                     if options.remove_tiny_infill_paths:
                         start_coords = np.array(np_finalLines[:, 0])
@@ -1613,7 +1617,7 @@ class laser_gcode(inkex.Effect):
                         np_finalLines = (np_finalLines[distances > (tiny_infill_factor * options.laser_beam_with)])
                         # print_("final_line: ", np_finalLines)
 
-                    print_(time.time() - timestamp, "s for calculating infill")
+                    print_time("Time for calculating infill paths")
 
                     csp_line = csp_from_polyline(np_finalLines)
                     csp_line = self.transform_csp(csp_line, layer, True)
@@ -1623,19 +1627,16 @@ class laser_gcode(inkex.Effect):
                     else:
                         offset_y = 0
 
+                    print_time("Time for transforming infill paths")
+
                     curve = self.parse_curve2d(csp_line, layer)
-
-                    print_("    drawing curve")
-                    timestamp = time.time()
-
                     self.draw_curve(curve, layer, area_group)
 
-                    print_(time.time() - timestamp, "s for drawing curve")
-                    timestamp = time.time()
+                    print_time("Time for drawing curve")
 
                     gcode += self.generate_gcode(curve, layer, self.tool_infill)
 
-                    print_(time.time() - timestamp, "s for generating Gcode")
+                    print_time("Time for generating Gcode")
 
         if gcode != '' and not(self.options.add_contours):
             self.export_gcode(gcode)
@@ -1643,7 +1644,6 @@ class laser_gcode(inkex.Effect):
         print_("===================================================================")
         print_("Finished filling area", time.strftime("%d.%m.%Y %H:%M:%S"))
         print_("===================================================================")
-        print_(time.time() - timestamp2, "s for infill")
 
 ################################################################################
 # Engraving
@@ -1764,6 +1764,11 @@ class laser_gcode(inkex.Effect):
                     self.selected_paths[layer][0].getparent(), inkex.addNS('g', 'svg'))
 
                 for node in self.selected_paths[layer]:
+
+                    print_("")
+                    print_("Working on path: ")
+                    print_debug(node.get("style"), node.get("d"))
+
                     if node.tag == inkex.addNS('path', 'svg'):
                         cspi = cubicsuperpath.parsePath(node.get('d'))
 
