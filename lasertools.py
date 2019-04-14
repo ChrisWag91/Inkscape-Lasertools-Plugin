@@ -849,8 +849,7 @@ class laser_gcode(inkex.Effect):
             self.header += "G21\n"
 
         else:
-            self.error(
-                _("Directory does not exist! Please specify existing directory at options tab!"), "error")
+            self.error(_("Directory does not exist! Please specify existing directory at options tab!"), "error")
             return False
 
         if self.options.add_numeric_suffix_to_filename:
@@ -878,8 +877,7 @@ class laser_gcode(inkex.Effect):
             f = open(self.options.directory+self.options.file, "w")
             f.close()
         except:
-            self.error(_("Can not write to specified file!\n%s" %
-                         (self.options.directory+self.options.file)), "error")
+            self.error(_("Can not write to specified file!\n%s" % (self.options.directory+self.options.file)), "error")
             return False
         return True
 
@@ -980,14 +978,14 @@ class laser_gcode(inkex.Effect):
             # print_(str("I: " + str(i)))
             if self.layers[i] not in self.orientation_points:
                 self.error(_("Orientation points for '%s' layer have not been found! Please add orientation points using Orientation tab!") % layer.get(
-                    inkex.addNS('label', 'inkscape')), "no_orientation_points")
+                    inkex.addNS('label', 'inkscape')))
             elif self.layers[i] in self.transform_matrix:
                 self.transform_matrix[layer] = self.transform_matrix[self.layers[i]]
             else:
                 orientation_layer = self.layers[i]
                 if len(self.orientation_points[orientation_layer]) > 1:
                     self.error(_("There are more than one orientation point groups in '%s' layer") % orientation_layer.get(
-                        inkex.addNS('label', 'inkscape')), "more_than_one_orientation_point_groups")
+                        inkex.addNS('label', 'inkscape')))
                 points = self.orientation_points[orientation_layer][0]
                 if len(points) == 2:
                     points += [[[(points[1][0][1]-points[0][0][1])+points[0][0][0], -(points[1][0][0]-points[0][0][0])+points[0][0][1]],
@@ -1030,9 +1028,10 @@ class laser_gcode(inkex.Effect):
                             [m[j*3+i][0] for i in range(3)] for j in range(3)]
 
                     else:
-                        self.error(_("Orientation points are wrong! (if there are two orientation points they sould not be the same. If there are three orientation points they should not be in a straight line.)"), "wrong_orientation_points")
+                        self.error(
+                            _("Orientation points are wrong! (if there are two orientation points they sould not be the same. If there are three orientation points they should not be in a straight line.)"))
                 else:
-                    self.error(_("Orientation points are wrong! (if there are two orientation points they sould not be the same. If there are three orientation points they should not be in a straight line.)"), "wrong_orientation_points")
+                    self.error(_("Orientation points are wrong! (if there are two orientation points they sould not be the same. If there are three orientation points they should not be in a straight line.)"))
 
             self.transform_matrix_reverse[layer] = np.linalg.inv(
                 self.transform_matrix[layer]).tolist()
@@ -1070,37 +1069,10 @@ class laser_gcode(inkex.Effect):
 # sepparated strings (case is ignoreg).
 ################################################################################
     def error(self, s, type_="Warning"):
-        notes = "Note "
-        warnings = """
-                        Warning tools_warning
-                        bad_orientation_points_in_some_layers
-                        more_than_one_orientation_point_groups
-                        more_than_one_tool
-                        orientation_have_not_been_defined
-                        tool_have_not_been_defined
-                        selection_does_not_contain_paths
-                        selection_does_not_contain_paths_will_take_all
-                        selection_is_empty_will_comupe_drawing
-                        selection_contains_objects_that_are_not_paths
-                        """
-        errors = """
-                        Error
-                        wrong_orientation_points
-                        area_tools_diameter_error
-                        no_tool_error
-                        active_layer_already_has_tool
-                        active_layer_already_has_orientation_points
-                    """
-        if type_.lower() in re.split("[\s\n,\.]+", errors.lower()):
+
+        if type_ == "Warning":
             print_(s)
             inkex.errormsg(s+"\n")
-            sys.exit()
-        elif type_.lower() in re.split("[\s\n,\.]+", warnings.lower()):
-            print_(s)
-            if not self.options.suppress_all_messages:
-                inkex.errormsg(s+"\n")
-        elif type_.lower() in re.split("[\s\n,\.]+", notes.lower()):
-            print_(s)
         else:
             print_(s)
             inkex.errormsg(s)
@@ -1153,7 +1125,7 @@ class laser_gcode(inkex.Effect):
                             layer.get(inkex.addNS('label', 'inkscape')), points))
                     else:
                         self.error(_("Warning! Found bad orientation points in '%s' layer. Resulting Gcode could be corrupt!") % layer.get(
-                            inkex.addNS('label', 'inkscape')), "bad_orientation_points_in_some_layers")
+                            inkex.addNS('label', 'inkscape')))
                 elif i.tag == inkex.addNS('path', 'svg'):
                     if "gcodetools" not in i.keys():
                         self.paths[layer] = self.paths[layer] + \
@@ -1164,7 +1136,7 @@ class laser_gcode(inkex.Effect):
                 elif i.tag == inkex.addNS("g", 'svg'):
                     recursive_search(i, layer, (i.get("id") in self.selected))
                 elif i.get("id") in self.selected:
-                    self.error(_("This extension works with Paths and Dynamic Offsets and groups of them only! All other objects will be ignored!\nSolution 1: press Path->Object to path or Shift+Ctrl+C.\nSolution 2: Path->Dynamic offset or Ctrl+J.\nSolution 3: export all contours to PostScript level 2 (File->Save As->.ps) and File->Import this file."), "selection_contains_objects_that_are_not_paths")
+                    self.error(_("This extension works with Paths and Dynamic Offsets and groups of them only! All other objects will be ignored!\nSolution 1: press Path->Object to path or Shift+Ctrl+C.\nSolution 2: Path->Dynamic offset or Ctrl+J.\nSolution 3: export all contours to PostScript level 2 (File->Save As->.ps) and File->Import this file."))
 
         recursive_search(self.document.getroot(), self.document.getroot())
 
@@ -1220,8 +1192,7 @@ class laser_gcode(inkex.Effect):
         print_("===================================================================")
 
         if len(self.selected_paths) <= 0:
-            self.error(
-                _("This extension requires at least one selected path."), "warning")
+            self.error(_("This extension requires at least one selected path."))
             return
         if not self.check_dir():
             return
@@ -1246,8 +1217,7 @@ class laser_gcode(inkex.Effect):
 
                     if d == None:
                         print_("omitting non-path")
-                        self.error(_("Warning: omitting non-path"),
-                                   "selection_contains_objects_that_are_not_paths")
+                        self.error(_("Warning: omitting non-path"))
                         continue
 
                     print_time("Time for path selection")
@@ -1281,8 +1251,7 @@ class laser_gcode(inkex.Effect):
                     # Zig-zag
                     r = self.options.laser_beam_with
                     if r <= 0:
-                        self.error(
-                            'Laser diameter must be greater than 0!', 'error')
+                        self.error(_("Laser diameter must be greater than 0!"), "error")
                         return
 
                     lines += [[]]
@@ -1523,8 +1492,7 @@ class laser_gcode(inkex.Effect):
         global offset_y
 
         if len(self.selected_paths) <= 0:
-            self.error(
-                _("Please select at least one path to engrave and run again."), "warning")
+            self.error(_("Please select at least one path to engrave and run again."))
             return
         if self.options.add_infill == False:
             if not self.check_dir():
@@ -1709,8 +1677,7 @@ class laser_gcode(inkex.Effect):
         if layer == None:
             layer = self.current_layer if self.current_layer is not None else self.document.getroot()
         if layer in self.orientation_points:
-            self.error(_("Active layer already has orientation points! Remove them or select another layer!"),
-                       "active_layer_already_has_orientation_points")
+            self.error(_("Active layer already has orientation points! Remove them or select another layer!"))
 
         orientation_group = inkex.etree.SubElement(layer, inkex.addNS(
             'g', 'svg'), {"gcodetools": "Gcodetools orientation group"})
@@ -1888,8 +1855,7 @@ class laser_gcode(inkex.Effect):
                     print_ = lambda *x: None
 
             else:
-                self.error(
-                    ("Directory does not exist! Please specify existing directory at options tab!"), "error")
+                self.error(("Directory does not exist! Please specify existing directory at options tab!"), "error")
 
         else:
             print_ = lambda *x: None
@@ -1903,8 +1869,6 @@ class laser_gcode(inkex.Effect):
             print_debug("Starting Program")
 
         if self.orientation_points == {}:
-            # self.error(
-            #    _("Orientation points have not been defined! A default set of orientation points has been automatically added."), "warning")
             self.orientation(self.layers[min(0, len(self.layers)-1)])
             self.get_info()
 
