@@ -66,9 +66,9 @@ timestamp = datetime.datetime.now()
 math.pi2 = math.pi*2
 doc_hight = 0
 tiny_infill_factor = 2  # x times the laser beam width will be removed
-straight_tolerance = 0.0001
-straight_distance_tolerance = 0.0001
-engraving_tolerance = 0.0002
+straight_tolerance = 0.000001
+straight_distance_tolerance = 0.000001
+engraving_tolerance = 0.000002
 options = {}
 cspm = []
 offset_y = 0
@@ -95,7 +95,7 @@ styles = {
 # Cubic Super Path additional functions
 ################################################################################
 
-
+'''
 def checkIfLineInsideShape(splitted_line):
     # check if the middle point of the first lines segment is inside the path.
     # and remove the subline if not.
@@ -106,11 +106,45 @@ def checkIfLineInsideShape(splitted_line):
 
     if l1 != l2:
         if point_inside_csp(p, csp):
-            if point_inside_csp(pMod, csp) and len(splitted_line) == 2:
-                return splitted_line
+            if point_inside_csp(pMod, csp):
+                if len(splitted_line) == 2:
+                    return splitted_line
+                else:
+                    return [splitted_line[0], splitted_line[1]]
 
             else:
-                return[[0, 0], [0, 0]]
+                print_debug("splitted_line removed: ", splitted_line)
+                return [[0, 0], [0, 0]]
+        else:
+            return [[0, 0], [0, 0]]
+    else:
+        return [[0, 0], [0, 0]]
+
+
+'''
+
+
+def checkIfLineInsideShape(splitted_line):
+    # print_("sl input", splitted_line)
+    # check if the middle point of the first lines segment is inside the path.
+    # and remove the subline if not.
+    l1, l2 = splitted_line[0], splitted_line[1]
+
+    if l1 == l2 and len(splitted_line) > 2:
+        l2 = splitted_line[2]
+
+    p = [(l1[0]+l2[0])/2, (l1[1]+l2[1])/2]
+
+    if point_inside_csp(p, csp):
+        if len(splitted_line) > 2:
+            print_debug("len splitted line > 2", splitted_line)
+
+        # if l1 == l2 and len(splitted_line) > 2:
+        #    l2 = splitted_line[2]
+
+        if l1 != l2:
+            print_debug("splitted line ", [l1, l2])
+            return [l1, l2]
         else:
             return [[0, 0], [0, 0]]
     else:
@@ -872,8 +906,6 @@ class laser_gcode(inkex.Effect):
                                      default="2",                           help="Defines maximum depth of splitting while approximating using biarcs.")
         self.OptionParser.add_option("",   "--area-fill-angle",                 action="store", type="float",           dest="area_fill_angle",
                                      default="0",                            help="Fill area with lines heading this angle")
-        self.OptionParser.add_option("",   "--area-fill-shift",                 action="store", type="float",
-                                     dest="area_fill_shift",                     default="0",                            help="Shift the lines by tool d * shift")
         self.OptionParser.add_option("",   "--engraving-newton-iterations",     action="store", type="int",             dest="engraving_newton_iterations",
                                      default="20",                           help="Number of sample points used to calculate distance")
         self.OptionParser.add_option("",   "--add-contours",                    action="store", type="inkbool",
@@ -1512,7 +1544,8 @@ class laser_gcode(inkex.Effect):
 
                     lines += [[]]
 
-                    i = b[0] - self.options.area_fill_shift*r
+                    #i = b[0] - self.options.area_fill_shift*r
+                    i = b[0] - r + 0.001
                     top = True
                     last_one = True
                     while (i < b[2] or last_one):
@@ -1568,8 +1601,9 @@ class laser_gcode(inkex.Effect):
                         ints.sort()
 
                         # mitigate vertical line glitch problem
+
                         if len(ints) % 2 != 0:
-                            # print_("removing intersection: ", len(ints))
+                            print_debug("removing intersection: ", ints)
                             ints = []
 
                         for i in ints:
@@ -1599,6 +1633,7 @@ class laser_gcode(inkex.Effect):
 
                     i = 0
 
+                    print_debug("number of final lines before removing emptys: ", len(finalLines))
                     # remove empty elements
                     # print_("final_line: ", finalLines)
                     np_finalLines = np.array(finalLines, dtype=np.float32)
@@ -2127,10 +2162,10 @@ class laser_gcode(inkex.Effect):
 
         # wait to attatch debugger to process
         if debug:
-            print_("Python version:", sys.version_info)
-            print_("Waiting for Debugger to be attached")
-            time.sleep(30)
-            print_("Starting Program")
+            print_debug("Python version:", sys.version_info)
+            print_debug("Waiting for Debugger to be attached")
+            time.sleep(3)
+            print_debug("Starting Program")
 
         if self.orientation_points == {}:
             # self.error(

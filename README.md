@@ -4,6 +4,8 @@ A simple plugin to convert Inkscape vector graphics to Gcode for DIY laser engra
 ## Version 0.91
 Tested with Inkscape 0.92
 This project is based on the Gcodetools extension.
+
+This Version is work in progress. Please feel free to test it, but don't rely on it in production.
 *******************************************************************************************************************************
 
 ## How to use Lasertools
@@ -76,6 +78,7 @@ https://github.com/nevir/readable-licenses/blob/master/markdown/GPLv2-LICENSE.md
 ## Open Bugs
 - Fix infill glitches which appear on some paths
     - Workaround: make Path/Difference or Path Union operation which does not change the shape. That will fix the glitch.
+    - Workaround: export as png, reimport and convert to paths again
 - Scaling factor needs to be Set to 1
 - Displayed units needs to be set to mm
 - Multithreading currently disabled on Windows systems
@@ -83,8 +86,7 @@ https://github.com/nevir/readable-licenses/blob/master/markdown/GPLv2-LICENSE.md
 ## Features to be implemented / tested
 - Automatically convert text to paths 
 - Make Laser On/Off command configurable
-- Make offsets work
-- Make a help section in the ui with the step by step instructions
+- Make a help section in the UI with the step by step instructions
 - Performance improvements / multithreading
 
 *******************************************************************************************************************************
