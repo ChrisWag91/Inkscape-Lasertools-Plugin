@@ -64,10 +64,8 @@ if profiling:
 
 timestamp = datetime.datetime.now()
 math.pi2 = math.pi*2
-doc_hight = 0
 tiny_infill_factor = 2  # x times the laser beam width will be removed
 straight_tolerance = 0.000001
-straight_distance_tolerance = 0.000001
 engraving_tolerance = 0.000002
 options = {}
 cspm = []

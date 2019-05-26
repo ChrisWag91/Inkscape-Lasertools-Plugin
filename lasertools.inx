@@ -9,8 +9,8 @@
 	<param name="laser-command" type="string" _gui-text="Laser ON Command Infill:">S100</param>
 	<param name="laser-off-command" type="string" _gui-text="Laser OFF Command:">S1</param>	
 	<param name="laser-beam-with" type="float" precision="2" min="0.00" max="10.00" _gui-text="Laser beam with (mm):">0.30</param>	
-	<param name="laser-speed" type="int" min="0" max="4000" _gui-text="Laser Speed (mm/min or in/min):">1000</param>	
-	<param name="power-delay" type="float" min="0" max="1000" _gui-text="Power-On Delay (ms or s):">0</param>	
+	<param name="laser-speed" type="int" min="0" max="4000" _gui-text="Laser Speed (mm/min):">1000</param>	
+	<param name="power-delay" type="float" min="0" max="1000" _gui-text="Power-On Delay (ms):">0</param>	
 	<param name="passes" type="int" min="1" max="100" _gui-text="Passes:">1</param>
 	<param name="add-contours" type="boolean" _gui-text="Add contours">true</param>
 	<param name="add-infill" type="boolean" _gui-text="Add infill on closed loops">true</param>	
