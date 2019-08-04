@@ -632,7 +632,9 @@ class laser_gcode(inkex.Effect):
         self.OptionParser.add_option("",   "--laser-beam-with",                 action="store", type="float",
                                      dest="laser_beam_with",                     default="0.3",                          help="Laser speed (mm/min)")
         self.OptionParser.add_option("",   "--laser-speed",                     action="store", type="int",
-                                     dest="laser_speed",                         default="600",                          help="Laser speed (mm/min)")
+                                     dest="laser_speed",                         default="1200",                          help="Laser speed for infill (mm/min)")
+        self.OptionParser.add_option("",   "--laser-param-speed",               action="store", type="int",
+                                     dest="laser_param_speed",                         default="700",                          help="Laser speed for Parameter (mm/min)")
         self.OptionParser.add_option("",   "--passes",                          action="store", type="int",
                                      dest="passes",                              default="1",                            help="Quantity of passes")
         self.OptionParser.add_option("",   "--power-delay",                     action="store", type="string",
@@ -1882,8 +1884,8 @@ class laser_gcode(inkex.Effect):
         self.tool_perimeter = {
             "name": "Laser Engraver Perimeter",
             "id": "Laser Engraver Perimeter",
-            "penetration feed": self.options.laser_speed,
-            "feed": self.options.laser_speed,
+            "penetration feed": self.options.laser_param_speed,
+            "feed": self.options.laser_param_speed,
             "gcode before path": ("G04 P" + self.options.power_delay + " " + self.options.laser_command_perimeter),
             "gcode after path": self.options.laser_off_command
         }
