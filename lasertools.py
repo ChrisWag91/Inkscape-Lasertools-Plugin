@@ -81,11 +81,11 @@ cspm = []
 offset_y = 0
 defaults = {
     'header': """
-G90
+;Inkscape Lasertools G-code
+
 """,
     'footer': """G00 X0 Y0
-M05 S0
-M02
+
 """
 }
 
@@ -587,57 +587,50 @@ class laser_gcode(inkex.Effect):
         for _ in range(1, self.options.passes):
             gcode += "G91\n" + "\nG90\n" + gcode_pass
         f = open(self.options.directory+self.options.file, "w")
+        
+        if self.options.prefix_1 != "": self.header += self.options.prefix_1 + "\n"
+        if self.options.prefix_2 != "": self.header += self.options.prefix_2 + "\n"
+        if self.options.prefix_3 != "": self.header += self.options.prefix_3 + "\n"
+        
+        if self.options.suffix_1 != "": self.footer += self.options.suffix_1 + "\n"
+        if self.options.suffix_2 != "": self.footer += self.options.suffix_2 + "\n"
+        if self.options.suffix_3 != "": self.footer += self.options.suffix_3 + "\n"
+        
         f.write(self.header + "\n" + gcode + self.footer)
         f.close()
 
     def __init__(self):
         inkex.Effect.__init__(self)
-        self.OptionParser.add_option("-d", "--directory",                       action="store", type="string",
-                                     dest="directory",                           default="/insert your target directory here",      help="Output directory")
-        self.OptionParser.add_option("-f", "--filename",                        action="store", type="string",
-                                     dest="file",                                default="output.ngc",                   help="File name")
-        self.OptionParser.add_option("",   "--add-numeric-suffix-to-filename",  action="store", type="inkbool",
-                                     dest="add_numeric_suffix_to_filename",      default=False,                          help="Add numeric suffix to file name")
-        self.OptionParser.add_option("",   "--laser-command-perimeter",         action="store", type="string",
-                                     dest="laser_command_perimeter",             default="S100",                         help="Laser gcode command Perimeter")
-        self.OptionParser.add_option("",   "--laser-command",                   action="store", type="string",
-                                     dest="laser_command",                       default="S100",                         help="Laser gcode command infill")
-        self.OptionParser.add_option("",   "--laser-off-command",               action="store", type="string",
-                                     dest="laser_off_command",                   default="S1",                           help="Laser gcode end command")
-        self.OptionParser.add_option("",   "--laser-beam-with",                 action="store", type="float",
-                                     dest="laser_beam_with",                     default="1.0",                          help="Laser speed (mm/min)")
-        self.OptionParser.add_option("",   "--infill-overshoot",                 action="store", type="float",
-                                     dest="infill_overshoot",                     default="0.0",                          help="overshoot to limit acceleration overburn")
-        self.OptionParser.add_option("",   "--laser-speed",                     action="store", type="int",
-                                     dest="laser_speed",                         default="1200",                          help="Laser speed for infill (mm/min)")
-        self.OptionParser.add_option("",   "--laser-param-speed",               action="store", type="int",
-                                     dest="laser_param_speed",                         default="700",                          help="Laser speed for Parameter (mm/min)")
-        self.OptionParser.add_option("",   "--passes",                          action="store", type="int",
-                                     dest="passes",                              default="1",                            help="Quantity of passes")
-        self.OptionParser.add_option("",   "--power-delay",                     action="store", type="string",
-                                     dest="power_delay",                         default="0",                            help="Laser power-on delay (ms)")
-        self.OptionParser.add_option("",   "--linuxcnc",           action="store", type="inkbool",
-                                     dest="linuxcnc",               default=True,                           help="Use G64 P0.1 trajectory planning")
-        self.OptionParser.add_option("",   "--suppress-all-messages",           action="store", type="inkbool",
-                                     dest="suppress_all_messages",               default=True,                           help="Hide messages during g-code generation")
-        self.OptionParser.add_option("",   "--create-log",                      action="store", type="inkbool",
-                                     dest="log_create_log",                      default=True,                           help="Create log files")
-        self.OptionParser.add_option("",   "--engraving-draw-calculation-paths", action="store", type="inkbool",
-                                     dest="engraving_draw_calculation_paths",    default=True,                           help="Draw additional graphics to debug engraving path")
-        self.OptionParser.add_option("",   "--biarc-max-split-depth",           action="store", type="int",             dest="biarc_max_split_depth",
-                                     default="2",                           help="Defines maximum depth of splitting while approximating using biarcs.")
-        self.OptionParser.add_option("",   "--area-fill-angle",                 action="store", type="float",           dest="area_fill_angle",
-                                     default="0",                            help="Fill area with lines heading this angle")
-        self.OptionParser.add_option("",   "--engraving-newton-iterations",     action="store", type="int",             dest="engraving_newton_iterations",
-                                     default="20",                           help="Number of sample points used to calculate distance")
-        self.OptionParser.add_option("",   "--add-contours",                    action="store", type="inkbool",
-                                     dest="add_contours",                        default=True,                           help="Add contour to Gcode paths")
-        self.OptionParser.add_option("",   "--add-infill",                      action="store", type="inkbool",
-                                     dest="add_infill",                          default=True,                           help="Add infill to Gcode paths")
-        self.OptionParser.add_option("",   "--remove-tiny-infill-paths",        action="store", type="inkbool",
-                                     dest="remove_tiny_infill_paths",            default=False,                           help="Remove tiny infill paths from Gcode")
-        self.OptionParser.add_option("",   "--multi_thread",                      action="store", type="inkbool",
-                                     dest="multi_thread",                          default=True,                           help="Activate multithreading support")
+        self.OptionParser.add_option("-d", "--directory",   action="store", type="string",  dest="directory",   default="/insert your target directory here",   help="Output directory")
+        self.OptionParser.add_option("-f", "--filename",    action="store", type="string",  dest="file",        default="output.ngc",                           help="File name")
+        self.OptionParser.add_option("",   "--add-numeric-suffix-to-filename",  action="store", type="inkbool", dest="add_numeric_suffix_to_filename",  default=False,  help="Add numeric suffix to file name")
+        self.OptionParser.add_option("",   "--laser-command-perimeter",         action="store", type="string",  dest="laser_command_perimeter",         default="S100", help="Laser gcode command Perimeter")
+        self.OptionParser.add_option("",   "--laser-command",                   action="store", type="string",  dest="laser_command",                   default="S100", help="Laser gcode command infill")
+        self.OptionParser.add_option("",   "--laser-off-command",               action="store", type="string",  dest="laser_off_command",               default="S1",   help="Laser gcode end command")
+        self.OptionParser.add_option("",   "--laser-beam-with",                 action="store", type="float",   dest="laser_beam_with",                 default="1.0",  help="Laser speed (mm/min)")
+        self.OptionParser.add_option("",   "--infill-overshoot",                action="store", type="float",   dest="infill_overshoot",                default="0.0",  help="overshoot to limit acceleration overburn")
+        self.OptionParser.add_option("",   "--laser-speed",                     action="store", type="int",     dest="laser_speed",                     default="1200", help="Laser speed for infill (mm/min)")
+        self.OptionParser.add_option("",   "--laser-param-speed",               action="store", type="int",     dest="laser_param_speed",               default="700",  help="Laser speed for Parameter (mm/min)")
+        self.OptionParser.add_option("",   "--passes",                          action="store", type="int",     dest="passes",                          default="1",    help="Quantity of passes")
+        self.OptionParser.add_option("",   "--power-delay",                     action="store", type="string",  dest="power_delay",                     default="0",    help="Laser power-on delay (ms)")
+        self.OptionParser.add_option("",   "--linuxcnc",                        action="store", type="inkbool", dest="linuxcnc",                        default=True,   help="Use G64 P0.1 trajectory planning")
+        self.OptionParser.add_option("",   "--suppress-all-messages",           action="store", type="inkbool", dest="suppress_all_messages",           default=True,   help="Hide messages during g-code generation")
+        self.OptionParser.add_option("",   "--create-log",                      action="store", type="inkbool", dest="log_create_log",                  default=True,   help="Create log files")
+        self.OptionParser.add_option("",   "--engraving-draw-calculation-paths", action="store", type="inkbool", dest="engraving_draw_calculation_paths", default=True, help="Draw additional graphics to debug engraving path")
+        self.OptionParser.add_option("",   "--biarc-max-split-depth",           action="store", type="int",     dest="biarc_max_split_depth",           default="2",    help="Defines maximum depth of splitting while approximating using biarcs.")
+        self.OptionParser.add_option("",   "--area-fill-angle",                 action="store", type="float",   dest="area_fill_angle",                 default="0",    help="Fill area with lines heading this angle")
+        self.OptionParser.add_option("",   "--engraving-newton-iterations",     action="store", type="int",     dest="engraving_newton_iterations",     default="20",   help="Number of sample points used to calculate distance")
+        self.OptionParser.add_option("",   "--add-contours",                    action="store", type="inkbool", dest="add_contours",                    default=True,   help="Add contour to Gcode paths")
+        self.OptionParser.add_option("",   "--add-infill",                      action="store", type="inkbool", dest="add_infill",                      default=True,   help="Add infill to Gcode paths")
+        self.OptionParser.add_option("",   "--remove-tiny-infill-paths",        action="store", type="inkbool", dest="remove_tiny_infill_paths",        default=False,  help="Remove tiny infill paths from Gcode")
+        self.OptionParser.add_option("",   "--multi_thread",                    action="store", type="inkbool", dest="multi_thread",                    default=True,   help="Activate multithreading support")
+        self.OptionParser.add_option("",   "--active-tab",					    action="store", type="string", 	dest="active_tab",                      default="",		help="Defines which tab is active")
+        self.OptionParser.add_option("",   "--prefix1",                         action="store", type="string",  dest="prefix_1",                        default="",     help="First line before G-Code starts")
+        self.OptionParser.add_option("",   "--prefix2",                         action="store", type="string",  dest="prefix_2",                        default="",     help="Second line before G-Code starts")
+        self.OptionParser.add_option("",   "--prefix3",                         action="store", type="string",  dest="prefix_3",                        default="",     help="Third line before G-Code starts")
+        self.OptionParser.add_option("",   "--suffix1",                         action="store", type="string",  dest="suffix_1",                        default="",     help="First line after G-Code ends")
+        self.OptionParser.add_option("",   "--suffix2",                         action="store", type="string",  dest="suffix_2",                        default="",     help="Second line after G-Code ends")
+        self.OptionParser.add_option("",   "--suffix3",                         action="store", type="string",  dest="suffix_3",                        default="",     help="Third line after G-Code ends")
 
     def parse_curve(self, p, layer):
 
@@ -824,8 +817,6 @@ class laser_gcode(inkex.Effect):
                 f.close()
             else:
                 self.footer = defaults['footer']
-
-            self.header += "G21\n"
 
         else:
             self.error(_("Directory does not exist! Please specify existing directory at options tab!"), "error")

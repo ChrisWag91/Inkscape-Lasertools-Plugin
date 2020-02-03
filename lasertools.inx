@@ -4,25 +4,42 @@
     <id>Lasertools</id>
 	<dependency type="executable" location="extensions">lasertools.py</dependency>
 	<dependency type="executable" location="extensions">inkex.py</dependency>
+	<param name='active-tab' type="notebook">
 
-	<param name="laser-command-perimeter" type="string" _gui-text="Laser ON Command Perimeter:">S100</param>
-	<param name="laser-command" type="string" _gui-text="Laser ON Command Infill:">S100</param>
-	<param name="laser-off-command" type="string" _gui-text="Laser OFF Command:">S1</param>	
-	<param name="laser-beam-with" type="float" precision="2" min="0.00" max="10.00" _gui-text="Laser beam with (mm):">0.20</param>	
-	<param name="laser-speed" type="int" min="0" max="7000" _gui-text="Laser Infill Speed (mm/min):">1200</param>
-	<param name="infill-overshoot" type="float" precision="1" min="0.0" max="10.0" _gui-text="Infill overshoot (mm):">0</param>
-	<param name="laser-param-speed" type="int" min="0" max="7000" _gui-text="Laser Parameter Speed (mm/min):">700</param>		
-	<param name="power-delay" type="float" min="0" max="1000" _gui-text="Power-On Delay (ms):">0</param>	
-	<param name="passes" type="int" min="1" max="100" _gui-text="Passes:">1</param>
-	<param name="linuxcnc" type="boolean" _gui-text="LinuxCNC G64 P0.1 Trajectory planning">false</param>
-	<param name="add-contours" type="boolean" _gui-text="Add contours">true</param>
-	<param name="add-infill" type="boolean" _gui-text="Add infill on closed loops">true</param>	
-	<param name="remove-tiny-infill-paths" type="boolean" _gui-text="Remove tiny infill paths">false</param>	
-	<param name="directory" type="string" _gui-text="Directory:">/insert your target directory here</param>
-	<param name="filename" type="string" _gui-text="Filename:">output.ngc</param>
-	<param name="add-numeric-suffix-to-filename" type="boolean" _gui-text="Add numeric suffix to filename">true</param>
-  	<param name="create-log" type="boolean" _gui-text="Create log files">true</param>
-  	<param name="multi_thread" type="boolean" _gui-text="Enable multithreading">true</param>
+		<page name='lastertools' _gui-text='Lasertools'>	
+			<param name="laser-command-perimeter" type="string" _gui-text="Laser ON Command Perimeter:">S100</param>
+			<param name="laser-command" type="string" _gui-text="Laser ON Command Infill:">S100</param>
+			<param name="laser-off-command" type="string" _gui-text="Laser OFF Command:">S1</param>	
+			<param name="laser-beam-with" type="float" precision="2" min="0.00" max="10.00" _gui-text="Laser beam with (mm):">0.20</param>	
+			<param name="laser-speed" type="int" min="0" max="7000" _gui-text="Laser Infill Speed (mm/min):">1200</param>			
+			<param name="laser-param-speed" type="int" min="0" max="7000" _gui-text="Laser Parameter Speed (mm/min):">700</param>				
+			<param name="passes" type="int" min="1" max="100" _gui-text="Passes:">1</param>			
+			<param name="add-contours" type="boolean" _gui-text="Add contours">true</param>
+			<param name="add-infill" type="boolean" _gui-text="Add infill on closed loops">true</param>					
+			<param name="directory" type="string" _gui-text="Directory:">/insert your target directory here</param>
+			<param name="filename" type="string" _gui-text="Filename:">output.ngc</param>			
+		</page>
+
+		<page name='preferences' _gui-text='Preferences'>
+			<param name="infill-overshoot" type="float" precision="1" min="0.0" max="10.0" _gui-text="Infill overshoot (mm):">0</param>
+			<param name="power-delay" type="float" min="0" max="1000" _gui-text="Power-On Delay (ms):">0</param>
+			<param name="linuxcnc" type="boolean" _gui-text="LinuxCNC G64 P0.1 Trajectory planning">false</param>
+			<param name="remove-tiny-infill-paths" type="boolean" _gui-text="Remove tiny infill paths">false</param>
+			<param name="add-numeric-suffix-to-filename" type="boolean" _gui-text="Add numeric suffix to filename">true</param>
+			<param name="create-log" type="boolean" _gui-text="Create log files">true</param>
+			<param name="multi_thread" type="boolean" _gui-text="Enable multithreading">true</param>
+
+			<param name="name" type="description">Prefix G-Code</param>
+			<param name="prefix1" type="string" _gui-text="">G90	;Absolute programming</param>	
+			<param name="prefix2" type="string" _gui-text="">G21	;Programming in millimeters (mm)</param>
+			<param name="prefix3" type="string" _gui-text="">M03 S1 ;Activate laser and set power to 0 (CUSTOM)</param>
+
+			<param name="name" type="description">Suffix G-Code</param>
+			<param name="suffix1" type="string" _gui-text="">M05 S0	;Deactivate laser and set power to 0 (CUSTOM)</param>	
+			<param name="suffix2" type="string" _gui-text=""></param>
+			<param name="suffix3" type="string" _gui-text="">M02	;End of program</param>			
+		</page>
+	</param>
 
 	<effect needs-live-preview="false">
 		<effects-menu>
