@@ -608,7 +608,7 @@ class laser_gcode(inkex.Effect):
         self.OptionParser.add_option("",   "--laser-beam-with",                 action="store", type="float",
                                      dest="laser_beam_with",                     default="1.0",                          help="Laser speed (mm/min)")
         self.OptionParser.add_option("",   "--infill-overshoot",                 action="store", type="float",
-                                     dest="infill_overshoot",                     default="0.3",                          help="overshoot to limit acceleration overburn")
+                                     dest="infill_overshoot",                     default="0.0",                          help="overshoot to limit acceleration overburn")
         self.OptionParser.add_option("",   "--laser-speed",                     action="store", type="int",
                                      dest="laser_speed",                         default="1200",                          help="Laser speed for infill (mm/min)")
         self.OptionParser.add_option("",   "--laser-param-speed",               action="store", type="int",

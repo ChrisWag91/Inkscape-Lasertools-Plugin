@@ -62,6 +62,10 @@ Copy the .py and .inx file to the Inkscape Extentions folder.
 under linux:    /usr/share/inkscape/extensions
 under windows   C:\Program Files\Inkscape\share\extensions 
 
+## Dependencies
+- python2-lxml
+- python2-numpy
+
 *******************************************************************************************************************************
 
 ## Warning
