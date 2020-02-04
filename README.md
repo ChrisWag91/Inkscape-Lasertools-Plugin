@@ -89,7 +89,6 @@ https://github.com/nevir/readable-licenses/blob/master/markdown/GPLv2-LICENSE.md
 
 ## Features to be implemented / tested
 - Automatically convert text to paths 
-- Make Laser On/Off command configurable
 - Make a help section in the UI with the step by step instructions
 - Performance improvements / multithreading
 

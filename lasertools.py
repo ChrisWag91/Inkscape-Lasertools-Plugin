@@ -585,7 +585,11 @@ class laser_gcode(inkex.Effect):
     def export_gcode(self, gcode):
         gcode_pass = gcode
         for _ in range(1, self.options.passes):
-            gcode += "G91\n" + "\nG90\n" + gcode_pass
+            if self.options.z_stepdown == 0:
+                gcode += "\nG90 \n" + gcode_pass
+            else:                
+                gcode += "\nG91 \nG0 Z%s \nG90 \n" % self.options.z_stepdown + gcode_pass
+
         f = open(self.options.directory+self.options.file, "w")
         
         if self.options.prefix_1 != "": self.header += self.options.prefix_1 + "\n"
@@ -608,10 +612,11 @@ class laser_gcode(inkex.Effect):
         self.OptionParser.add_option("",   "--laser-command",                   action="store", type="string",  dest="laser_command",                   default="S100", help="Laser gcode command infill")
         self.OptionParser.add_option("",   "--laser-off-command",               action="store", type="string",  dest="laser_off_command",               default="S1",   help="Laser gcode end command")
         self.OptionParser.add_option("",   "--laser-beam-with",                 action="store", type="float",   dest="laser_beam_with",                 default="1.0",  help="Laser speed (mm/min)")
-        self.OptionParser.add_option("",   "--infill-overshoot",                action="store", type="float",   dest="infill_overshoot",                default="0.0",  help="overshoot to limit acceleration overburn")
+        self.OptionParser.add_option("",   "--infill-overshoot",                action="store", type="float",   dest="infill_overshoot",                default="0.0",  help="Overshoot to limit acceleration overburn")
         self.OptionParser.add_option("",   "--laser-speed",                     action="store", type="int",     dest="laser_speed",                     default="1200", help="Laser speed for infill (mm/min)")
         self.OptionParser.add_option("",   "--laser-param-speed",               action="store", type="int",     dest="laser_param_speed",               default="700",  help="Laser speed for Parameter (mm/min)")
         self.OptionParser.add_option("",   "--passes",                          action="store", type="int",     dest="passes",                          default="1",    help="Quantity of passes")
+        self.OptionParser.add_option("",   "--z-stepdown",                      action="store", type="float",   dest="z_stepdown",                      default="0.0",  help="Z-stepdown per pass for cutting operations")
         self.OptionParser.add_option("",   "--power-delay",                     action="store", type="string",  dest="power_delay",                     default="0",    help="Laser power-on delay (ms)")
         self.OptionParser.add_option("",   "--linuxcnc",                        action="store", type="inkbool", dest="linuxcnc",                        default=True,   help="Use G64 P0.1 trajectory planning")
         self.OptionParser.add_option("",   "--suppress-all-messages",           action="store", type="inkbool", dest="suppress_all_messages",           default=True,   help="Hide messages during g-code generation")
@@ -631,6 +636,7 @@ class laser_gcode(inkex.Effect):
         self.OptionParser.add_option("",   "--suffix1",                         action="store", type="string",  dest="suffix_1",                        default="",     help="First line after G-Code ends")
         self.OptionParser.add_option("",   "--suffix2",                         action="store", type="string",  dest="suffix_2",                        default="",     help="Second line after G-Code ends")
         self.OptionParser.add_option("",   "--suffix3",                         action="store", type="string",  dest="suffix_3",                        default="",     help="Third line after G-Code ends")
+
 
     def parse_curve(self, p, layer):
 
@@ -1715,14 +1721,12 @@ class laser_gcode(inkex.Effect):
             'g', 'svg'), {"gcodetools": "Gcodetools orientation group"})
 
         if layer.get("transform") != None:
-            translate = layer.get("transform").replace(
-                "translate(", "").replace(")", "").split(",")
+            translate = layer.get("transform").replace("translate(", "").replace(")", "").split(",")
         else:
             translate = [0, 0]
 
         global doc_height
-        doc_height = self.unittouu(self.document.getroot().xpath(
-            '@height', namespaces=inkex.NSS)[0])
+        doc_height = self.unittouu(self.document.getroot().xpath('@height', namespaces=inkex.NSS)[0])
 
         if self.document.getroot().get('height') == "100%":
             doc_height = 1052.3622047
