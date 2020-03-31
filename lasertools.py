@@ -257,7 +257,7 @@ def point_to_point_d2(a, b):
 
 
 def point_to_point_d(a, b):
-    return math.sqrt((a[0]-b[0])**2 + (a[1]-b[1])**2)
+    return math.hypot((a[0]-b[0]),(a[1]-b[1]))
 
 
 def csp_normalized_slope(sp1, sp2, t):
@@ -268,32 +268,32 @@ def csp_normalized_slope(sp1, sp2, t):
     f1x = 3*ax*t*t+2*bx*t+cx
     f1y = 3*ay*t*t+2*by*t+cy
     if abs(f1x*f1x+f1y*f1y) > 1e-20:
-        l = math.sqrt(f1x*f1x+f1y*f1y)
+        l = math.hypot(f1x,f1y)
         return [f1x/l, f1y/l]
 
     if t == 0:
         f1x = sp2[0][0]-sp1[1][0]
         f1y = sp2[0][1]-sp1[1][1]
         if abs(f1x*f1x+f1y*f1y) > 1e-20:
-            l = math.sqrt(f1x*f1x+f1y*f1y)
+            l = math.hypot(f1x,f1y)
             return [f1x/l, f1y/l]
         else:
             f1x = sp2[1][0]-sp1[1][0]
             f1y = sp2[1][1]-sp1[1][1]
             if f1x*f1x+f1y*f1y != 0:
-                l = math.sqrt(f1x*f1x+f1y*f1y)
+                l = math.hypot(f1x,f1y)
                 return [f1x/l, f1y/l]
     elif t == 1:
         f1x = sp2[1][0]-sp1[2][0]
         f1y = sp2[1][1]-sp1[2][1]
         if abs(f1x*f1x+f1y*f1y) > 1e-20:
-            l = math.sqrt(f1x*f1x+f1y*f1y)
+            l = math.hypot(f1x,f1y)
             return [f1x/l, f1y/l]
         else:
             f1x = sp2[1][0]-sp1[1][0]
             f1y = sp2[1][1]-sp1[1][1]
             if f1x*f1x+f1y*f1y != 0:
-                l = math.sqrt(f1x*f1x+f1y*f1y)
+                l = math.hypot(f1x,f1y)
                 return [f1x/l, f1y/l]
     else:
         return [1., 0.]
@@ -427,7 +427,7 @@ def csp_close_all_subpaths(csp, tolerance=0.000001):
 
 
 def normalize(x, y):
-    l = math.sqrt(x**2+y**2)
+    l = math.hypot(x,y)
     if l == 0:
         return [0., 0.]
     else:
@@ -898,7 +898,7 @@ class laser_gcode(inkex.Effect):
         if strategy == 'infill' and self.options.linuxcnc: 
             g += "G64 P0 ;linuxcnc continuous mode trajectory planning\n"
         if strategy == 'perimeter' and self.options.linuxcnc: 
-            g += "G64 P0.1 ;linuxcnc blend tolerence mode trajectory planning\n"
+            g += "G64 P0.15 ;linuxcnc blend tolerence mode trajectory planning\n"
   
         #set the begining past coordinates to unlikely numbers
         pastX, pastY =-10000.05, 10000.01
@@ -1808,8 +1808,7 @@ class laser_gcode(inkex.Effect):
                     # pixelsnap ext assumes scaling is similar in x and y
                     # and uses the x scale...
                     # let's try to be a bit smarter
-                    stroke_width *= math.sqrt(transf[0]
-                                              [0]**2 + transf[1][1]**2)
+                    stroke_width *= math.hypot(transf[0][0],transf[1][1])
                     style['stroke-width'] = str(stroke_width)
                     update = True
                 except AttributeError:
@@ -1910,7 +1909,7 @@ class laser_gcode(inkex.Effect):
         #handle power on delay    
         delayOn= ""
         if round(float(self.options.power_delay),1) > 0:
-            delayOn = "G04 P" + str(round(float(self.options.power_delay),1)) + "\n"
+            delayOn = "G04 P" + str(round(float(self.options.power_delay)/1000,3)) + "\n"
         self.tool_infill = {
             "name": "Laser Engraver Infill",
             "id": "Laser Engraver Infill",
@@ -1925,7 +1924,7 @@ class laser_gcode(inkex.Effect):
             "id": "Laser Engraver Perimeter",
             "penetration feed": self.options.laser_param_speed,
             "feed": self.options.laser_param_speed,
-            "gcode before path": (delayOn + self.options.laser_command),
+            "gcode before path": (delayOn + self.options.laser_command_perimeter),
             "gcode after path": self.options.laser_off_command
         }
 
