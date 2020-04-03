@@ -24,7 +24,7 @@
 		<page name='preferences' _gui-text='Preferences'>
 			<param name="infill-overshoot" type="float" precision="1" min="0.0" max="10.0" _gui-text="Infill overshoot (mm):">0</param>
 			<param name="power-delay" type="float" min="0" max="1000" _gui-text="Power-On delay (ms):">0</param>
-			<param name="linuxcnc" type="boolean" _gui-text="LinuxCNC G64 P0.1 trajectory planning">false</param>
+			<param name="linuxcnc" type="boolean" _gui-text="LinuxCNC G64 trajectory planning">false</param>
 			<param name="remove-tiny-infill-paths" type="boolean" _gui-text="Remove tiny infill paths">false</param>
 			<param name="add-numeric-suffix-to-filename" type="boolean" _gui-text="Add numeric suffix to filename">true</param>
 			<param name="create-log" type="boolean" _gui-text="Create log files">true</param>
@@ -52,6 +52,5 @@
 	<script>
 		<command reldir="extensions" interpreter="python">lasertools.py</command>
 	</script>
-
 
 </inkscape-extension>

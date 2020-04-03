@@ -93,8 +93,7 @@
 - 5.63703203201 s for infill 
 - 15.0216479301 s for parameters 
 
-# Test Removing emty G00 Instructions
-
+# Test Removing empty G00 Instructions
 
 ## Test With empty G00 Instructions
 ### Settings
