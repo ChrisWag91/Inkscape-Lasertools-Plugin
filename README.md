@@ -85,12 +85,11 @@ https://github.com/nevir/readable-licenses/blob/master/markdown/GPLv2-LICENSE.md
     - Workaround: export as png, reimport and convert to paths again
 - Scaling factor needs to be Set to 1
 - Displayed units needs to be set to mm
-- Multithreading currently disabled on Windows systems
 
 ## Features to be implemented / tested
 - Automatically convert text to paths 
 - Make a help section in the UI with the step by step instructions
-- Performance improvements / multithreading
+- Performance improvements
 
 *******************************************************************************************************************************
 

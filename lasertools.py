@@ -36,6 +36,7 @@ import bezmisc
 import simpletransform
 from simpletransform import composeTransform, fuseTransform, parseTransform, applyTransformToPath, applyTransformToPoint, formatTransform
 
+import multiprocessing
 from multiprocessing import Pool
 
 import cProfile
@@ -62,8 +63,6 @@ if "errormsg" not in dir(inkex):
 ################################################################################
 
 gcode = ""
-
-noOfThreads = 4
 csp = []
 profiling = False    # Disable if not debugging
 debug = False        # Disable if not debugging
@@ -108,13 +107,7 @@ def checkIfLineInsideShape(splitted_line):
 
     p = [(l1[0]+l2[0])/2, (l1[1]+l2[1])/2]
 
-    if point_inside_csp(p, csp):
-        if len(splitted_line) > 2:
-            print_debug("len splitted line > 2", splitted_line)
-
-        # if l1 == l2 and len(splitted_line) > 2:
-        #    l2 = splitted_line[2]
-
+    if point_inside_csp(p, csp):    
         if l1 != l2:
             print_debug("splitted line ", [l1, l2])
             return [l1, l2]
@@ -122,6 +115,25 @@ def checkIfLineInsideShape(splitted_line):
             return [[0, 0], [0, 0]]
     else:
         return [[0, 0], [0, 0]]
+
+def checkIfLineInsideShape_mt(splitted_line_csp):
+
+    splitted_line = splitted_line_csp[0]
+    csp = splitted_line_csp[1]
+    l1, l2 = splitted_line[0], splitted_line[1]    
+
+    if l1 == l2 and len(splitted_line) > 2:
+        l2 = splitted_line[2]
+
+    p = [(l1[0]+l2[0])/2, (l1[1]+l2[1])/2]
+    
+    if point_inside_csp(p, csp):       
+        if l1 != l2:            
+            return [l1, l2]
+        else:
+            return [[0, 0], [0, 0]]
+    else:
+        return [[0, 0], [0, 0]] 
 
 
 def csp_segment_to_bez(sp1, sp2):
@@ -1367,14 +1379,16 @@ class laser_gcode(inkex.Effect):
 
                     finalLines = []
 
-                    # Mutitheading not working on Windows; temporarily disabled
-                    if self.options.multi_thread and os.name != 'nt':
-                        pool = Pool(processes=noOfThreads)
-                        finalLines = pool.map(
-                            checkIfLineInsideShape, splitted_line)
-
-                        pool.close()
-                        pool.join()
+                    if self.options.multi_thread:                      
+                        pool = Pool(processes= multiprocessing.cpu_count())
+                                                                   
+                        csp4zip = [csp] * len(splitted_line)
+                        splitted_line_csp = zip(splitted_line,csp4zip)
+                   
+                        finalLines = pool.map(checkIfLineInsideShape_mt, splitted_line_csp)
+                     
+                        pool.close()                        
+                        pool.join()                        
 
                     else:
                         while i < len(splitted_line):
@@ -1872,7 +1886,7 @@ class laser_gcode(inkex.Effect):
         options.self = self
         options.doc_root = self.document.getroot()
         global print_
-
+        
         if self.options.log_create_log:
             if os.path.isdir(self.options.directory):
                 try:
@@ -1957,6 +1971,6 @@ class laser_gcode(inkex.Effect):
 
             self.engraving()
 
-
-e = laser_gcode()
-e.affect()
+if __name__ == '__main__':
+    e = laser_gcode()
+    e.affect()
