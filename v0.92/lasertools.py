@@ -28,6 +28,14 @@ You should have received a copy of the GNU General Public Licensey
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 """
+import gettext
+import numpy as np
+import cmath
+import datetime
+import time
+import re
+import math
+import os
 import inkex
 import simplestyle
 import simplepath
@@ -43,14 +51,6 @@ import cProfile
 import sys
 sys.path.append('/usr/share/inkscape/extensions')
 
-import os
-import math
-import re
-import time
-import datetime
-import cmath
-import numpy as np
-import gettext
 _ = gettext.gettext
 
 if "errormsg" not in dir(inkex):
@@ -96,6 +96,7 @@ styles = {
 
 }
 
+
 def checkIfLineInsideShape(splitted_line):
     # print_("sl input", splitted_line)
     # check if the middle point of the first lines segment is inside the path.
@@ -107,7 +108,7 @@ def checkIfLineInsideShape(splitted_line):
 
     p = [(l1[0]+l2[0])/2, (l1[1]+l2[1])/2]
 
-    if point_inside_csp(p, csp):    
+    if point_inside_csp(p, csp):
         if l1 != l2:
             print_debug("splitted line ", [l1, l2])
             return [l1, l2]
@@ -116,24 +117,25 @@ def checkIfLineInsideShape(splitted_line):
     else:
         return [[0, 0], [0, 0]]
 
+
 def checkIfLineInsideShape_mt(splitted_line_csp):
 
     splitted_line = splitted_line_csp[0]
     csp = splitted_line_csp[1]
-    l1, l2 = splitted_line[0], splitted_line[1]    
+    l1, l2 = splitted_line[0], splitted_line[1]
 
     if l1 == l2 and len(splitted_line) > 2:
         l2 = splitted_line[2]
 
     p = [(l1[0]+l2[0])/2, (l1[1]+l2[1])/2]
-    
-    if point_inside_csp(p, csp):       
-        if l1 != l2:            
+
+    if point_inside_csp(p, csp):
+        if l1 != l2:
             return [l1, l2]
         else:
             return [[0, 0], [0, 0]]
     else:
-        return [[0, 0], [0, 0]] 
+        return [[0, 0], [0, 0]]
 
 
 def csp_segment_to_bez(sp1, sp2):
@@ -269,7 +271,7 @@ def point_to_point_d2(a, b):
 
 
 def point_to_point_d(a, b):
-    return math.hypot((a[0]-b[0]),(a[1]-b[1]))
+    return math.hypot((a[0]-b[0]), (a[1]-b[1]))
 
 
 def csp_normalized_slope(sp1, sp2, t):
@@ -280,32 +282,32 @@ def csp_normalized_slope(sp1, sp2, t):
     f1x = 3*ax*t*t+2*bx*t+cx
     f1y = 3*ay*t*t+2*by*t+cy
     if abs(f1x*f1x+f1y*f1y) > 1e-20:
-        l = math.hypot(f1x,f1y)
+        l = math.hypot(f1x, f1y)
         return [f1x/l, f1y/l]
 
     if t == 0:
         f1x = sp2[0][0]-sp1[1][0]
         f1y = sp2[0][1]-sp1[1][1]
         if abs(f1x*f1x+f1y*f1y) > 1e-20:
-            l = math.hypot(f1x,f1y)
+            l = math.hypot(f1x, f1y)
             return [f1x/l, f1y/l]
         else:
             f1x = sp2[1][0]-sp1[1][0]
             f1y = sp2[1][1]-sp1[1][1]
             if f1x*f1x+f1y*f1y != 0:
-                l = math.hypot(f1x,f1y)
+                l = math.hypot(f1x, f1y)
                 return [f1x/l, f1y/l]
     elif t == 1:
         f1x = sp2[1][0]-sp1[2][0]
         f1y = sp2[1][1]-sp1[2][1]
         if abs(f1x*f1x+f1y*f1y) > 1e-20:
-            l = math.hypot(f1x,f1y)
+            l = math.hypot(f1x, f1y)
             return [f1x/l, f1y/l]
         else:
             f1x = sp2[1][0]-sp1[1][0]
             f1y = sp2[1][1]-sp1[1][1]
             if f1x*f1x+f1y*f1y != 0:
-                l = math.hypot(f1x,f1y)
+                l = math.hypot(f1x, f1y)
                 return [f1x/l, f1y/l]
     else:
         return [1., 0.]
@@ -439,7 +441,7 @@ def csp_close_all_subpaths(csp, tolerance=0.000001):
 
 
 def normalize(x, y):
-    l = math.hypot(x,y)
+    l = math.hypot(x, y)
     if l == 0:
         return [0., 0.]
     else:
@@ -599,56 +601,91 @@ class laser_gcode(inkex.Effect):
         for _ in range(1, self.options.passes):
             if self.options.z_stepdown == 0:
                 gcode += "\nG90 \n" + gcode_pass
-            else:                
+            else:
                 gcode += "\nG91 \nG0 Z%s \nG90 \n" % self.options.z_stepdown + gcode_pass
 
         f = open(self.options.directory+self.options.file, "w")
-        
-        if self.options.prefix_1 != "": self.header += self.options.prefix_1 + "\n"
-        if self.options.prefix_2 != "": self.header += self.options.prefix_2 + "\n"
-        if self.options.prefix_3 != "": self.header += self.options.prefix_3 + "\n"
-        
-        if self.options.suffix_1 != "": self.footer += self.options.suffix_1 + "\n"
-        if self.options.suffix_2 != "": self.footer += self.options.suffix_2 + "\n"
-        if self.options.suffix_3 != "": self.footer += self.options.suffix_3 + "\n"
-        
+
+        if self.options.prefix_1 != "":
+            self.header += self.options.prefix_1 + "\n"
+        if self.options.prefix_2 != "":
+            self.header += self.options.prefix_2 + "\n"
+        if self.options.prefix_3 != "":
+            self.header += self.options.prefix_3 + "\n"
+
+        if self.options.suffix_1 != "":
+            self.footer += self.options.suffix_1 + "\n"
+        if self.options.suffix_2 != "":
+            self.footer += self.options.suffix_2 + "\n"
+        if self.options.suffix_3 != "":
+            self.footer += self.options.suffix_3 + "\n"
+
         f.write(self.header + "\n" + gcode + self.footer)
         f.close()
 
     def __init__(self):
         inkex.Effect.__init__(self)
-        self.OptionParser.add_option("-d", "--directory",   action="store", type="string",  dest="directory",   default="/insert your target directory here",   help="Output directory")
+        self.OptionParser.add_option("-d", "--directory",   action="store", type="string",  dest="directory",
+                                     default="/insert your target directory here",   help="Output directory")
         self.OptionParser.add_option("-f", "--filename",    action="store", type="string",  dest="file",        default="output.ngc",                           help="File name")
-        self.OptionParser.add_option("",   "--add-numeric-suffix-to-filename",  action="store", type="inkbool", dest="add_numeric_suffix_to_filename",  default=False,  help="Add numeric suffix to file name")
-        self.OptionParser.add_option("",   "--laser-command-perimeter",         action="store", type="string",  dest="laser_command_perimeter",         default="S100", help="Laser gcode command Perimeter")
-        self.OptionParser.add_option("",   "--laser-command",                   action="store", type="string",  dest="laser_command",                   default="S100", help="Laser gcode command infill")
-        self.OptionParser.add_option("",   "--laser-off-command",               action="store", type="string",  dest="laser_off_command",               default="S1",   help="Laser gcode end command")
-        self.OptionParser.add_option("",   "--laser-beam-with",                 action="store", type="float",   dest="laser_beam_with",                 default="1.0",  help="Laser speed (mm/min)")
-        self.OptionParser.add_option("",   "--infill-overshoot",                action="store", type="float",   dest="infill_overshoot",                default="0.0",  help="Overshoot to limit acceleration overburn")
-        self.OptionParser.add_option("",   "--laser-speed",                     action="store", type="int",     dest="laser_speed",                     default="1200", help="Laser speed for infill (mm/min)")
-        self.OptionParser.add_option("",   "--laser-param-speed",               action="store", type="int",     dest="laser_param_speed",               default="700",  help="Laser speed for Parameter (mm/min)")
-        self.OptionParser.add_option("",   "--passes",                          action="store", type="int",     dest="passes",                          default="1",    help="Quantity of passes")
-        self.OptionParser.add_option("",   "--z-stepdown",                      action="store", type="float",   dest="z_stepdown",                      default="0.0",  help="Z-stepdown per pass for cutting operations")
-        self.OptionParser.add_option("",   "--power-delay",                     action="store", type="string",  dest="power_delay",                     default="0",    help="Laser power-on delay (ms)")
-        self.OptionParser.add_option("",   "--linuxcnc",                        action="store", type="inkbool", dest="linuxcnc",                        default=True,   help="Use G64 P0.1 trajectory planning")
-        self.OptionParser.add_option("",   "--suppress-all-messages",           action="store", type="inkbool", dest="suppress_all_messages",           default=True,   help="Hide messages during g-code generation")
-        self.OptionParser.add_option("",   "--create-log",                      action="store", type="inkbool", dest="log_create_log",                  default=True,   help="Create log files")
-        self.OptionParser.add_option("",   "--engraving-draw-calculation-paths", action="store", type="inkbool", dest="engraving_draw_calculation_paths", default=True, help="Draw additional graphics to debug engraving path")
-        self.OptionParser.add_option("",   "--biarc-max-split-depth",           action="store", type="int",     dest="biarc_max_split_depth",           default="2",    help="Defines maximum depth of splitting while approximating using biarcs.")
-        self.OptionParser.add_option("",   "--area-fill-angle",                 action="store", type="float",   dest="area_fill_angle",                 default="0",    help="Fill area with lines heading this angle")
-        self.OptionParser.add_option("",   "--engraving-newton-iterations",     action="store", type="int",     dest="engraving_newton_iterations",     default="20",   help="Number of sample points used to calculate distance")
-        self.OptionParser.add_option("",   "--add-contours",                    action="store", type="inkbool", dest="add_contours",                    default=True,   help="Add contour to Gcode paths")
-        self.OptionParser.add_option("",   "--add-infill",                      action="store", type="inkbool", dest="add_infill",                      default=True,   help="Add infill to Gcode paths")
-        self.OptionParser.add_option("",   "--remove-tiny-infill-paths",        action="store", type="inkbool", dest="remove_tiny_infill_paths",        default=False,  help="Remove tiny infill paths from Gcode")
-        self.OptionParser.add_option("",   "--multi_thread",                    action="store", type="inkbool", dest="multi_thread",                    default=True,   help="Activate multithreading support")
-        self.OptionParser.add_option("",   "--active-tab",					    action="store", type="string", 	dest="active_tab",                      default="",		help="Defines which tab is active")
-        self.OptionParser.add_option("",   "--prefix1",                         action="store", type="string",  dest="prefix_1",                        default="",     help="First line before G-Code starts")
-        self.OptionParser.add_option("",   "--prefix2",                         action="store", type="string",  dest="prefix_2",                        default="",     help="Second line before G-Code starts")
-        self.OptionParser.add_option("",   "--prefix3",                         action="store", type="string",  dest="prefix_3",                        default="",     help="Third line before G-Code starts")
-        self.OptionParser.add_option("",   "--suffix1",                         action="store", type="string",  dest="suffix_1",                        default="",     help="First line after G-Code ends")
-        self.OptionParser.add_option("",   "--suffix2",                         action="store", type="string",  dest="suffix_2",                        default="",     help="Second line after G-Code ends")
-        self.OptionParser.add_option("",   "--suffix3",                         action="store", type="string",  dest="suffix_3",                        default="",     help="Third line after G-Code ends")
-
+        self.OptionParser.add_option("",   "--add-numeric-suffix-to-filename",  action="store", type="inkbool",
+                                     dest="add_numeric_suffix_to_filename",  default=False,  help="Add numeric suffix to file name")
+        self.OptionParser.add_option("",   "--laser-command-perimeter",         action="store", type="string",
+                                     dest="laser_command_perimeter",         default="S100", help="Laser gcode command Perimeter")
+        self.OptionParser.add_option("",   "--laser-command",                   action="store", type="string",
+                                     dest="laser_command",                   default="S100", help="Laser gcode command infill")
+        self.OptionParser.add_option("",   "--laser-off-command",               action="store", type="string",
+                                     dest="laser_off_command",               default="S1",   help="Laser gcode end command")
+        self.OptionParser.add_option("",   "--laser-beam-with",                 action="store", type="float",
+                                     dest="laser_beam_with",                 default="1.0",  help="Laser speed (mm/min)")
+        self.OptionParser.add_option("",   "--infill-overshoot",                action="store", type="float",
+                                     dest="infill_overshoot",                default="0.0",  help="Overshoot to limit acceleration overburn")
+        self.OptionParser.add_option("",   "--laser-speed",                     action="store", type="int",
+                                     dest="laser_speed",                     default="1200", help="Laser speed for infill (mm/min)")
+        self.OptionParser.add_option("",   "--laser-param-speed",               action="store", type="int",
+                                     dest="laser_param_speed",               default="700",  help="Laser speed for Parameter (mm/min)")
+        self.OptionParser.add_option("",   "--passes",                          action="store", type="int",
+                                     dest="passes",                          default="1",    help="Quantity of passes")
+        self.OptionParser.add_option("",   "--z-stepdown",                      action="store", type="float",   dest="z_stepdown",
+                                     default="0.0",  help="Z-stepdown per pass for cutting operations")
+        self.OptionParser.add_option("",   "--power-delay",                     action="store", type="string",
+                                     dest="power_delay",                     default="0",    help="Laser power-on delay (ms)")
+        self.OptionParser.add_option("",   "--linuxcnc",                        action="store", type="inkbool",
+                                     dest="linuxcnc",                        default=True,   help="Use G64 P0.1 trajectory planning")
+        self.OptionParser.add_option("",   "--suppress-all-messages",           action="store", type="inkbool",
+                                     dest="suppress_all_messages",           default=True,   help="Hide messages during g-code generation")
+        self.OptionParser.add_option("",   "--create-log",                      action="store", type="inkbool",
+                                     dest="log_create_log",                  default=True,   help="Create log files")
+        self.OptionParser.add_option("",   "--engraving-draw-calculation-paths", action="store", type="inkbool",
+                                     dest="engraving_draw_calculation_paths", default=True, help="Draw additional graphics to debug engraving path")
+        self.OptionParser.add_option("",   "--biarc-max-split-depth",           action="store", type="int",     dest="biarc_max_split_depth",
+                                     default="2",    help="Defines maximum depth of splitting while approximating using biarcs.")
+        self.OptionParser.add_option("",   "--area-fill-angle",                 action="store", type="float",
+                                     dest="area_fill_angle",                 default="0",    help="Fill area with lines heading this angle")
+        self.OptionParser.add_option("",   "--engraving-newton-iterations",     action="store", type="int",     dest="engraving_newton_iterations",
+                                     default="20",   help="Number of sample points used to calculate distance")
+        self.OptionParser.add_option("",   "--add-contours",                    action="store", type="inkbool",
+                                     dest="add_contours",                    default=True,   help="Add contour to Gcode paths")
+        self.OptionParser.add_option("",   "--add-infill",                      action="store", type="inkbool",
+                                     dest="add_infill",                      default=True,   help="Add infill to Gcode paths")
+        self.OptionParser.add_option("",   "--remove-tiny-infill-paths",        action="store", type="inkbool",
+                                     dest="remove_tiny_infill_paths",        default=False,  help="Remove tiny infill paths from Gcode")
+        self.OptionParser.add_option("",   "--multi_thread",                    action="store", type="inkbool",
+                                     dest="multi_thread",                    default=True,   help="Activate multithreading support")
+        self.OptionParser.add_option("",   "--active-tab",					    action="store", type="string",
+                                     dest="active_tab",                      default="",		help="Defines which tab is active")
+        self.OptionParser.add_option("",   "--prefix1",                         action="store", type="string",
+                                     dest="prefix_1",                        default="",     help="First line before G-Code starts")
+        self.OptionParser.add_option("",   "--prefix2",                         action="store", type="string",
+                                     dest="prefix_2",                        default="",     help="Second line before G-Code starts")
+        self.OptionParser.add_option("",   "--prefix3",                         action="store", type="string",
+                                     dest="prefix_3",                        default="",     help="Third line before G-Code starts")
+        self.OptionParser.add_option("",   "--suffix1",                         action="store", type="string",
+                                     dest="suffix_1",                        default="",     help="First line after G-Code ends")
+        self.OptionParser.add_option("",   "--suffix2",                         action="store", type="string",
+                                     dest="suffix_2",                        default="",     help="Second line after G-Code ends")
+        self.OptionParser.add_option("",   "--suffix3",                         action="store", type="string",
+                                     dest="suffix_3",                        default="",     help="Third line after G-Code ends")
 
     def parse_curve(self, p, layer):
 
@@ -875,8 +912,8 @@ class laser_gcode(inkex.Effect):
 # Generates Gcode on given curve.
 # Crve defenitnion [start point, type = {'arc','line','move','end'}, arc center, arc angle, end point, [zstart, zend]]
 # strategy is either infill or parameter each will calculate differently.
-# infill strategy will allow for acceleration and deceleration buffer distance to prevent speed change burn. 
-# 
+# infill strategy will allow for acceleration and deceleration buffer distance to prevent speed change burn.
+#
 ################################################################################
 
     def generate_gcode(self, curve, layer, tool, strategy):
@@ -900,21 +937,20 @@ class laser_gcode(inkex.Effect):
             self.last_used_tool == None
         except:
             self.last_used_tool = None
-        
-        
+
         # print_("Curve: " + str(curve) + "/n")
         lg, f = 'G00', "F%.1f" % tool['penetration feed']
         g = "; START " + strategy+" strategy\nG01 " + f + "\n"
-        
-        #linuxcnc trajectory planning to limit corner burns and acceleration burns
-        if strategy == 'infill' and self.options.linuxcnc: 
+
+        # linuxcnc trajectory planning to limit corner burns and acceleration burns
+        if strategy == 'infill' and self.options.linuxcnc:
             g += "G64 P0 ;linuxcnc continuous mode trajectory planning\n"
-        if strategy == 'perimeter' and self.options.linuxcnc: 
+        if strategy == 'perimeter' and self.options.linuxcnc:
             g += "G64 P0.15 ;linuxcnc blend tolerence mode trajectory planning\n"
-  
-        #set the begining past coordinates to unlikely numbers
-        pastX, pastY =-10000.05, 10000.01
-        
+
+        # set the begining past coordinates to unlikely numbers
+        pastX, pastY = -10000.05, 10000.01
+
         for i in range(1, len(curve)):
             #    Creating Gcode for curve between s=curve[i-1] and si=curve[i] start at s[0] end at s[4]=si[0]
             s, si = curve[i-1], curve[i]
@@ -926,84 +962,87 @@ class laser_gcode(inkex.Effect):
 
             s[0][1] = s[0][1] - offset_y
             si[0][1] = si[0][1] - offset_y
-                     
-            #verify the new coordinates are different from the old coordinates
-            #no need move or burn to a destination already moved
-            #becomes true of different
-            newcoord_different = round(si[0][0],2) != pastX or round(si[0][1],2) != pastY
+
+            # verify the new coordinates are different from the old coordinates
+            # no need move or burn to a destination already moved
+            # becomes true of different
+            newcoord_different = round(si[0][0], 2) != pastX or round(si[0][1], 2) != pastY
 
 #############################
 # infill strategy
 #############################
-            #checks for moves and writes the G00 X0.00, Y0.00
-            #move with overshoot just moves the X
-            #move without overshoot moves the X and Y
-            if  newcoord_different and s[1] == 'move' and strategy == "infill":
-                if round(self.options.infill_overshoot,1)>0:
-                    g += "G00 X" + str(round(si[0][0],2)) + "\n" 
-                else:g += "G00" + c(si[0]) + "\n" 
-                #write past used command and coordinates
-                pastX, pastY,lg = round(si[0][0],2), round(si[0][1],2),'G00'
+            # checks for moves and writes the G00 X0.00, Y0.00
+            # move with overshoot just moves the X
+            # move without overshoot moves the X and Y
+            if newcoord_different and s[1] == 'move' and strategy == "infill":
+                if round(self.options.infill_overshoot, 1) > 0:
+                    g += "G00 X" + str(round(si[0][0], 2)) + "\n"
+                else:
+                    g += "G00" + c(si[0]) + "\n"
+                # write past used command and coordinates
+                pastX, pastY, lg = round(si[0][0], 2), round(si[0][1], 2), 'G00'
 
-			#Check if the line is going up or down.  
-			#sets the laser head to start moving before the laser fires
-			#fires the laser arrives at destination
-			#turns off the laser and overshoots the end
-			#The overshoots gives a buffer for 
-			#accelerating and decelerating the head
-			#if overshoot is selected to be 0.0, the 
-			#overshoot Gcode is ignored
-			#if overshoot is >0.0 G00 Y to overshoot location
-            elif newcoord_different and s[1] == 'line' and strategy == "infill" and lg =='G00':
-				#detect up direction
-                if round(si[0][1],2) > pastY:
-                    if round(self.options.infill_overshoot,1)>0:
-                        g += "G00 Y" + str(round(pastY-self.options.infill_overshoot,2)) + "\n" 
-                        g += "G01 Y" + str(pastY) + "\n" 
-                    g += tool['gcode before path'] + "\n"  
-                    g += "G01 Y" + str(round(si[0][1],2)) + "\n"
+                # Check if the line is going up or down.
+                # sets the laser head to start moving before the laser fires
+                # fires the laser arrives at destination
+                # turns off the laser and overshoots the end
+                # The overshoots gives a buffer for
+                # accelerating and decelerating the head
+                # if overshoot is selected to be 0.0, the
+                # overshoot Gcode is ignored
+                # if overshoot is >0.0 G00 Y to overshoot location
+            elif newcoord_different and s[1] == 'line' and strategy == "infill" and lg == 'G00':
+                # detect up direction
+                if round(si[0][1], 2) > pastY:
+                    if round(self.options.infill_overshoot, 1) > 0:
+                        g += "G00 Y" + str(round(pastY-self.options.infill_overshoot, 2)) + "\n"
+                        g += "G01 Y" + str(pastY) + "\n"
+                    g += tool['gcode before path'] + "\n"
+                    g += "G01 Y" + str(round(si[0][1], 2)) + "\n"
                     g += tool['gcode after path'] + "\n"
-                    if round(self.options.infill_overshoot,1)>0:
-                        g += "G01 Y" + str(round(si[0][1]+self.options.infill_overshoot,2)) + "\n" 
-					#write past used command and coordinates
-                    pastX, pastY,lg = round(si[0][0],2), round(si[0][1],2),'G01'
-				#detect down direction
-                elif round(si[0][1],2) < pastY:
-                    if round(self.options.infill_overshoot,1)>0:
-                        g += "G00 Y" + str(round(pastY+self.options.infill_overshoot,2)) + "\n" 
-                        g += "G01 Y" + str(pastY) + "\n" 
-                    g += tool['gcode before path'] + "\n"  
-                    g += "G01 Y" + str(round(si[0][1],2)) + "\n"
+                    if round(self.options.infill_overshoot, 1) > 0:
+                        g += "G01 Y" + str(round(si[0][1]+self.options.infill_overshoot, 2)) + "\n"
+                        # write past used command and coordinates
+                    pastX, pastY, lg = round(si[0][0], 2), round(si[0][1], 2), 'G01'
+                    # detect down direction
+                elif round(si[0][1], 2) < pastY:
+                    if round(self.options.infill_overshoot, 1) > 0:
+                        g += "G00 Y" + str(round(pastY+self.options.infill_overshoot, 2)) + "\n"
+                        g += "G01 Y" + str(pastY) + "\n"
+                    g += tool['gcode before path'] + "\n"
+                    g += "G01 Y" + str(round(si[0][1], 2)) + "\n"
                     g += tool['gcode after path'] + "\n"
-                    if round(self.options.infill_overshoot,1)>0:
-                        g += "G01 Y" + str(round(si[0][1]-self.options.infill_overshoot,2)) + "\n" 
-					#write past used command and coordinates
-                    pastX, pastY,lg = round(si[0][0],2), round(si[0][1],2),'G01'
+                    if round(self.options.infill_overshoot, 1) > 0:
+                        g += "G01 Y" + str(round(si[0][1]-self.options.infill_overshoot, 2)) + "\n"
+                        # write past used command and coordinates
+                    pastX, pastY, lg = round(si[0][0], 2), round(si[0][1], 2), 'G01'
 
 
 #############################
 # perimeter strategy
 #############################
-			#turns off laser before issuing a G00 move instruction
+                    # turns off laser before issuing a G00 move instruction
             elif newcoord_different and s[1] == 'move' and strategy == "perimeter":
-                g += tool['gcode after path'] + "\n"# turn off laser before fast move
-                g += "G00" + c(si[0]) + "\n" 
-				#write past used command and coordinates
-                pastX, pastY,lg = round(si[0][0],2), round(si[0][1],2),'G00'
+                g += tool['gcode after path'] + "\n"  # turn off laser before fast move
+                g += "G00" + c(si[0]) + "\n"
+                # write past used command and coordinates
+                pastX, pastY, lg = round(si[0][0], 2), round(si[0][1], 2), 'G00'
             elif newcoord_different and s[1] == 'line' and strategy == "perimeter":
-                if lg == 'G00': g += tool['gcode before path'] + "\n"  #burn laser only after a G00 move
-                x,y = round(si[0][0],2),round(si[0][1],2) 
-                gx,gy="","" #clear gx and gy
-                if x != pastX: gx = " X"+str(x) #only include X0.00 coordinates if they are diffrent from past burn
-                if y != pastY: gy = " Y"+str(y) #only include Y0.00 coordinates if they are diffrent from past burn  
+                if lg == 'G00':
+                    g += tool['gcode before path'] + "\n"  # burn laser only after a G00 move
+                x, y = round(si[0][0], 2), round(si[0][1], 2)
+                gx, gy = "", ""  # clear gx and gy
+                if x != pastX:
+                    gx = " X"+str(x)  # only include X0.00 coordinates if they are diffrent from past burn
+                if y != pastY:
+                    gy = " Y"+str(y)  # only include Y0.00 coordinates if they are diffrent from past burn
                 g += "G01" + gx+gy + "\n"
-                #write past used command and coordinates
-                pastX, pastY,lg = round(si[0][0],2), round(si[0][1],2),'G01'
+                # write past used command and coordinates
+                pastX, pastY, lg = round(si[0][0], 2), round(si[0][1], 2), 'G01'
 
-		#Turn off laser before leaving
-        g +=  tool['gcode after path'] + "\n;END " +strategy +"\n\n" 
+                # Turn off laser before leaving
+        g += tool['gcode after path'] + "\n;END " + strategy + "\n\n"
         return g
-
 
     def get_transforms(self, g):
         root = self.document.getroot()
@@ -1142,6 +1181,8 @@ class laser_gcode(inkex.Effect):
 ################################################################################
 # Get defs from svg
 ################################################################################
+
+
     def get_defs(self):
         self.defs = {}
 
@@ -1158,6 +1199,8 @@ class laser_gcode(inkex.Effect):
 ################################################################################
 # Get Gcodetools info from the svg
 ################################################################################
+
+
     def get_info(self):
         self.selected_paths = {}
         self.paths = {}
@@ -1166,7 +1209,7 @@ class laser_gcode(inkex.Effect):
         self.Zcoordinates = {}
         self.transform_matrix = {}
         self.transform_matrix_reverse = {}
-        
+
         def recursive_search(g, layer, selected=False):
             items = g.getchildren()
             items.reverse()
@@ -1231,7 +1274,9 @@ class laser_gcode(inkex.Effect):
             if point[0] != [] and point[1] != []:
                 points += [point]
         if len(points) == len(p2) == 2 or len(points) == len(p3) == 3:
+            print_("Orientation Points: ", points)
             return points
+
         else:
             return None
 
@@ -1244,7 +1289,6 @@ class laser_gcode(inkex.Effect):
         global gcode
         global offset_y
         global csp
-        
 
         self.options.area_fill_angle = self.options.area_fill_angle * math.pi / 180
 
@@ -1322,10 +1366,14 @@ class laser_gcode(inkex.Effect):
                     top = True
                     last_one = True
                     while (i < b[2] or last_one):
-                        if i >= b[2]:last_one = False
-                        if lines[-1] == []:lines[-1] += [[i, b[3]]]
-                        if top:lines[-1] += [[i, b[1]], [i+r, b[1]]]
-                        else:lines[-1] += [[i, b[3]], [i+r, b[3]]]
+                        if i >= b[2]:
+                            last_one = False
+                        if lines[-1] == []:
+                            lines[-1] += [[i, b[3]]]
+                        if top:
+                            lines[-1] += [[i, b[1]], [i+r, b[1]]]
+                        else:
+                            lines[-1] += [[i, b[3]], [i+r, b[3]]]
                         top = not top
                         i += r
 
@@ -1356,9 +1404,12 @@ class laser_gcode(inkex.Effect):
 
                                 for t in roots:
                                     p = tuple(csp_at_t(sp1, sp2, t))
-                                    if l1[0] == l2[0]: t1 = (p[1]-l1[1])/(l2[1]-l1[1])
-                                    else: t1 = (p[0]-l1[0])/(l2[0]-l1[0])
-                                    if 0 <= t1 <= 1: ints += [[t1, p[0], p[1], i, j, t]]
+                                    if l1[0] == l2[0]:
+                                        t1 = (p[1]-l1[1])/(l2[1]-l1[1])
+                                    else:
+                                        t1 = (p[0]-l1[0])/(l2[0]-l1[0])
+                                    if 0 <= t1 <= 1:
+                                        ints += [[t1, p[0], p[1], i, j, t]]
 
                         ints.sort()
 
@@ -1379,16 +1430,16 @@ class laser_gcode(inkex.Effect):
 
                     finalLines = []
 
-                    if self.options.multi_thread:                      
-                        pool = Pool(processes= multiprocessing.cpu_count())
-                                                                   
+                    if self.options.multi_thread:
+                        pool = Pool(processes=multiprocessing.cpu_count())
+
                         csp4zip = [csp] * len(splitted_line)
-                        splitted_line_csp = zip(splitted_line,csp4zip)
-                   
+                        splitted_line_csp = zip(splitted_line, csp4zip)
+
                         finalLines = pool.map(checkIfLineInsideShape_mt, splitted_line_csp)
-                     
-                        pool.close()                        
-                        pool.join()                        
+
+                        pool.close()
+                        pool.join()
 
                     else:
                         while i < len(splitted_line):
@@ -1433,7 +1484,7 @@ class laser_gcode(inkex.Effect):
 
                     print_time("Time for drawing curve")
 
-                    gcode += self.generate_gcode(curve, layer, self.tool_infill,"infill")
+                    gcode += self.generate_gcode(curve, layer, self.tool_infill, "infill")
 
                     print_time("Time for generating Gcode")
 
@@ -1700,7 +1751,7 @@ class laser_gcode(inkex.Effect):
                 if cspe != []:
 
                     # for entr in cspe:
-                        #    print_("cspe ", entr)
+                    #    print_("cspe ", entr)
                     curve = self.parse_curve(cspe, layer)
                     # for entr in curve:
                     #    print_("curve ", entr)
@@ -1711,7 +1762,7 @@ class laser_gcode(inkex.Effect):
                     else:
                         offset_y = 0
 
-                    gcode += self.generate_gcode(curve, layer, self.tool_perimeter,"perimeter")
+                    gcode += self.generate_gcode(curve, layer, self.tool_perimeter, "perimeter")
 
         if gcode != '':
             self.export_gcode(gcode)
@@ -1822,7 +1873,7 @@ class laser_gcode(inkex.Effect):
                     # pixelsnap ext assumes scaling is similar in x and y
                     # and uses the x scale...
                     # let's try to be a bit smarter
-                    stroke_width *= math.hypot(transf[0][0],transf[1][1])
+                    stroke_width *= math.hypot(transf[0][0], transf[1][1])
                     style['stroke-width'] = str(stroke_width)
                     update = True
                 except AttributeError:
@@ -1865,7 +1916,7 @@ class laser_gcode(inkex.Effect):
             self.recursiveFuseTransform(child, transf)
 
     def applytransforms(self):
-         # Apply transformations
+        # Apply transformations
         self.getselected()
 
         if self.selected:
@@ -1886,7 +1937,7 @@ class laser_gcode(inkex.Effect):
         options.self = self
         options.doc_root = self.document.getroot()
         global print_
-        
+
         if self.options.log_create_log:
             if os.path.isdir(self.options.directory):
                 try:
@@ -1920,10 +1971,10 @@ class laser_gcode(inkex.Effect):
         if self.orientation_points == {}:
             self.orientation(self.layers[min(0, len(self.layers)-1)])
             self.get_info()
-        #handle power on delay    
-        delayOn= ""
-        if round(float(self.options.power_delay),1) > 0:
-            delayOn = "G04 P" + str(round(float(self.options.power_delay)/1000,3)) + "\n"
+        # handle power on delay
+        delayOn = ""
+        if round(float(self.options.power_delay), 1) > 0:
+            delayOn = "G04 P" + str(round(float(self.options.power_delay)/1000, 3)) + "\n"
         self.tool_infill = {
             "name": "Laser Engraver Infill",
             "id": "Laser Engraver Infill",
@@ -1970,6 +2021,7 @@ class laser_gcode(inkex.Effect):
                 kFile.close()
 
             self.engraving()
+
 
 if __name__ == '__main__':
     e = laser_gcode()

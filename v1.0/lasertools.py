@@ -759,77 +759,37 @@ class laser_gcode(inkex.EffectExtension):
     def __init__(self):
         super(laser_gcode, self).__init__()
 
-    def parse_curve(self, p, layer):
-
+    def parse_curve(self, p, layer, w=None, f=None):
         c = []
         if len(p) == 0:
             return []
-
         p = self.transform_csp(p, layer)
 
-        # this code is intended to replace the code below.
-        # At the Moment there is a problem with muliple paths, where the fist/last path will not be generated
-        # TODO: Fix that
-        '''
-        print_("p_post_Trans ", p)
-        startPoints = np.zeros(shape=[len(p), 2])
-        endPoints = np.zeros(shape=[len(p), 2])
-
-        # reduce Array size
-        for i in range(0, len(p)):
-            elRed = np.array(p[i])
-            elRed = elRed[:, 0]
-            startPoints[i] = elRed[0]
-            endPoints[i] = elRed[-1]
-
-        print_("StartPoints", startPoints)
-        print_("EndPoints", endPoints)
-        print_("elRed", elRed)
-
-        sortedPoints = np.array(self.sort_points(
-            startPoints[:, 0], startPoints[:, 1], endPoints[:, 0], endPoints[:, 1]))
-
-        for point in sortedPoints:
-            ind = np.argwhere(startPoints == point[0])[0, 0]
-            elRed = np.array(p[ind])
-            elRed = elRed[:, 0]
-
-            c += [[[point[0], point[1]], 'move']]
-
-            for i in range(1, len(elRed)):
-                c += [[[elRed[i-1, 0], elRed[i-1, 1]], 'line', [elRed[i, 0], elRed[i, 1]]]]
-
-            c += [[[elRed[-1, 0], elRed[-1, 1]], 'end']]
-
         # Sort to reduce Rapid distance
-        '''
-
-        k = range(1, len(p))
+        k = list(range(1, len(p)))
         keys = [0]
         while len(k) > 0:
             end = p[keys[-1]][-1][1]
             dist = None
             for i in range(len(k)):
                 start = p[k[i]][0][1]
-                dist = max(
-                    (-((end[0]-start[0])**2+(end[1]-start[1])**2), i),   dist)
+                print_("start for parse_curve ", start)
+                print_("end for parse_curve ", end)
+                print_("val for max ", (-((end[0] - start[0]) ** 2 + (end[1] - start[1]) ** 2), i))
+                print_("dist ", dist)
+                #dist = max((-((end[0] - start[0]) ** 2 + (end[1] - start[1]) ** 2), i), dist)
+                dist = (-((end[0] - start[0]) ** 2 + (end[1] - start[1]) ** 2), i)
+                print_("dist ", dist)
             keys += [k[dist[1]]]
             del k[dist[1]]
         for k in keys:
             subpath = p[k]
-            c += [[[subpath[0][1][0], subpath[0][1][1]], 'move']]
-            # print_([[[subpath[0][1][0], subpath[0][1][1]], 'move']])
+            c += [[[subpath[0][1][0], subpath[0][1][1]], 'move', 0, 0]]
             for i in range(1, len(subpath)):
-                # print_("subpath: ", subpath[i-1])
-                sp1 = [[subpath[i-1][j][0], subpath[i-1][j][1]]
-                       for j in range(3)]
+                sp1 = [[subpath[i - 1][j][0], subpath[i - 1][j][1]] for j in range(3)]
                 sp2 = [[subpath[i][j][0], subpath[i][j][1]] for j in range(3)]
                 c += [[[sp1[0][0], sp1[0][1]], 'line', [sp2[0][0], sp2[0][1]]]]
-                # print_("sp1: ", sp1)
-            c += [[[subpath[-1][1][0], subpath[-1][1][1]], 'end']]
-            # print_([[[subpath[-1][1][0], subpath[-1][1][1]], 'end']])
-        # print_("Curve: " + str(c))
-
+            c += [[[subpath[-1][1][0], subpath[-1][1][1]], 'end', 0, 0]]
         return c
 
     def parse_curve2d(self, p, layer):
@@ -902,33 +862,51 @@ class laser_gcode(inkex.EffectExtension):
 
     def draw_curve(self, curve, layer, group=None, style=MARKER_STYLE["biarc_style"]):
 
-        self.get_defs()
+        for i in [0, 1]:
+            sid = 'biarc1_r'.format(i)
+            style[sid] = style['biarc1'.format(i)].copy()
 
-        if group == None:
-            group = inkex.etree.SubElement(self.layers[min(1, len(
-                self.layers)-1)], inkex.addNS('g', 'svg'), {"gcodetools": "Preview group"})
+        if group is None:
+            group = self.layers[min(1, len(self.layers) - 1)].add(Group(gcodetools="Preview group"))
+            if not hasattr(self, "preview_groups"):
+                self.preview_groups = {layer: group}
+            elif layer not in self.preview_groups:
+                self.preview_groups[layer] = group
+            group = self.preview_groups[layer]
 
         s = ''
-        a, b, c = [0., 0.], [1., 0.], [0., 1.]
-        a, b, c = self.transform(a, layer, True), self.transform(
-            b, layer, True), self.transform(c, layer, True)
+        arcn = 0
+        '''
+        transform = self.get_transforms(group)
+        if transform:
+            transform = self.reverse_transform(transform)
+            transform = str(Transform(transform))
+        '''
 
-        for si in curve:
-
+        a = [0., 0.]
+        b = [1., 0.]
+        c = [0., 1.]
+        k = (b[0] - a[0]) * (c[1] - a[1]) - (c[0] - a[0]) * (b[1] - a[1])
+        a = self.transform(a, layer, True)
+        b = self.transform(b, layer, True)
+        c = self.transform(c, layer, True)
+        if ((b[0] - a[0]) * (c[1] - a[1]) - (c[0] - a[0]) * (b[1] - a[1])) * k > 0:
+            reverse_angle = 1
+        else:
+            reverse_angle = -1
+        for sk in curve:
+            si = sk[:]
             si[0] = self.transform(si[0], layer, True)
-            # print_("si ", si)
             if len(si) == 3:
                 si[2] = self.transform(si[2], layer, True)
 
             if s != '':
                 if s[1] == 'line':
-                    inkex.etree.SubElement(group, inkex.addNS('path', 'svg'),
-                                           {
-                        'style': style['line'],
-                        'd': 'M %s,%s L %s,%s' % (s[0][0], s[0][1], si[0][0], si[0][1]),
-                        "gcodetools": "Preview",
-                    }
-                    )
+                    elem = group.add(PathElement(gcodetools="Preview"))
+                    #elem.transform = transform
+                    elem.style = style['line']
+                    elem.path = 'M {},{} L {},{}'.format(s[0][0], s[0][1], si[0][0], si[0][1])
+
             s = si
 
     def check_dir(self):
@@ -1345,46 +1323,10 @@ class laser_gcode(inkex.EffectExtension):
         recursive_search(self.document.getroot(), self.document.getroot())
 
     # TODO refactor
-    # def get_orientation_points(self, g):
-    #    global orient_points
-
-    #    return orient_points
-    # TODO remove
-
     def get_orientation_points(self, g):
-        items = g.getchildren()
-        items.reverse()
-        p2, p3 = [], []
-        p = None
-        for i in items:
-            if i.tag == inkex.addNS("g", 'svg') and i.get("gcodetools") == "Gcodetools orientation point (2 points)":
-                p2 += [i]
-            if i.tag == inkex.addNS("g", 'svg') and i.get("gcodetools") == "Gcodetools orientation point (3 points)":
-                p3 += [i]
-        if len(p2) == 2:
-            p = p2
-        elif len(p3) == 3:
-            p = p3
-        if p == None:
-            return None
-        points = []
-        for i in p:
-            point = [[], []]
-            for node in i:
-                for node in i:
-                    if node.get('gcodetools') == "Gcodetools orientation point arrow":
-                        csp = node.path.transform(node.composed_transform()).to_superpath()
-                        point[0] = csp[0][0][1]
-                    if node.get('gcodetools') == "Gcodetools orientation point text":
-                        r = re.match(r'(?i)\s*\(\s*(-?\s*\d*(?:,|\.)*\d*)\s*;\s*(-?\s*\d*(?:,|\.)*\d*)\s*;\s*(-?\s*\d*(?:,|\.)*\d*)\s*\)\s*', node.get_text())
-                        point[1] = [float(r.group(1)), float(r.group(2)), float(r.group(3))]
-                if point[0] != [] and point[1] != []:
-                    points += [point]
-        if len(points) == len(p2) == 2 or len(points) == len(p3) == 3:
-            print_debug("Points: ", points)
-            return points
-        else:
-            return None
+        global orient_points
+        return orient_points
+
 
 ################################################################################
 # Fill area
@@ -1740,7 +1682,7 @@ class laser_gcode(inkex.EffectExtension):
                 # Calculate scale in pixels per user unit (mm or inch)
 
                 max_dist = self.options.laser_beam_with/2
-                engraving_group = inkex.etree.SubElement(self.svg.selected_paths[layer][0].getparent(), inkex.addNS('g', 'svg'))
+                engraving_group = self.svg.selected_paths[layer][0].getparent().add(Group())
 
                 for node in self.svg.selected_paths[layer]:
 
@@ -1751,28 +1693,6 @@ class laser_gcode(inkex.EffectExtension):
                     if node.tag == inkex.addNS('path', 'svg'):
                         cspi = node.path.to_superpath()
                         nlLT = []
-
-                        '''
-                        noOfElements = 0
-                        delElements = 0
-
-                        for j in xrange(len(cspi)):  # LT For each subpath...
-                            # Remove zero length segments, assume closed path
-                            i = 0
-                            noOfElements += len(cspi[j])
-
-                            while i < len(cspi[j]):
-                                if abs(cspi[j][i-1][1][0]-cspi[j][i][1][0]) < engraving_tolerance and abs(cspi[j][i-1][1][1]-cspi[j][i][1][1]) < engraving_tolerance:
-                                    cspi[j][i-1][2] = cspi[j][i][2]
-                                    del cspi[j][i]
-                                    delElements += 1
-                                else:
-                                    i += 1
-
-                        print_("Total number of points ", noOfElements)
-                        print_("Number of removed points: ", delElements)
-
-                        '''
 
                         for csp in cspi:
                             # print_("csp is",csp)
@@ -1931,97 +1851,8 @@ class laser_gcode(inkex.EffectExtension):
             doc_height = 1052.3622047
             print_("Overriding height from 100 percents to {}".format(doc_height))
 
-        # TODO: 2D is enough
-        orient_points = [[0., 0., 0], [100., 0., 0], [0., 100., 0.]]
-
-    # TODO remove
-
-    def orientation_v2(self, layer=None):
-        self.get_info()
-
-        if layer is None:
-            layer = self.svg.get_current_layer() if self.svg.get_current_layer() is not None else self.document.getroot()
-
-        transform = self.get_transforms(layer)
-        if transform:
-            transform = self.reverse_transform(transform)
-            transform = str(Transform(transform))
-
-        print_("Inserting orientation points")
-
-        if layer in self.orientation_points:
-            self.error("Active layer already has orientation points! Remove them or select another layer!", "error")
-
-        attr = {"gcodetools": "Gcodetools orientation group"}
-        if transform:
-            attr["transform"] = transform
-
-        orientation_group = layer.add(Group(**attr))
-        doc_height = self.svg.unittouu(self.document.getroot().get('height'))
-        if self.document.getroot().get('height') == "100%":
-            doc_height = 1052.3622047
-            print_("Overriding height from 100 percents to {}".format(doc_height))
-
-        points = [[0., 0., 0], [100., 0., 0], [0., 100., 0.]]
-
-        for i in points:
-            name = "Gcodetools orientation point (2 points)"
-            grp = orientation_group.add(Group(gcodetools=name))
-            elem = grp.add(PathElement(style="stroke:none;fill:#000000;"))
-            elem.set('gcodetools', "Gcodetools orientation point arrow")
-            elem.path = 'm {},{} 2.9375,-6.343750000001 0.8125,1.90625 6.843748640396,'\
-                '-6.84374864039 0,0 0.6875,0.6875 -6.84375,6.84375 1.90625,0.812500000'\
-                '001 z'.format(i[0], -i[1] + doc_height)
-
-            draw_text("({}; {}; {})".format(i[0], i[1], i[2]), (i[0] + 10), (-i[1] - 10 + doc_height), group=grp, gcodetools_tag="Gcodetools orientation point text")
-
-    # TODO: remove
-    def orientation_old(self, layer=None):
-        print_("entering orientations")
-
-        if layer == None:
-            layer = self.current_layer if self.current_layer is not None else self.document.getroot()
-
-        if layer in self.orientation_points:
-            self.error("Active layer already has orientation points! Remove them or select another layer!")
-
-        attr = {'gcodetools': "Gcodetools graffiti reference point"}
-        orientation_group = layer.add(Group(**attr))
-
-        if layer.get("transform") != None:
-            translate = layer.get("transform").replace("translate(", "").replace(")", "").split(",")
-        else:
-            translate = [0, 0]
-
-        doc_height = self.svg.unittouu(self.document.getroot().get('height'))
-
-        if self.document.getroot().get('height') == "100%":
-            doc_height = 1052.3622047
-            print_("Overriding height from 100 percents to {}".format(doc_height))
-
-        print_("Document height: " + str(doc_height))
-
-        # setup for mm as base unit
-        points = [[0., 0., 0.], [100., 0., 0.], [0., 100., 0.]]
-        orientation_scale = 1
-        print_("orientation_scale < 0 ===> switching to mm units= {}".format(orientation_scale))
-
-        points = points[:2]
-
-        print_(("using orientation scale", orientation_scale, "i=", points))
-        print_("translate", translate[1])
-
-        for i in points:
-            name = "Gcodetools orientation point ({} points)".format("in-out reference point")
-            grp = orientation_group.add(Group(gcodetools=name))
-            elem = grp.add(PathElement(style="stroke:none;fill:#000000;"))
-            elem.set('gcodetools', "Gcodetools orientation point arrow")
-            elem.path = 'm {},{} 2.9375,-6.343750000001 0.8125,1.90625 6.843748640396,'\
-                '-6.84374864039 0,0 0.6875,0.6875 -6.84375,6.84375 1.90625,0.812500000'\
-                '001 z'.format(i[0], -i[1] + doc_height)
-
-            draw_text("({}; {}; {})".format(i[0], i[1], i[2]), (i[0] + 10), (-i[1] - 10 + doc_height), group=grp, gcodetools_tag="Gcodetools orientation point text")
-
+        # TODO: refactor
+        orient_points = [[[100, doc_height], [100., 0.0, 0.0]], [[0.0, doc_height], [0.0, 0.0, 0.0]]]
     '''
     deactivated
     ################################################################################
