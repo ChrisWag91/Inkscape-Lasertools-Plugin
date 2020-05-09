@@ -29,22 +29,18 @@ import os
 import re
 import sys
 import time
-from functools import partial
 import multiprocessing
 from multiprocessing import Pool
-import gettext
 import datetime
-import pprint
 
 # 3rd party libraries
-from lxml import etree
 import numpy as np
 import cProfile
 
 # local libraries
 import inkex
 # TODO: check if V and H can be prozessed by the parser
-from inkex import CubicSuperPath, Style, TextElement, Tspan
+from inkex import CubicSuperPath, Style
 from inkex.bezier import bezierlength, bezierparameterize, beziertatlength
 from inkex.transforms import Transform
 from inkex.elements import PathElement, Group
@@ -54,44 +50,8 @@ if sys.version_info[0] > 2:
     xrange = range
     unicode = str
 
-"""
-From GcodeTools
-import inkex
-from inkex.bezier import bezierlength, bezierparameterize, beziertatlength
-from inkex import Transform, PathElement, TextElement, Tspan, Group, Layer, Marker, CubicSuperPath, Style
-"""
-
-
-"""
-import inkex
-import simplestyle
-import simplepath
-import cubicsuperpath
-import bezmisc
-import simpletransform
-from simpletransform import composeTransform, fuseTransform, parseTransform, applyTransformToPath, applyTransformToPoint, formatTransform
-
-import multiprocessing
-from multiprocessing import Pool
-
-import cProfile
-import sys
-sys.path.append('/usr/share/inkscape/extensions')
-
-import os
-import math
-import re
-import time
-import datetime
-import cmath
-import numpy as np
-import gettext
-_ = gettext.gettext
-"""
-
 if "errormsg" not in dir(inkex):
-    inkex.errormsg = lambda msg: sys.stderr.write(
-        (str(msg) + "\n").encode("UTF-8"))
+    inkex.errormsg = lambda msg: sys.stderr.write((str(msg) + "\n").encode("UTF-8"))
 
 
 ################################################################################
@@ -101,7 +61,7 @@ if "errormsg" not in dir(inkex):
 gcode = ""
 csp = []
 profiling = False    # Disable if not debugging
-debug = True      # Disable if not debugging
+debug = False      # Disable if not debugging
 
 if profiling:
     import lsprofcalltree
@@ -109,7 +69,6 @@ if profiling:
 timestamp = datetime.datetime.now()
 math.pi2 = math.pi*2
 tiny_infill_factor = 2  # x times the laser beam width will be removed
-straight_tolerance = 0.000001
 engraving_tolerance = 0.000002
 options = {}
 cspm = []
@@ -139,15 +98,6 @@ MARKER_STYLE = {
     }
 }
 
-'''
-styles = {
-    "biarc_style": {
-        'line':        simplestyle.formatStyle({'stroke': '#f88', 'fill': 'none', "marker-end": 'none', 'stroke-width': '0.1'}),
-        'biarc1':        simplestyle.formatStyle({'stroke': '#8f8', 'fill': 'none', "marker-end": 'none', 'stroke-width': '0.5'})
-    }
-}
-'''
-
 
 def checkIfLineInsideShape(splitted_line):
     # print_("sl input", splitted_line)
@@ -162,7 +112,6 @@ def checkIfLineInsideShape(splitted_line):
 
     if point_inside_csp(p, csp):
         if l1 != l2:
-            print_debug("splitted line ", [l1, l2])
             return [l1, l2]
         else:
             return [[0, 0], [0, 0]]
@@ -244,11 +193,6 @@ def csp_at_t(sp1, sp2, t):
     return [x, y]
 
 
-def cspseglength(sp1, sp2, tolerance=0.01):
-    bez = (sp1[1][:], sp1[2][:], sp2[0][:], sp2[1][:])
-    return bezierlength(bez, tolerance)
-
-
 def csp_line_intersection(l1, l2, sp1, sp2):
     dd = l1[0]
     cc = l2[0]-l1[0]
@@ -275,53 +219,6 @@ def csp_line_intersection(l1, l2, sp1, sp2):
         if type(i) is not complex and -1e-10 <= i <= 1.+1e-10:
             retval.append(i)
     return retval
-
-
-# Return only points [ (x,y) ]
-def line_line_intersection_points(p1, p2, p3, p4):
-    if (p1[0] == p2[0] and p1[1] == p2[1]) or (p3[0] == p4[0] and p3[1] == p4[1]):
-        return []
-    x = (p2[0]-p1[0])*(p4[1]-p3[1]) - (p2[1]-p1[1])*(p4[0]-p3[0])
-    if x == 0:  # Lines are parallel
-        if (p3[0]-p1[0])*(p2[1]-p1[1]) == (p3[1]-p1[1])*(p2[0]-p1[0]):
-            if p3[0] != p4[0]:
-                t11 = (p1[0]-p3[0])/(p4[0]-p3[0])
-                t12 = (p2[0]-p3[0])/(p4[0]-p3[0])
-                t21 = (p3[0]-p1[0])/(p2[0]-p1[0])
-                t22 = (p4[0]-p1[0])/(p2[0]-p1[0])
-            else:
-                t11 = (p1[1]-p3[1])/(p4[1]-p3[1])
-                t12 = (p2[1]-p3[1])/(p4[1]-p3[1])
-                t21 = (p3[1]-p1[1])/(p2[1]-p1[1])
-                t22 = (p4[1]-p1[1])/(p2[1]-p1[1])
-            res = []
-            if (0 <= t11 <= 1 or 0 <= t12 <= 1) and (0 <= t21 <= 1 or 0 <= t22 <= 1):
-                if 0 <= t11 <= 1:
-                    res += [p1]
-                if 0 <= t12 <= 1:
-                    res += [p2]
-                if 0 <= t21 <= 1:
-                    res += [p3]
-                if 0 <= t22 <= 1:
-                    res += [p4]
-            return res
-        else:
-            return []
-    else:
-        t1 = ((p4[0]-p3[0])*(p1[1]-p3[1]) - (p4[1]-p3[1])*(p1[0]-p3[0]))/x
-        t2 = ((p2[0]-p1[0])*(p1[1]-p3[1]) - (p2[1]-p1[1])*(p1[0]-p3[0]))/x
-        if 0 <= t1 <= 1 and 0 <= t2 <= 1:
-            return [[p1[0]*(1-t1)+p2[0]*t1, p1[1]*(1-t1)+p2[1]*t1]]
-        else:
-            return []
-
-
-def point_to_point_d2(a, b):
-    return (a[0]-b[0])**2 + (a[1]-b[1])**2
-
-
-def point_to_point_d(a, b):
-    return math.hypot((a[0]-b[0]), (a[1]-b[1]))
 
 
 def csp_normalized_slope(sp1, sp2, t):
@@ -370,79 +267,10 @@ def csp_normalized_normal(sp1, sp2, t):
 def csp_parameterize(sp1, sp2):
     return bezierparameterize(csp_segment_to_bez(sp1, sp2))
 
-# from Gcodetools
-
-
-def csp_draw(csp, stroke="#f00", fill="none", comment="", width=0.354, group=None, style=None):
-    if group is None:
-        group = options.doc_root
-    node = group.add(PathElement())
-
-    node.style = style if style is not None else \
-        {'fill': fill, 'fill-opacity': 1, 'stroke': stroke, 'stroke-width': width}
-
-    node.path = CubicSuperPath(csp)
-
-    if comment != '':
-        node.set('comment', comment)
-
-    return node
-
-
-'''
-old
-def csp_draw(csp, color="#05f", group=None, style="fill:none;", width=.1, comment=""):
-    if csp != [] and csp != [[]]:
-        if group == None:
-            group = options.doc_root
-        style += "stroke:"+color+";" + "stroke-width:%0.4fpx;" % width
-        args = {"d": cubicsuperpath.formatPath(csp), "style": style}
-        if comment != "":
-            args["comment"] = str(comment)
-        inkex.etree.SubElement(group, inkex.addNS('path', 'svg'), args)
-'''
-
-
-def csp_subpath_line_to(subpath, points):
-    # Appends subpath with line or polyline.
-    if len(points) > 0:
-        if len(subpath) > 0:
-            subpath[-1][2] = subpath[-1][1][:]
-        if type(points[0]) == type([1, 1]):
-            for p in points:
-                subpath += [[p[:], p[:], p[:]]]
-        else:
-            subpath += [[points, points, points]]
-    return subpath
-
-
-def draw_text(text, x, y, group=None, style=None, font_size=10, gcodetools_tag=None):
-    if style is None:
-        style = "font-family:DejaVu Sans;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:DejaVu Sans;fill:#000000;fill-opacity:1;stroke:none;"
-    style += "font-size:{:f}px;".format(font_size)
-    attributes = {'x': str(x),
-                  inkex.addNS("space", "xml"): "preserve",
-                  'y': str(y),
-                  'style': style
-                  }
-    if gcodetools_tag is not None:
-        attributes["gcodetools"] = str(gcodetools_tag)
-
-    if group is None:
-        group = options.doc_root
-
-    text_elem = group.add(TextElement(**attributes))
-    text = str(text).split("\n")
-    for string in text:
-        span = text_elem.add(Tspan(x=str(x), y=str(y)))
-        span.set('sodipodi:role', 'line')
-        y += font_size
-        span.text = str(string)
 
 ################################################################################
 # Area Fill Stuff
 ################################################################################
-
 
 def point_inside_csp(p, csp, on_the_path=True):
 
@@ -530,29 +358,9 @@ def csp_close_all_subpaths(csp, tolerance=0.000001):
 '''
 
 ################################################################################
-# Some vector functions
-################################################################################
-
-
-def normalize(x, y):
-    l = math.hypot(x, y)
-    if l == 0:
-        return [0., 0.]
-    else:
-        return [x/l, y/l]
-
-
-def cross(a, b):
-    return a[1] * b[0] - a[0] * b[1]
-
-
-def dot(a, b):
-    return a[0] * b[0] + a[1] * b[1]
-
-
-################################################################################
 # Common functions
 ################################################################################
+
 
 def atan2(*arg):
     if len(arg) == 1 and (type(arg[0]) == type([0., 0.]) or type(arg[0]) == type((0., 0.))):
@@ -562,10 +370,6 @@ def atan2(*arg):
         return (math.pi/2 - math.atan2(arg[0], arg[1])) % math.pi2
     else:
         raise ValueError("Bad argumets for atan! (%s)" % arg)
-
-
-def between(c, x, y):
-    return x-straight_tolerance <= c <= y+straight_tolerance or y-straight_tolerance <= c <= x+straight_tolerance
 
 
 def cubic_solver(a, b, c, d):
@@ -655,31 +459,7 @@ class P:
 
     def __div__(self, other): return P(self.x / other, self.y / other)
 
-    def mag(self): return math.hypot(self.x, self.y)
-
-    def unit(self):
-        h = self.mag()
-        if h:
-            return self / h
-        else:
-            return P(0, 0)
-
-    def dot(self, other): return self.x * other.x + self.y * other.y
-
-    def rot(self, theta):
-        c = math.cos(theta)
-        s = math.sin(theta)
-        return P(self.x * c - self.y * s,  self.x * s + self.y * c)
-
-    def angle(self): return math.atan2(self.y, self.x)
-
     def __repr__(self): return '%f,%f' % (self.x, self.y)
-
-    def pr(self): return "%.3f,%.3f" % (self.x, self.y)
-
-    def to_list(self): return [self.x, self.y]
-
-    def ccw(self): return P(-self.y, self.x)
 
     def l2(self): return self.x*self.x + self.y*self.y
 
@@ -689,7 +469,6 @@ class P:
 
 
 class laser_gcode(inkex.EffectExtension):
-    multi_inx = True  # XXX Remove this after refactoring
 
     def export_gcode(self, gcode):
         gcode_pass = gcode
@@ -773,13 +552,10 @@ class laser_gcode(inkex.EffectExtension):
             dist = None
             for i in range(len(k)):
                 start = p[k[i]][0][1]
-                print_("start for parse_curve ", start)
-                print_("end for parse_curve ", end)
-                print_("val for max ", (-((end[0] - start[0]) ** 2 + (end[1] - start[1]) ** 2), i))
-                print_("dist ", dist)
+                # TODO Needs Fixing
                 #dist = max((-((end[0] - start[0]) ** 2 + (end[1] - start[1]) ** 2), i), dist)
                 dist = (-((end[0] - start[0]) ** 2 + (end[1] - start[1]) ** 2), i)
-                print_("dist ", dist)
+                print_debug("dist ", dist)
             keys += [k[dist[1]]]
             del k[dist[1]]
         for k in keys:
@@ -798,9 +574,7 @@ class laser_gcode(inkex.EffectExtension):
         if len(p) == 0:
             return []
         p = self.transform_csp(p, layer)
-        # print_("p: ", p)
         np_p = np.array(p)
-        # print_("len p Slice: ", len(np_p[:, 0, 0, 0]))
         sortedToolpaths = self.sort_points(
             np_p[:, 0, 0, 0], np_p[:, 0, 0, 1], np_p[:, 1, 0, 0], np_p[:, 1, 0, 1])
 
@@ -834,7 +608,6 @@ class laser_gcode(inkex.EffectExtension):
             distances = np.array(
                 [np.add(xDist, yDist), np.add(xDistInv, yDistInv)])
             distances = np.abs(distances)
-            # print_("Distances: ", distances)
 
             minInd = np.unravel_index(
                 np.argmin(distances, axis=None), distances.shape)
@@ -875,13 +648,11 @@ class laser_gcode(inkex.EffectExtension):
             group = self.preview_groups[layer]
 
         s = ''
-        arcn = 0
-        '''
+
         transform = self.get_transforms(group)
         if transform:
             transform = self.reverse_transform(transform)
             transform = str(Transform(transform))
-        '''
 
         a = [0., 0.]
         b = [1., 0.]
@@ -890,10 +661,7 @@ class laser_gcode(inkex.EffectExtension):
         a = self.transform(a, layer, True)
         b = self.transform(b, layer, True)
         c = self.transform(c, layer, True)
-        if ((b[0] - a[0]) * (c[1] - a[1]) - (c[0] - a[0]) * (b[1] - a[1])) * k > 0:
-            reverse_angle = 1
-        else:
-            reverse_angle = -1
+
         for sk in curve:
             si = sk[:]
             si[0] = self.transform(si[0], layer, True)
@@ -903,7 +671,7 @@ class laser_gcode(inkex.EffectExtension):
             if s != '':
                 if s[1] == 'line':
                     elem = group.add(PathElement(gcodetools="Preview"))
-                    #elem.transform = transform
+                    elem.transform = transform
                     elem.style = style['line']
                     elem.path = 'M {},{} L {},{}'.format(s[0][0], s[0][1], si[0][0], si[0][1])
 
@@ -915,7 +683,7 @@ class laser_gcode(inkex.EffectExtension):
                 self.options.directory += "\\"
             else:
                 self.options.directory += "/"
-        print_("Checking direcrory: '%s'" % self.options.directory)
+        print_("Checking direcrory: ", self.options.directory)
         if (os.path.isdir(self.options.directory)):
             if (os.path.isfile(self.options.directory+'header')):
                 f = open(self.options.directory+'header', 'r')
@@ -953,13 +721,12 @@ class laser_gcode(inkex.EffectExtension):
                 ("0"*(4-len(str(max_n+1))) + str(max_n+1)) + ext
             self.options.file = filename
 
-        print_("Testing writing rights on '%s'" %
-               (self.options.directory+self.options.file))
+        print_("Testing writing rights on ", self.options.directory+self.options.file)
         try:
             f = open(self.options.directory+self.options.file, "w")
             f.close()
         except:
-            self.error("Can not write to specified file!\n%s" % (self.options.directory+self.options.file), "error")
+            self.error("Can not write to specified file!\n{}".format(self.options.directory+self.options.file), "error")
             return False
         return True
 
@@ -993,7 +760,6 @@ class laser_gcode(inkex.EffectExtension):
         except:
             self.last_used_tool = None
 
-        # print_("Curve: " + str(curve) + "/n")
         lg, f = 'G00', "F%.1f" % tool['penetration feed']
         g = "; START " + strategy+" strategy\nG01 " + f + "\n"
 
@@ -1010,19 +776,20 @@ class laser_gcode(inkex.EffectExtension):
             #    Creating Gcode for curve between s=curve[i-1] and si=curve[i] start at s[0] end at s[4]=si[0]
             s, si = curve[i-1], curve[i]
 
+            # TODO: potential Fixing required
+            '''
             si[0] = self.transform(si[0], layer, True)
             # print_("si ", si)
             if len(si) == 3:
                 si[2] = self.transform(si[2], layer, True)
-
+            '''
             s[0][1] = s[0][1] - offset_y
             si[0][1] = si[0][1] - offset_y
 
             # verify the new coordinates are different from the old coordinates
             # no need move or burn to a destination already moved
             # becomes true of different
-            newcoord_different = round(
-                si[0][0], 2) != pastX or round(si[0][1], 2) != pastY
+            newcoord_different = round(si[0][0], 2) != pastX or round(si[0][1], 2) != pastY
 
             #############################
             # infill strategy
@@ -1123,23 +890,16 @@ class laser_gcode(inkex.EffectExtension):
                 t = Transform(t).matrix
                 trans = (Transform(t) * Transform(trans)).matrix if trans != [] else t
 
-                print_(trans)
             g = g.getparent()
         return trans
 
-    '''
-    old
-
-    def apply_transforms(self, g, csp):
-        trans = self.get_transforms(g)
-        if trans != []:
-            trans[1][2] = 0
-            print_('    applying transformation')
-            # print_(trans)
-            simpletransform.applyTransformToPath(trans, csp)
-        return csp
-
-    '''
+    def reverse_transform(self, transform):
+        trans = np.array(transform + ([0, 0, 1],))
+        if np.linalg.det(trans) != 0:
+            trans = np.linalg.inv(trans).tolist()[:2]
+            return trans
+        else:
+            return transform
 
     def apply_transforms(self, g, csp, reverse=False):
         trans = self.get_transforms(g)
@@ -1167,8 +927,6 @@ class laser_gcode(inkex.EffectExtension):
                 if self.layers[i] in self.orientation_points:
                     break
 
-            # print_(str(self.layers))
-            # print_(str("I: " + str(i)))
             if self.layers[i] not in self.orientation_points:
                 self.error("Orientation points for '{}' layer have not been found! Please add orientation points using Orientation tab!".format(
                     layer.get(inkex.addNS('label', 'inkscape'))), "error")
@@ -1183,22 +941,18 @@ class laser_gcode(inkex.EffectExtension):
                     points += [[[(points[1][0][1]-points[0][0][1])+points[0][0][0], -(points[1][0][0]-points[0][0][0])+points[0][0][1]],
                                 [-(points[1][1][1]-points[0][1][1])+points[0][1][0], points[1][1][0]-points[0][1][0]+points[0][1][1]]]]
                 if len(points) == 3:
-                    # print_("Layer '%s' Orientation points: " % orientation_layer.get(inkex.addNS('label', 'inkscape')))
-                    for point in points:
-                        print_(point)
-                    matrix = np.array([
-                        [0, 0, 1, 0, 0, 0, 0, 0, 0],
-                        [0, 0, 0, 0, 0, 1, 0, 0, 0],
-                        [0, 0, 0, 0, 0, 0, 0, 0, 1],
-                        [100, 0, 1, 0, 0, 0, 0, 0, 0],
-                        [0, 0, 0, 100, 0, 1, 0, 0, 0],
-                        [0, 0, 0, 0, 0, 0, 100, 0, 1],
-                        [0, 100, 1, 0, 0, 0, 0, 0, 0],
-                        [0, 0, 0, 0, 100, 1, 0, 0, 0],
-                        [0, 0, 0, 0, 0, 0, 0, 100, 1]
-                    ])
 
-                    print_debug("Orientation Point matrix: ", matrix)
+                    matrix = np.array([
+                        [points[0][0][0], points[0][0][1], 1, 0, 0, 0, 0, 0, 0],
+                        [0, 0, 0, points[0][0][0], points[0][0][1], 1, 0, 0, 0],
+                        [0, 0, 0, 0, 0, 0, points[0][0][0], points[0][0][1], 1],
+                        [points[1][0][0], points[1][0][1], 1, 0, 0, 0, 0, 0, 0],
+                        [0, 0, 0, points[1][0][0], points[1][0][1], 1, 0, 0, 0],
+                        [0, 0, 0, 0, 0, 0, points[1][0][0], points[1][0][1], 1],
+                        [points[2][0][0], points[2][0][1], 1, 0, 0, 0, 0, 0, 0],
+                        [0, 0, 0, points[2][0][0], points[2][0][1], 1, 0, 0, 0],
+                        [0, 0, 0, 0, 0, 0, points[2][0][0], points[2][0][1], 1]
+                    ])
 
                     if np.linalg.det(matrix) != 0:
                         m = np.linalg.solve(matrix,
@@ -1207,21 +961,16 @@ class laser_gcode(inkex.EffectExtension):
                                                     points[1][1][1]], [1], [points[2][1][0]], [points[2][1][1]], [1]]
                                             )
                                             ).tolist()
-                        self.transform_matrix[layer] = [
-                            [m[j*3+i][0] for i in range(3)] for j in range(3)]
+                        self.transform_matrix[layer] = [[m[j*3+i][0] for i in range(3)] for j in range(3)]
 
                     else:
                         self.error("Orientation points are wrong! (if there are two orientation points they sould not be the same. If there are three orientation points they should not be in a straight line.)")
                 else:
                     self.error("Orientation points are wrong! (if there are two orientation points they sould not be the same. If there are three orientation points they should not be in a straight line.)")
 
-            self.transform_matrix_reverse[layer] = np.linalg.inv(
-                self.transform_matrix[layer]).tolist()
-            # print_(self.transform_matrix)
-            # print_(self.transform_matrix_reverse)
+            self.transform_matrix_reverse[layer] = np.linalg.inv(self.transform_matrix[layer]).tolist()
 
         x, y = source_point[0], source_point[1]
-        # print_("source point x", str(x) + " " + str(y))
 
         if not reverse:
             t = self.transform_matrix[layer]
@@ -1239,7 +988,6 @@ class laser_gcode(inkex.EffectExtension):
                 # print_("csp pre trans", csp[i][j])
                 for k in xrange(len(csp[i][j])):
                     csp[i][j][k] = self.transform(csp[i][j][k], layer, reverse)
-                # csp[i][j][0] = self.transform(csp[i][j][0], layer, reverse)
                 # print_("csp post trans", csp[i][j])
         return csp
 
@@ -1259,24 +1007,6 @@ class laser_gcode(inkex.EffectExtension):
             print_(s)
             inkex.errormsg(s)
             sys.exit()
-
-
-################################################################################
-# Get defs from svg
-################################################################################
-
-
-    def get_defs(self):
-        self.defs = {}
-
-        def recursive(g):
-            for i in g:
-                if i.tag == inkex.addNS("defs", "svg"):
-                    for j in i:
-                        self.defs[j.get("id")] = i
-                if i.tag == inkex.addNS("g", 'svg'):
-                    recursive(i)
-        recursive(self.document.getroot())
 
 
 ################################################################################
@@ -1305,8 +1035,7 @@ class laser_gcode(inkex.EffectExtension):
                     points = self.get_orientation_points(i)
                     if points != None:
                         self.orientation_points[layer] = self.orientation_points[layer]+[points[:]] if layer in self.orientation_points else [points[:]]
-                        print_("    Found orientation points in '%s' layer: %s" % (
-                            layer.get(inkex.addNS('label', 'inkscape')), points))
+                        print_("    Found orientation points in '{}' layer: '{}'".format(layer.get(inkex.addNS('label', 'inkscape')), points))
                     else:
                         self.error("Warning! Found bad orientation points in '{}' layer. Resulting Gcode could be corrupt!".format(layer.get(inkex.addNS('label', 'inkscape'))))
                 elif i.tag == inkex.addNS('path', 'svg'):
@@ -1372,33 +1101,9 @@ class laser_gcode(inkex.EffectExtension):
                         continue
                     csp = self.apply_transforms(path, csp)
                     # csp = csp_close_all_subpaths(csp)
-
-                    # TODO Fix Transforms
-                    #csp = self.transform_csp(csp, layer)
-
-                    '''
-                    old
-
-                    area_group = inkex.etree.SubElement(
-                        path.getparent(), inkex.addNS('g', 'svg'))
-                    d = path.get('d')
-
-                    if d == None:
-                        print_("omitting non-path")
-                        self.error("Warning: omitting non-path")
-                        continue
-
-                    print_time("Time for path selection")
-
-                    csp = cubicsuperpath.parsePath(d)
-                    csp = self.apply_transforms(path, csp)
-                    # csp = csp_close_all_subpaths(csp)
                     csp = self.transform_csp(csp, layer)
-                    '''
 
                     print_debug("csp length: ", len(csp))
-                    # print_("csp: ", csp)
-
                     print_time("Time for csp transformation")
 
                     # rotate the path to get bounds in defined direction.
@@ -1442,8 +1147,6 @@ class laser_gcode(inkex.EffectExtension):
                         i += r
 
                     print_time("Time for calculating zigzag pattern")
-
-                    # print_("lines from infill:", lines)
 
                     # Rotate created paths back
                     a = self.options.area_fill_angle
@@ -1490,8 +1193,7 @@ class laser_gcode(inkex.EffectExtension):
                         i = 0
 
                     print_time("Time for calculating intersections")
-                    print_debug("number of splitted lines: ",
-                                len(splitted_line))
+                    print_debug("number of splitted lines: ", len(splitted_line))
 
                     finalLines = []
 
@@ -1501,8 +1203,7 @@ class laser_gcode(inkex.EffectExtension):
                         csp4zip = [csp] * len(splitted_line)
                         splitted_line_csp = zip(splitted_line, csp4zip)
 
-                        finalLines = pool.map(
-                            checkIfLineInsideShape_mt, splitted_line_csp)
+                        finalLines = pool.map(checkIfLineInsideShape_mt, splitted_line_csp)
 
                         pool.close()
                         pool.join()
@@ -1515,36 +1216,28 @@ class laser_gcode(inkex.EffectExtension):
 
                     i = 0
 
-                    print_debug(
-                        "number of final lines before removing emptys: ", len(finalLines))
+                    print_debug("number of final lines before removing emptys: ", len(finalLines))
                     # remove empty elements
                     # print_("final_line: ", finalLines)
                     np_finalLines = np.array(finalLines, dtype=np.float32)
-                    index_zeros = np.argwhere(
-                        np_finalLines == [[0, 0], [0, 0]])
-                    np_finalLines = np.delete(
-                        np_finalLines, index_zeros, axis=0)
+                    index_zeros = np.argwhere(np_finalLines == [[0, 0], [0, 0]])
+                    np_finalLines = np.delete(np_finalLines, index_zeros, axis=0)
 
-                    # print_("np_final_line: ", np_finalLines)
                     print_debug("number of final lines: ", len(np_finalLines))
 
                     if options.remove_tiny_infill_paths:
                         start_coords = np.array(np_finalLines[:, 0])
                         end_coords = np.array(np_finalLines[:, 1])
 
-                        distances = np.array(
-                            end_coords[:, 1]-start_coords[:, 1])
+                        distances = np.array(end_coords[:, 1]-start_coords[:, 1])
                         distances = np.abs(distances)
-                        np_finalLines = (np_finalLines[distances > (
-                            tiny_infill_factor * options.laser_beam_with)])
+                        np_finalLines = (np_finalLines[distances > (tiny_infill_factor * options.laser_beam_with)])
                         # print_("final_line: ", np_finalLines)
 
                     print_time("Time for calculating infill paths")
 
                     csp_line = csp_from_polyline(np_finalLines)
-
-                    # TODO fix Transform
-                    #csp_line = self.transform_csp(csp_line, layer, True)
+                    csp_line = self.transform_csp(csp_line, layer, True)
 
                     if self.get_transforms(layer) != []:
                         offset_y = self.get_transforms(layer)[1][2]
@@ -1681,7 +1374,6 @@ class laser_gcode(inkex.EffectExtension):
             if layer in self.svg.selected_paths:
                 # Calculate scale in pixels per user unit (mm or inch)
 
-                max_dist = self.options.laser_beam_with/2
                 engraving_group = self.svg.selected_paths[layer][0].getparent().add(Group())
 
                 for node in self.svg.selected_paths[layer]:
@@ -1797,7 +1489,6 @@ class laser_gcode(inkex.EffectExtension):
                                 cspe += [cspm]
 
                 if cspe != []:
-
                     # for entr in cspe:
                     #    print_("cspe ", entr)
                     curve = self.parse_curve(cspe, layer)
@@ -1810,8 +1501,7 @@ class laser_gcode(inkex.EffectExtension):
                     else:
                         offset_y = 0
 
-                    gcode += self.generate_gcode(curve, layer,
-                                                 self.tool_perimeter, "perimeter")
+                    gcode += self.generate_gcode(curve, layer, self.tool_perimeter, "perimeter")
 
         if gcode != '':
             self.export_gcode(gcode)
@@ -1832,6 +1522,7 @@ class laser_gcode(inkex.EffectExtension):
             layer = self.svg.get_current_layer() if self.svg.get_current_layer() is not None else self.document.getroot()
 
         transform = self.get_transforms(layer)
+
         if transform:
             transform = self.reverse_transform(transform)
             transform = str(Transform(transform))
@@ -1846,6 +1537,7 @@ class laser_gcode(inkex.EffectExtension):
             attr["transform"] = transform
 
         orientation_group = layer.add(Group(**attr))
+
         doc_height = self.svg.unittouu(self.document.getroot().get('height'))
         if self.document.getroot().get('height') == "100%":
             doc_height = 1052.3622047
@@ -1959,7 +1651,6 @@ class laser_gcode(inkex.EffectExtension):
         global options
         options = self.options
         options.self = self
-        options.doc_root = self.document.getroot()
         global print_
 
         if self.options.log_create_log:
@@ -2019,6 +1710,7 @@ class laser_gcode(inkex.EffectExtension):
 
         self.get_info()
 
+        # TODO: fix transformations
         # print_("Applying all transformations")
         # self.applytransforms()
 
