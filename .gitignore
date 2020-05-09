@@ -16,3 +16,4 @@ log.txt
 .vscode
 .idea
 .gitignore
+/inkex/*
