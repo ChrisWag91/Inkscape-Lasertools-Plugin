@@ -41,7 +41,7 @@ import cProfile
 import inkex
 # TODO: check if V and H can be prozessed by the parser
 from inkex import CubicSuperPath, Style
-from inkex.bezier import bezierlength, bezierparameterize, beziertatlength
+from inkex.bezier import bezierparameterize
 from inkex.transforms import Transform
 from inkex.elements import PathElement, Group
 from inkex.paths import Path
@@ -549,13 +549,12 @@ class laser_gcode(inkex.EffectExtension):
         keys = [0]
         while len(k) > 0:
             end = p[keys[-1]][-1][1]
-            dist = None
+            dist = (-10000000, -10000000)
+
             for i in range(len(k)):
                 start = p[k[i]][0][1]
-                # TODO Needs Fixing
-                #dist = max((-((end[0] - start[0]) ** 2 + (end[1] - start[1]) ** 2), i), dist)
-                dist = (-((end[0] - start[0]) ** 2 + (end[1] - start[1]) ** 2), i)
-                print_debug("dist ", dist)
+                dist = max((-((end[0] - start[0]) ** 2 + (end[1] - start[1]) ** 2), i), dist)
+
             keys += [k[dist[1]]]
             del k[dist[1]]
         for k in keys:
@@ -901,24 +900,6 @@ class laser_gcode(inkex.EffectExtension):
         else:
             return transform
 
-    def apply_transforms(self, g, csp, reverse=False):
-        trans = self.get_transforms(g)
-        if trans:
-            if not reverse:
-                # TODO: This was applyTransformToPath but was deprecated.   Candidate for refactoring.
-                for comp in csp:
-                    for ctl in comp:
-                        for pt in ctl:
-                            pt[0], pt[1] = Transform(trans).apply_to_point(pt)
-
-            else:
-                # TODO: This was applyTransformToPath but was deprecated.   Candidate for refactoring.
-                for comp in csp:
-                    for ctl in comp:
-                        for pt in ctl:
-                            pt[0], pt[1] = Transform(self.reverse_transform(trans)).apply_to_point(pt)
-        return csp
-
     def transform(self, source_point, layer, reverse=False):
         if layer == None:
             layer = self.current_layer if self.current_layer is not None else self.document.getroot()
@@ -1013,7 +994,6 @@ class laser_gcode(inkex.EffectExtension):
 # Get Gcodetools info from the svg
 ################################################################################
 
-
     def get_info(self):
         self.svg.selected_paths = {}
         self.paths = {}
@@ -1099,8 +1079,7 @@ class laser_gcode(inkex.EffectExtension):
                         print_("omitting non-path")
                         self.error("Warning: omitting non-path")
                         continue
-                    csp = self.apply_transforms(path, csp)
-                    # csp = csp_close_all_subpaths(csp)
+
                     csp = self.transform_csp(csp, layer)
 
                     print_debug("csp length: ", len(csp))
@@ -1496,11 +1475,6 @@ class laser_gcode(inkex.EffectExtension):
                     #    print_("curve ", entr)
                     self.draw_curve(curve, layer, engraving_group)
 
-                    if self.get_transforms(layer) != []:
-                        offset_y = self.get_transforms(layer)[1][2]
-                    else:
-                        offset_y = 0
-
                     gcode += self.generate_gcode(curve, layer, self.tool_perimeter, "perimeter")
 
         if gcode != '':
@@ -1545,107 +1519,99 @@ class laser_gcode(inkex.EffectExtension):
 
         # TODO: refactor
         orient_points = [[[100, doc_height], [100., 0.0, 0.0]], [[0.0, doc_height], [0.0, 0.0, 0.0]]]
-    '''
-    deactivated
+
     ################################################################################
     # ApplyTransform
     ################################################################################
 
-        @staticmethod
-        def objectToPath(node):
+    @staticmethod
+    def objectToPath(node):
 
-            # print_("convertring node to path:", node.tag)
-
-            if node.tag == inkex.addNS('g', 'svg'):
-                return node
-
-            if node.tag == inkex.addNS('path', 'svg') or node.tag == 'path':
-                for attName in node.attrib.keys():
-                    if ("sodipodi" in attName) or ("inkscape" in attName):
-                        del node.attrib[attName]
-                return node
-
+        if node.tag == inkex.addNS('g', 'svg'):
             return node
 
-        def recursiveFuseTransform(self, node, transf=[[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]]):
+        if node.tag == inkex.addNS('path', 'svg') or node.tag == 'path':
+            for attName in node.attrib.keys():
+                if ("sodipodi" in attName) or ("inkscape" in attName):
+                    del node.attrib[attName]
+            return node
 
-            # print_("transforming Node:", node.tag)
-            transf = composeTransform(transf, parseTransform(node.get("transform", None)))
+        return node
 
-            if 'transform' in node.attrib:
-                del node.attrib['transform']
+    def recursiveFuseTransform(self, node, transf=[[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]]):
 
-            if 'style' in node.attrib:
-                style = node.attrib.get('style')
-                style = simplestyle.parseStyle(style)
-                update = False
+        transf = Transform(transf) * Transform(node.get("transform", None))
 
-                if 'stroke-width' in style:
-                    try:
-                        stroke_width = self.unittouu(
-                            style.get('stroke-width').strip())
-                        # pixelsnap ext assumes scaling is similar in x and y
-                        # and uses the x scale...
-                        # let's try to be a bit smarter
-                        stroke_width *= math.hypot(transf[0][0], transf[1][1])
-                        style['stroke-width'] = str(stroke_width)
-                        update = True
-                    except AttributeError:
-                        pass
+        if 'transform' in node.attrib:
+            del node.attrib['transform']
 
-                if update:
-                    style = simplestyle.formatStyle(style)
-                    node.attrib['style'] = style
+        if 'style' in node.attrib:
+            style = node.attrib.get('style')
+            style = dict(Style.parse_str(style))
+            update = False
 
-            node = self.objectToPath(node)
+            if 'stroke-width' in style:
+                try:
+                    stroke_width = self.unittouu(style.get('stroke-width').strip())
+                    stroke_width *= math.hypot(transf[0][0], transf[1][1])
+                    style['stroke-width'] = str(stroke_width)
+                    update = True
+                except AttributeError:
+                    pass
 
-            if 'd' in node.attrib:
-                d = node.get('d')
-                p = cubicsuperpath.parsePath(d)
-                applyTransformToPath(transf, p)
-                node.set('d', cubicsuperpath.formatPath(p))
+            if update:
+                node.attrib['style'] = Style(style).to_str()
 
-            elif node.tag in [inkex.addNS('polygon', 'svg'),
-                            inkex.addNS('polyline', 'svg')]:
-                points = node.get('points')
-                points = points.strip().split(' ')
-                for k, p in enumerate(points):
-                    if ',' in p:
-                        p = p.split(',')
-                        p = [float(p[0]), float(p[1])]
-                        applyTransformToPoint(transf, p)
-                        p = [str(p[0]), str(p[1])]
-                        p = ','.join(p)
-                        points[k] = p
-                points = ' '.join(points)
-                node.set('points', points)
+        node = self.objectToPath(node)
 
-            elif node.tag in [inkex.addNS('rect', 'svg'),
-                            inkex.addNS('text', 'svg'),
-                            inkex.addNS('image', 'svg'),
-                            inkex.addNS('use', 'svg')]:
-                node.set('transform', formatTransform(transf))
+        if 'd' in node.attrib:
+            d = node.get('d')
+            p = CubicSuperPath(d)
+            p = Path(p).to_absolute().transform(transf, True)
+            node.set('d', Path(CubicSuperPath(p).to_path()))
 
-            for child in node.getchildren():
-                self.recursiveFuseTransform(child, transf)
+        elif node.tag in [inkex.addNS('polygon', 'svg'), inkex.addNS('polyline', 'svg')]:
+            points = node.get('points')
+            points = points.strip().split(' ')
+            for k, p in enumerate(points):
+                if ',' in p:
+                    p = p.split(',')
+                    p = [float(p[0]), float(p[1])]
+                    Transform.apply_to_point(transf, p)
+                    p = [str(p[0]), str(p[1])]
+                    p = ','.join(p)
+                    points[k] = p
+            points = ' '.join(points)
+            node.set('points', points)
 
-        def applytransforms(self):
-            # Apply transformations
-            self.getselected()
+        elif node.tag in [inkex.addNS('rect', 'svg'),
+                          inkex.addNS('text', 'svg'),
+                          inkex.addNS('image', 'svg'),
+                          inkex.addNS('use', 'svg'),
+                          inkex.addNS('circle', 'svg')]:
+            node.set('transform', str(Transform(transf)))
+            #inkex.utils.errormsg("Shape %s not yet supported" % node.tag)
 
-            if self.svg.selected:
-                for _, shape in self.svg.selected.items():
-                    self.recursiveFuseTransform(shape, parseTransform(None))
-            else:
-                self.recursiveFuseTransform(
-                    self.document.getroot(), parseTransform(None))
-            # Transformations applied
-    '''
+        for child in node.getchildren():
+            self.recursiveFuseTransform(child, transf)
+
+    def applytransforms(self):
+        # Apply transformations
+        self.svg.get_selected()
+
+        if self.svg.selected:
+            for id, shape in self.svg.selected.items():
+                self.recursiveFuseTransform(shape)
+        else:
+            self.recursiveFuseTransform(self.document.getroot())
+        # Transformations applied
+
 
 ################################################################################
 # Effect
 # Main function of Lasertools class
 ################################################################################
+
 
     def effect(self):
         global options
@@ -1660,8 +1626,7 @@ class laser_gcode(inkex.EffectExtension):
                         os.remove(self.options.directory+"/log.txt")
                     f = open(self.options.directory+"/log.txt", "a")
                     f.write("===================================================================\n")
-                    f.write("Lasertools log file.\nStarted at %s.\n%s\n" % (
-                        time.strftime("%d.%m.%Y %H:%M:%S"), options.directory+"/log.txt"))
+                    f.write("Lasertools log file.\nStarted at %s.\n%s\n" % (time.strftime("%d.%m.%Y %H:%M:%S"), options.directory+"/log.txt"))
                     f.write("===================================================================\n\n")
                     f.close()
                 except:
@@ -1688,8 +1653,8 @@ class laser_gcode(inkex.EffectExtension):
         # handle power on delay
         delayOn = ""
         if round(float(self.options.power_delay), 1) > 0:
-            delayOn = "G04 P" + \
-                str(round(float(self.options.power_delay)/1000, 3)) + "\n"
+            delayOn = "G04 P" + str(round(float(self.options.power_delay)/1000, 3)) + "\n"
+
         self.tool_infill = {
             "name": "Laser Engraver Infill",
             "id": "Laser Engraver Infill",
@@ -1710,9 +1675,8 @@ class laser_gcode(inkex.EffectExtension):
 
         self.get_info()
 
-        # TODO: fix transformations
-        # print_("Applying all transformations")
-        # self.applytransforms()
+        print_("Applying all transformations")
+        self.applytransforms()
 
         if self.options.add_infill:
             self.svg.selected_paths = self.paths
