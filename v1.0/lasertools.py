@@ -994,6 +994,7 @@ class laser_gcode(inkex.EffectExtension):
 # Get Gcodetools info from the svg
 ################################################################################
 
+
     def get_info(self):
         self.svg.selected_paths = {}
         self.paths = {}
@@ -1160,6 +1161,7 @@ class laser_gcode(inkex.EffectExtension):
                         ints.sort()
 
                         # mitigate vertical line glitch problem
+                        # TODO Needs improvement
 
                         if len(ints) % 2 != 0:
                             print_debug("removing intersection: ", ints)
@@ -1590,7 +1592,6 @@ class laser_gcode(inkex.EffectExtension):
                           inkex.addNS('use', 'svg'),
                           inkex.addNS('circle', 'svg')]:
             node.set('transform', str(Transform(transf)))
-            #inkex.utils.errormsg("Shape %s not yet supported" % node.tag)
 
         for child in node.getchildren():
             self.recursiveFuseTransform(child, transf)
@@ -1611,7 +1612,6 @@ class laser_gcode(inkex.EffectExtension):
 # Effect
 # Main function of Lasertools class
 ################################################################################
-
 
     def effect(self):
         global options

@@ -1,11 +1,16 @@
 # Inkscape-Lasertools-Plugin
 A simple plugin to convert Inkscape vector graphics to Gcode for DIY laser engravers
 
-## Version 0.91
-Tested with Inkscape 0.92
+## Version 1.x
+The version found in the folder v1.0 is intended to be used with v1.x of Inkscape.
+This Version is work in progress. Please feel free to test it, but don't rely on it in production.
+
+## Version 0.9x
+The version found in the folder v0.92 is intended to be used with v0.9x of Inkscape.
+(Tested with Inkscape 0.92)
+
 This project is based on the Gcodetools extension.
 
-This Version is work in progress. Please feel free to test it, but don't rely on it in production.
 *******************************************************************************************************************************
 
 ## How to use Lasertools
@@ -57,10 +62,10 @@ Calculating the Gcode can take quite some time on larger engravings. I would adv
 *******************************************************************************************************************************
 
 ## Installation
-Copy the .py and .inx file to the Inkscape Extentions folder.
+Copy the .py and .inx file from /v0.92 for Inkscape 0.9x or /v1.0 for Inkscape 1.x into the Inkscape extentions folder.
 
-under linux:    /usr/share/inkscape/extensions
-under windows   C:\Program Files\Inkscape\share\extensions 
+- under linux:    /usr/share/inkscape/extensions 
+- under windows   C:\Program Files\Inkscape\share\extensions 
 
 ## Dependencies
 - python2-lxml
