@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 """
 Modified by Christoph Wagner 2020
-
 Modified by Alain Pelletier 2020
 
-based on gcodetools, https://github.com/cnc-club/gcodetools
-based on inkscape-applytransforms, https://github.com/Klowner/inkscape-applytransforms
+based on gcodetools, https://gitlab.com/inkscape/extensions/-/blob/master/gcodetools.py
+based on flatten, https://gitlab.com/inkscape/extensions/-/blob/master/flatten.py
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -40,7 +39,7 @@ import cProfile
 # local libraries
 import inkex
 # TODO: check if V and H can be prozessed by the parser
-from inkex import CubicSuperPath, Style
+from inkex import CubicSuperPath, Style, bezier
 from inkex.bezier import bezierparameterize
 from inkex.transforms import Transform
 from inkex.elements import PathElement, Group
@@ -463,10 +462,10 @@ class P:
 
     def l2(self): return self.x*self.x + self.y*self.y
 
+
 ################################################################################
 # Lasertools class
 ################################################################################
-
 
 class laser_gcode(inkex.EffectExtension):
 
@@ -507,6 +506,7 @@ class laser_gcode(inkex.EffectExtension):
         add_argument("--laser-off-command", dest="laser_off_command", default="S1", help="Laser gcode end command")
         add_argument("--laser-beam-with", type=float, dest="laser_beam_with", default="0.3", help="Laser speed (mm/min)")
         add_argument("--infill-overshoot", type=float, dest="infill_overshoot", default="0.0", help="Overshoot to limit acceleration overburn")
+        add_argument("--contour-tolerance", type=float, dest="tolerance", default="0.1", help="Tolerance for contour approximation")
         add_argument("--laser-speed", type=int, dest="laser_speed", default="1200", help="Laser speed (mm/min)")
         add_argument("--laser-param-speed", type=int, dest="laser_param_speed", default="700", help="Laser speed for Parameter (mm/min)")
         add_argument("--passes", type=int, dest="passes", default="1", help="Quantity of passes")
@@ -1036,7 +1036,6 @@ class laser_gcode(inkex.EffectExtension):
     def get_orientation_points(self, g):
         global orient_points
         return orient_points
-
 
 ################################################################################
 # Fill area
@@ -1607,6 +1606,24 @@ class laser_gcode(inkex.EffectExtension):
             self.recursiveFuseTransform(self.document.getroot())
         # Transformations applied
 
+    def flatten(self, tolerance=0.1):
+        print_("Elements in path: ", self.svg.get_selected(inkex.PathElement))
+
+        for layer in self.layers:
+            if layer in self.svg.selected_paths:
+                for node in self.svg.selected_paths[layer]:
+                    path = node.path.to_superpath()
+                    bezier.cspsubdiv(path, tolerance)
+                    newpath = []
+                    for subpath in path:
+                        first = True
+                        for csp in subpath:
+                            cmd = 'L'
+                            if first:
+                                cmd = 'M'
+                            first = False
+                            newpath.append([cmd, [csp[1][0], csp[1][1]]])
+                    node.path = newpath
 
 ################################################################################
 # Effect
@@ -1678,8 +1695,11 @@ class laser_gcode(inkex.EffectExtension):
         print_("Applying all transformations")
         self.applytransforms()
 
+        print_("Flattening beziers")
+        self.svg.selected_paths = self.paths
+        self.flatten(self.options.tolerance)
+
         if self.options.add_infill:
-            self.svg.selected_paths = self.paths
             self.area_fill()
 
         if self.options.add_contours:
@@ -1691,8 +1711,7 @@ class laser_gcode(inkex.EffectExtension):
                     os.remove(self.options.directory+"/performance.prof")
 
                 profile = cProfile.Profile()
-                profile.runctx('self.engraving()', globals(),
-                               locals())
+                profile.runctx('self.engraving()', globals(), locals())
 
                 kProfile = lsprofcalltree.KCacheGrind(profile)
 
