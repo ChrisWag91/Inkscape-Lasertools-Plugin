@@ -788,7 +788,7 @@ class laser_gcode(inkex.EffectExtension):
             # verify the new coordinates are different from the old coordinates
             # no need move or burn to a destination already moved
             # becomes true of different
-            newcoord_different = round(si[0][0], 2) != pastX or round(si[0][1], 2) != pastY
+            newcoord_different = si[0][0] != pastX or si[0][1] != pastY
 
             #############################
             # infill strategy
@@ -873,8 +873,7 @@ class laser_gcode(inkex.EffectExtension):
                     gy = " Y"+str(y)
                 g += "G01" + gx+gy + "\n"
                 # write past used command and coordinates
-                pastX, pastY, lg = round(
-                    si[0][0], 2), round(si[0][1], 2), 'G01'
+                pastX, pastY, lg = round(si[0][0], 2), round(si[0][1], 2), 'G01'
 
                 # Turn off laser before leaving
         g += tool['gcode after path'] + "\n;END " + strategy + "\n\n"
