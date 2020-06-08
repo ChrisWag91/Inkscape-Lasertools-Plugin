@@ -34,7 +34,7 @@ import datetime
 
 # 3rd party libraries
 import numpy as np
-import cProfile
+
 
 # local libraries
 import inkex
@@ -56,7 +56,7 @@ if "errormsg" not in dir(inkex):
 # Styles and additional parameters
 ################################################################################
 
-PROFILING = False    # Disable if not debugging
+PROFILING = True   # Disable if not debugging
 DEBUG = False      # Disable if not debugging
 TINY_INFILL_FACTOR = 2  # x times the laser beam width will be removed
 ENGRAVING_TOLERANCE = 0.000002
@@ -72,6 +72,8 @@ DEFAULTS = {
 
 if PROFILING:
     import lsprofcalltree
+    import cProfile
+
 
 gcode = ""
 csp = []
@@ -95,27 +97,7 @@ MARKER_STYLE = {
 }
 
 
-def check_if_line_inside_shape(splitted_line):
-    # print_("sl input", splitted_line)
-    # check if the middle point of the first lines segment is inside the path.
-    # and remove the subline if not.
-    l1, l2 = splitted_line[0], splitted_line[1]
-
-    if l1 == l2 and len(splitted_line) > 2:
-        l2 = splitted_line[2]
-
-    p = [(l1[0]+l2[0])/2, (l1[1]+l2[1])/2]
-
-    if point_inside_csp(p, csp):
-        if l1 != l2:
-            return [l1, l2]
-        else:
-            return [[0, 0], [0, 0]]
-    else:
-        return [[0, 0], [0, 0]]
-
-
-def check_if_line_inside_shape_mt(splitted_line_csp):
+def check_if_line_inside_shape(splitted_line_csp):
 
     splitted_line = splitted_line_csp[0]
     csp_temp = splitted_line_csp[1]
@@ -975,6 +957,7 @@ class laser_gcode(inkex.EffectExtension):
 # Get Gcodetools info from the svg
 ################################################################################
 
+
     def get_info(self):
         self.svg.selected_paths = {}
         self.paths = {}
@@ -1150,24 +1133,20 @@ class laser_gcode(inkex.EffectExtension):
 
                     # TODO: fix for Windows Systems. Causes infinite loop due to lack of Fork
                     if self.options.multi_thread and os.name != 'nt':
-                        pool = Pool()
+                        with Pool() as pool:
 
-                        csp4zip = [csp] * len(splitted_line)
-                        splitted_line_csp = zip(splitted_line, csp4zip)
-
-                        finalLines = pool.map(check_if_line_inside_shape_mt, splitted_line_csp)
-
-                        pool.close()
-                        pool.join()
+                            splitted_line_csp = zip(splitted_line, [csp] * len(splitted_line))
+                            finalLines = pool.map(check_if_line_inside_shape, splitted_line_csp)  # 13s; s1:57
 
                     else:
+                        splitted_line_csp = zip(splitted_line, [csp] * len(splitted_line))
                         while i < len(splitted_line):
-                            finalLines += [
-                                check_if_line_inside_shape(splitted_line[i])]
+                            finalLines += [check_if_line_inside_shape(splitted_line_csp[i])]
                             i += 1
 
                     i = 0
 
+                    print_time("Time for checking if line is insied of shape")
                     print_debug("number of final lines before removing emptys: ", len(finalLines))
                     # remove empty elements
                     # print_("final_line: ", finalLines)
