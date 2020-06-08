@@ -38,7 +38,6 @@ import cProfile
 
 # local libraries
 import inkex
-# TODO: check if V and H can be prozessed by the parser
 from inkex import CubicSuperPath, Style, bezier
 from inkex.bezier import bezierparameterize
 from inkex.transforms import Transform
@@ -59,22 +58,9 @@ if "errormsg" not in dir(inkex):
 
 PROFILING = False    # Disable if not debugging
 DEBUG = False      # Disable if not debugging
-
-gcode = ""
-csp = []
-
-if PROFILING:
-    import lsprofcalltree
-
-timestamp = datetime.datetime.now()
-math.pi2 = math.pi*2
-tiny_infill_factor = 2  # x times the laser beam width will be removed
-engraving_tolerance = 0.000002
-options = {}
-cspm = []
-orient_points = []
-offset_y = 0
-defaults = {
+TINY_INFILL_FACTOR = 2  # x times the laser beam width will be removed
+ENGRAVING_TOLERANCE = 0.000002
+DEFAULTS = {
     'header': """
 ;Inkscape Lasertools G-code
 
@@ -83,6 +69,16 @@ defaults = {
 
 """
 }
+
+if PROFILING:
+    import lsprofcalltree
+
+gcode = ""
+csp = []
+timestamp = datetime.datetime.now()
+options = {}
+cspm = []
+orient_points = []
 
 
 def marker_style(stroke, marker='DrawCurveMarker', width=1):
@@ -99,7 +95,7 @@ MARKER_STYLE = {
 }
 
 
-def checkIfLineInsideShape(splitted_line):
+def check_if_line_inside_shape(splitted_line):
     # print_("sl input", splitted_line)
     # check if the middle point of the first lines segment is inside the path.
     # and remove the subline if not.
@@ -119,7 +115,7 @@ def checkIfLineInsideShape(splitted_line):
         return [[0, 0], [0, 0]]
 
 
-def checkIfLineInsideShape_mt(splitted_line_csp):
+def check_if_line_inside_shape_mt(splitted_line_csp):
 
     splitted_line = splitted_line_csp[0]
     csp_temp = splitted_line_csp[1]
@@ -364,10 +360,10 @@ def csp_close_all_subpaths(csp, tolerance=0.000001):
 
 def atan2(*arg):
     if len(arg) == 1 and (type(arg[0]) == type([0., 0.]) or type(arg[0]) == type((0., 0.))):
-        return (math.pi/2 - math.atan2(arg[0][0], arg[0][1])) % math.pi2
+        return (math.pi/2 - math.atan2(arg[0][0], arg[0][1])) % math.pi * 2
     elif len(arg) == 2:
 
-        return (math.pi/2 - math.atan2(arg[0], arg[1])) % math.pi2
+        return (math.pi/2 - math.atan2(arg[0], arg[1])) % math.pi * 2
     else:
         raise ValueError("Bad argumets for atan! (%s)" % arg)
 
@@ -684,19 +680,19 @@ class laser_gcode(inkex.EffectExtension):
             else:
                 self.options.directory += "/"
         print_("Checking direcrory: ", self.options.directory)
-        if (os.path.isdir(self.options.directory)):
-            if (os.path.isfile(self.options.directory+'header')):
+        if os.path.isdir(self.options.directory):
+            if os.path.isfile(self.options.directory+'header'):
                 f = open(self.options.directory+'header', 'r')
                 self.header = f.read()
                 f.close()
             else:
-                self.header = defaults['header']
-            if (os.path.isfile(self.options.directory+'footer')):
+                self.header = DEFAULTS['header']
+            if os.path.isfile(self.options.directory+'footer'):
                 f = open(self.options.directory+'footer', 'r')
                 self.footer = f.read()
                 f.close()
             else:
-                self.footer = defaults['footer']
+                self.footer = DEFAULTS['footer']
 
         else:
             self.error("Directory does not exist! Please specify existing directory at options tab!", "error")
@@ -740,7 +736,6 @@ class laser_gcode(inkex.EffectExtension):
 ################################################################################
 
     def generate_gcode(self, curve, layer, tool, strategy):
-        global offset_y
 
         print_debug("    Laser parameters: " + str(tool))
 
@@ -775,13 +770,6 @@ class laser_gcode(inkex.EffectExtension):
         for i in range(1, len(curve)):
             #    Creating Gcode for curve between s=curve[i-1] and si=curve[i] start at s[0] end at s[4]=si[0]
             s, si = curve[i-1], curve[i]
-
-            s[0][1] = s[0][1] - offset_y
-            si[0][1] = si[0][1] - offset_y
-
-            # verify the new coordinates are different from the old coordinates
-            # no need move or burn to a destination already moved
-            # becomes true of different
             newcoord_different = si[0][0] != pastX or si[0][1] != pastY
 
             #############################
@@ -1031,7 +1019,6 @@ class laser_gcode(inkex.EffectExtension):
     def area_fill(self):
 
         global gcode
-        global offset_y
         global csp
 
         self.options.area_fill_angle = self.options.area_fill_angle * math.pi / 180
@@ -1168,7 +1155,7 @@ class laser_gcode(inkex.EffectExtension):
                         csp4zip = [csp] * len(splitted_line)
                         splitted_line_csp = zip(splitted_line, csp4zip)
 
-                        finalLines = pool.map(checkIfLineInsideShape_mt, splitted_line_csp)
+                        finalLines = pool.map(check_if_line_inside_shape_mt, splitted_line_csp)
 
                         pool.close()
                         pool.join()
@@ -1176,7 +1163,7 @@ class laser_gcode(inkex.EffectExtension):
                     else:
                         while i < len(splitted_line):
                             finalLines += [
-                                checkIfLineInsideShape(splitted_line[i])]
+                                check_if_line_inside_shape(splitted_line[i])]
                             i += 1
 
                     i = 0
@@ -1196,18 +1183,13 @@ class laser_gcode(inkex.EffectExtension):
 
                         distances = np.array(end_coords[:, 1]-start_coords[:, 1])
                         distances = np.abs(distances)
-                        np_finalLines = (np_finalLines[distances > (tiny_infill_factor * options.laser_beam_with)])
+                        np_finalLines = (np_finalLines[distances > (TINY_INFILL_FACTOR * options.laser_beam_with)])
                         # print_("final_line: ", np_finalLines)
 
                     print_time("Time for calculating infill paths")
 
                     csp_line = csp_from_polyline(np_finalLines)
                     csp_line = self.transform_csp(csp_line, layer, True)
-
-                    if self.get_transforms(layer) != []:
-                        offset_y = self.get_transforms(layer)[1][2]
-                    else:
-                        offset_y = 0
 
                     print_time("Time for transforming infill paths")
 
@@ -1220,7 +1202,7 @@ class laser_gcode(inkex.EffectExtension):
 
                     print_time("Time for generating Gcode")
 
-        if gcode != '' and not(self.options.add_contours):
+        if gcode != '' and not self.options.add_contours:
             self.export_gcode(gcode)
 
         print_("===================================================================")
@@ -1232,15 +1214,15 @@ class laser_gcode(inkex.EffectExtension):
 ################################################################################
     def engraving(self):
         global cspm
-        global nlLT, i, j
-        global max_dist  # minimum of tool radius and user's requested maximum distance
+        #global nlLT, i, j
+        # global max_dist  # minimum of tool radius and user's requested maximum distance
 
         def bisect(nx1, ny1, nx2, ny2):
 
             cosBis = math.sqrt(max(0, (1.0+nx1*nx2-ny1*ny2)/2.0))
             # We can get correct sign of the sin, assuming cos is positive
-            if (abs(ny1-ny2) < engraving_tolerance) or (abs(cosBis) < engraving_tolerance):
-                if (abs(nx1-nx2) < engraving_tolerance):
+            if (abs(ny1-ny2) < ENGRAVING_TOLERANCE) or (abs(cosBis) < ENGRAVING_TOLERANCE):
+                if abs(nx1-nx2) < ENGRAVING_TOLERANCE:
                     return(nx1, ny1, 0.0)
                 sinBis = math.copysign(1, ny1)
             else:
@@ -1304,7 +1286,7 @@ class laser_gcode(inkex.EffectExtension):
                         if length2 > length1 and length2 > length12:  # point 1 between them
                             xydist = abs(
                                 (xy2[0]-x)*(xy1[1]-y)-(xy1[0]-x)*(xy2[1]-y))/length2
-                            if xydist < engraving_tolerance:  # so far so good
+                            if xydist < ENGRAVING_TOLERANCE:  # so far so good
                                 cspm.pop()
             cspm += [[[x, y], [x, y], [x, y], i, j]]
 
@@ -1323,7 +1305,6 @@ class laser_gcode(inkex.EffectExtension):
         x1, y1, nx, ny = 0, 0, 0, 0
 
         cspe = []
-        global offset_y
 
         if len(self.svg.selected_paths) <= 0:
             self.error("Please select at least one path to engrave and run again.")
@@ -1377,7 +1358,7 @@ class laser_gcode(inkex.EffectExtension):
                                                 nx1 = bLT[seg][1]-bLT[seg+1][1]
                                                 ny1 = bLT[seg+1][0]-bLT[seg][0]
                                                 l1 = math.hypot(nx1, ny1)
-                                                if l1 < engraving_tolerance:
+                                                if l1 < ENGRAVING_TOLERANCE:
                                                     continue
                                                 nx1 = nx1/l1  # normalise them
                                                 ny1 = ny1/l1
@@ -1390,7 +1371,7 @@ class laser_gcode(inkex.EffectExtension):
                                                 nx1 = bLT[seg+1][1] - bLT[seg+2][1]
                                                 ny1 = bLT[seg+2][0] - bLT[seg+1][0]
                                                 l1 = math.hypot(nx1, ny1)
-                                                if l1 < engraving_tolerance:
+                                                if l1 < ENGRAVING_TOLERANCE:
                                                     continue
                                                 nx1 = nx1/l1  # normalise them
                                                 ny1 = ny1/l1
