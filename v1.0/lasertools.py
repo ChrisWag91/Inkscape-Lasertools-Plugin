@@ -57,12 +57,13 @@ if "errormsg" not in dir(inkex):
 # Styles and additional parameters
 ################################################################################
 
+PROFILING = False    # Disable if not debugging
+DEBUG = False      # Disable if not debugging
+
 gcode = ""
 csp = []
-profiling = False    # Disable if not debugging
-debug = False      # Disable if not debugging
 
-if profiling:
+if PROFILING:
     import lsprofcalltree
 
 timestamp = datetime.datetime.now()
@@ -121,7 +122,7 @@ def checkIfLineInsideShape(splitted_line):
 def checkIfLineInsideShape_mt(splitted_line_csp):
 
     splitted_line = splitted_line_csp[0]
-    csp = splitted_line_csp[1]
+    csp_temp = splitted_line_csp[1]
     l1, l2 = splitted_line[0], splitted_line[1]
 
     if l1 == l2 and len(splitted_line) > 2:
@@ -129,7 +130,7 @@ def checkIfLineInsideShape_mt(splitted_line_csp):
 
     p = [(l1[0]+l2[0])/2, (l1[1]+l2[1])/2]
 
-    if point_inside_csp(p, csp):
+    if point_inside_csp(p, csp_temp):
         if l1 != l2:
             return [l1, l2]
         else:
@@ -142,16 +143,16 @@ def csp_segment_to_bez(sp1, sp2):
     return sp1[1:]+sp2[:2]
 
 
-def csp_true_bounds(csp):
+def csp_true_bounds(csp_temp):
 
     # Finds minx,miny,maxx,maxy of the csp and return their (x,y,i,j,t)
     minx = [float("inf"), 0, 0, 0]
     maxx = [float("-inf"), 0, 0, 0]
     miny = [float("inf"), 0, 0, 0]
     maxy = [float("-inf"), 0, 0, 0]
-    for i in range(len(csp)):
-        for j in range(1, len(csp[i])):
-            ax, ay, bx, by, cx, cy, x0, y0 = bezierparameterize((csp[i][j-1][1], csp[i][j-1][2], csp[i][j][0], csp[i][j][1]))
+    for i in range(len(csp_temp)):
+        for j in range(1, len(csp_temp[i])):
+            ax, ay, bx, by, cx, cy, x0, y0 = bezierparameterize((csp_temp[i][j-1][1], csp_temp[i][j-1][2], csp_temp[i][j][0], csp_temp[i][j][1]))
             roots = cubic_solver(0, 3*ax, 2*bx, cx) + [0, 1]
             for root in roots:
                 if type(root) is complex and abs(root.imag) < 1e-10:
@@ -414,14 +415,14 @@ def print_(*arg):
     if os.path.isdir(options.directory):
         f = open(options.directory+"/log.txt", "a")
         for s in arg:
-            s = str(str(s).encode('unicode_escape'))+" "
+            s = str(str(s))+" "
             f.write(s)
         f.write("\n")
         f.close()
 
 
 def print_debug(*arg):
-    if debug:
+    if DEBUG:
         print_("DEBUG: ", *arg)
 
 
@@ -775,13 +776,6 @@ class laser_gcode(inkex.EffectExtension):
             #    Creating Gcode for curve between s=curve[i-1] and si=curve[i] start at s[0] end at s[4]=si[0]
             s, si = curve[i-1], curve[i]
 
-            # TODO: potential Fixing required
-            '''
-            si[0] = self.transform(si[0], layer, True)
-            # print_("si ", si)
-            if len(si) == 3:
-                si[2] = self.transform(si[2], layer, True)
-            '''
             s[0][1] = s[0][1] - offset_y
             si[0][1] = si[0][1] - offset_y
 
@@ -993,7 +987,6 @@ class laser_gcode(inkex.EffectExtension):
 # Get Gcodetools info from the svg
 ################################################################################
 
-
     def get_info(self):
         self.svg.selected_paths = {}
         self.paths = {}
@@ -1012,7 +1005,7 @@ class laser_gcode(inkex.EffectExtension):
                     self.layers += [i]
                     recursive_search(i, i)
                 elif i.get('gcodetools') == "Gcodetools orientation group":
-                    points = self.get_orientation_points(i)
+                    points = orient_points
                     if points != None:
                         self.orientation_points[layer] = self.orientation_points[layer]+[points[:]] if layer in self.orientation_points else [points[:]]
                         print_("    Found orientation points in '{}' layer: '{}'".format(layer.get(inkex.addNS('label', 'inkscape')), points))
@@ -1030,11 +1023,6 @@ class laser_gcode(inkex.EffectExtension):
                     self.error("This extension works with Paths and Dynamic Offsets and groups of them only! All other objects will be ignored!\nSolution 1: press Path->Object to path or Shift+Ctrl+C.\nSolution 2: Path->Dynamic offset or Ctrl+J.\nSolution 3: export all contours to PostScript level 2 (File->Save As->.ps) and File->Import this file.")
 
         recursive_search(self.document.getroot(), self.document.getroot())
-
-    # TODO refactor
-    def get_orientation_points(self, g):
-        global orient_points
-        return orient_points
 
 ################################################################################
 # Fill area
@@ -1158,9 +1146,6 @@ class laser_gcode(inkex.EffectExtension):
 
                         ints.sort()
 
-                        # mitigate vertical line glitch problem
-                        # TODO Needs improvement
-
                         if len(ints) % 2 != 0:
                             print_debug("removing intersection: ", ints)
                             ints = []
@@ -1176,8 +1161,9 @@ class laser_gcode(inkex.EffectExtension):
 
                     finalLines = []
 
-                    if self.options.multi_thread:
-                        pool = Pool(processes=multiprocessing.cpu_count())
+                    # TODO: fix for Windows Systems. Causes infinite loop due to lack of Fork
+                    if self.options.multi_thread and os.name != 'nt':
+                        pool = Pool()
 
                         csp4zip = [csp] * len(splitted_line)
                         splitted_line_csp = zip(splitted_line, csp4zip)
@@ -1333,7 +1319,7 @@ class laser_gcode(inkex.EffectExtension):
         timestamp2 = time.time()
 
         global gcode
-        r = 0,  # theoretical and tool-radius-limited radii in pixels
+        r = 0  # theoretical and tool-radius-limited radii in pixels
         x1, y1, nx, ny = 0, 0, 0, 0
 
         cspe = []
@@ -1401,10 +1387,8 @@ class laser_gcode(inkex.EffectExtension):
                                             if seg < 2:  # get outgoing bisector
                                                 nx0 = nx1
                                                 ny0 = ny1
-                                                nx1 = bLT[seg+1][1] - \
-                                                    bLT[seg+2][1]
-                                                ny1 = bLT[seg+2][0] - \
-                                                    bLT[seg+1][0]
+                                                nx1 = bLT[seg+1][1] - bLT[seg+2][1]
+                                                ny1 = bLT[seg+2][0] - bLT[seg+1][0]
                                                 l1 = math.hypot(nx1, ny1)
                                                 if l1 < engraving_tolerance:
                                                     continue
@@ -1517,7 +1501,6 @@ class laser_gcode(inkex.EffectExtension):
             doc_height = 1052.3622047
             print_("Overriding height from 100 percents to {}".format(doc_height))
 
-        # TODO: refactor
         orient_points = [[[100, doc_height], [100., 0.0, 0.0]], [[0.0, doc_height], [0.0, 0.0, 0.0]]]
 
     ################################################################################
@@ -1656,7 +1639,7 @@ class laser_gcode(inkex.EffectExtension):
         self.get_info()
 
         # wait to attatch debugger to process
-        if debug:
+        if DEBUG:
             print_debug("Python version:", sys.version_info)
             print_debug("Waiting for Debugger to be attached")
             time.sleep(3)
@@ -1705,7 +1688,7 @@ class laser_gcode(inkex.EffectExtension):
             self.get_info()
             self.svg.selected_paths = self.paths
 
-            if profiling:
+            if PROFILING:
                 if os.path.isfile(self.options.directory+"performance.prof"):
                     os.remove(self.options.directory+"/performance.prof")
 
