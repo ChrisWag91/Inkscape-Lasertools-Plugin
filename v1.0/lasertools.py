@@ -106,8 +106,6 @@ def check_if_line_inside_shape(splitted_line_csp):
     p = [(l1[0]+l2[0])/2, (l1[1]+l2[1])/2]
 
     if point_inside_csp(p, csp_temp):
-        # print_("Splitted Line inside")
-        # print_(splitted_line)
         return [l1, l2]
 
     else:
@@ -187,11 +185,9 @@ def line_intersection(line1, line2):
 
 def csp_line_intersection(l1, l2, sp1, sp2):
 
-    precission = 6
+    precission = 10
     sp1l = sp1[0]
     sp2l = sp2[0]
-    l1 = [round(l1[0], precission), round(l1[1], precission)]
-    l2 = [round(l2[0], precission), round(l2[1], precission)]
 
     inters = line_intersection((l1, l2), (sp1l, sp2l))
 
@@ -271,39 +267,17 @@ def point_inside_csp(p, csp, on_the_path=True):
     for subpath in csp:
         for i in range(1, len(subpath)):
             sp1, sp2 = subpath[i-1], subpath[i]
-            ax, bx, cx, dx = csp_parameterize(sp1, sp2)[::2]
-            #print_("sp1: ", sp1[0])
-            #print_("sp2: ", sp2[0])
-            #print_("ax: ", ax)
-            #print_("bx: ", bx)
-            #print_("cx: ", cx)
-            # print_("dx: ", dx)s
-            if ax == 0 and bx == 0 and cx == 0 and dx == x:
-                # we've got a special case here
-                b = csp_true_bounds([[sp1, sp2]])
-                #print_("True Bounds ", b)
-                if b[1][1] <= y <= b[3][1]:
-                    # points is on the path
+
+            p = csp_line_intersection([x, y], [x, y+5], sp1, sp2)
+
+            if len(p) == 2:
+
+                if p[1] == y:
                     return on_the_path
+
                 else:
-                    # we can skip this segment because it wont influence the answer.
-                    pass
-            else:
-                p = csp_line_intersection([x, y], [x, y+5], sp1, sp2)
-
-                if len(p) == 2:
-                    # print_("p")
-                    # print_(p)
-
-                    # if p[1] > (y):
-                    #     ray_intersections_count += 1
-
-                    if p[1] == y:
-                        # the point is on the path
-                        return on_the_path
-                    else:
-                        if p[1] > y:
-                            ray_intersections_count += 1
+                    if p[1] > y:
+                        ray_intersections_count += 1
 
     return ray_intersections_count % 2 == 1
 
@@ -343,8 +317,6 @@ def cubic_solver(a, b, c, d):
     if a != 0:
         #    Monics formula see http://en.wikipedia.org/wiki/Cubic_function#Monic_formula_of_roots
         a, b, c = (b/a, c/a, d/a)
-        # print_("abc")
-        #print_(a, b, c)
 
         m = 2*a**3 - 9*a*b + 27*c
         k = a**2 - 3*b
@@ -921,10 +893,8 @@ class laser_gcode(inkex.EffectExtension):
         for i in xrange(len(csp)):
 
             for j in xrange(len(csp[i])):
-                # print_("csp pre trans", csp[i][j])
                 for k in xrange(len(csp[i][j])):
                     csp[i][j][k] = self.transform(csp[i][j][k], layer, reverse)
-                # print_("csp post trans", csp[i][j])
         return csp
 
 ################################################################################
@@ -948,6 +918,7 @@ class laser_gcode(inkex.EffectExtension):
 ################################################################################
 # Get Gcodetools info from the svg
 ################################################################################
+
 
     def get_info(self):
         self.svg.selected_paths = {}
@@ -1073,9 +1044,6 @@ class laser_gcode(inkex.EffectExtension):
                         i += r
 
                     print_time("Time for calculating zigzag pattern")
-                    # Lines ok
-                    # print_("lines")
-                    # print_(lines)
 
                     # Rotate created paths back
                     a = self.options.area_fill_angle
@@ -1090,8 +1058,8 @@ class laser_gcode(inkex.EffectExtension):
                     for l1, l2, in zip(lines[0], lines[0][1:]):
                         ints = []
 
-                        # if l1[0] == l2[0] and l1[1] == l2[1]:
-                        # continue
+                        if l1[0] == l2[0] and l1[1] == l2[1]:
+                            continue
 
                         for i in range(len(csp)):
                             for j in range(1, len(csp[i])):
@@ -1105,7 +1073,7 @@ class laser_gcode(inkex.EffectExtension):
                                     else:
                                         t1 = (p[0]-l1[0])/(l2[0]-l1[0])
 
-                                    if 0 <= round(t1, 6) < 1:
+                                    if 0 <= round(t1, 12) < 1:
                                         ints += [[t1, p[0], p[1]]]
 
                                     # print_(" ")
@@ -1130,9 +1098,6 @@ class laser_gcode(inkex.EffectExtension):
                     print_debug("number of splitted lines: ", len(splitted_line))
 
                     finalLines = []
-
-                    # print_("sl")
-                    # print_(splitted_line)
 
                     # TODO: fix for Windows Systems. Causes infinite loop due to lack of Fork
                     if self.options.multi_thread and os.name != 'nt':
@@ -1173,13 +1138,8 @@ class laser_gcode(inkex.EffectExtension):
                     csp_line = csp_from_polyline(np_finalLines)
 
                     #TODO: Remove
-                    #print_("csp line")
-                    # print_(csp_line)
-                    # print_("splitted_line")
-                    #splitted_line = csp_from_polyline(splitted_line)
-                    # print_(splitted_line)
-                    curve = self.parse_curve2d(csp_line, layer)
-                    self.draw_curve(curve, layer, area_group)
+                    # curve = self.parse_curve2d(csp_line, layer)
+                    # self.draw_curve(curve, layer, area_group)
 
                     csp_line = self.transform_csp(csp_line, layer, True)
 
@@ -1419,17 +1379,10 @@ class laser_gcode(inkex.EffectExtension):
                             # LT next i
                             if len(cspm) != 0:
                                 cspm += [cspm[0]]
-
-                                # for entr in cspm:
-                                #    print_("cspm ", entr)
                                 cspe += [cspm]
 
                 if cspe != []:
-                    # for entr in cspe:
-                    #    print_("cspe ", entr)
                     curve = self.parse_curve(cspe, layer)
-                    # for entr in curve:
-                    #    print_("curve ", entr)
                     self.draw_curve(curve, layer, engraving_group)
 
                     gcode += self.generate_gcode(curve, layer, self.tool_perimeter, "perimeter")
