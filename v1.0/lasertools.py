@@ -56,8 +56,8 @@ if "errormsg" not in dir(inkex):
 # Styles and additional parameters
 ################################################################################
 
-PROFILING = True   # Disable if not debugging
-DEBUG = False      # Disable if not debugging
+PROFILING = False   # Disable if not debugging
+DEBUG = False     # Disable if not debugging
 TINY_INFILL_FACTOR = 2  # x times the laser beam width will be removed
 ENGRAVING_TOLERANCE = 0.000002
 DEFAULTS = {
@@ -103,16 +103,13 @@ def check_if_line_inside_shape(splitted_line_csp):
     csp_temp = splitted_line_csp[1]
     l1, l2 = splitted_line[0], splitted_line[1]
 
-    if l1 == l2 and len(splitted_line) > 2:
-        l2 = splitted_line[2]
-
     p = [(l1[0]+l2[0])/2, (l1[1]+l2[1])/2]
 
     if point_inside_csp(p, csp_temp):
-        if l1 != l2:
-            return [l1, l2]
-        else:
-            return [[0, 0], [0, 0]]
+        # print_("Splitted Line inside")
+        # print_(splitted_line)
+        return [l1, l2]
+
     else:
         return [[0, 0], [0, 0]]
 
@@ -171,32 +168,48 @@ def csp_at_t(sp1, sp2, t):
     return [x, y]
 
 
-def csp_line_intersection(l1, l2, sp1, sp2):
-    dd = l1[0]
-    cc = l2[0]-l1[0]
-    bb = l1[1]
-    aa = l2[1]-l1[1]
-    if aa == cc == 0:
+def line_intersection(line1, line2):
+    xdiff = (line1[0][0] - line1[1][0], line2[0][0] - line2[1][0])
+    ydiff = (line1[0][1] - line1[1][1], line2[0][1] - line2[1][1])
+
+    def det(a, b):
+        return a[0] * b[1] - a[1] * b[0]
+
+    div = det(xdiff, ydiff)
+    if div == 0:
         return []
-    if aa:
-        coef1 = cc/aa
-        coef2 = 1
-    else:
-        coef1 = 1
-        coef2 = aa/cc
-    ax, ay, bx, by, cx, cy, x0, y0 = bezierparameterize((sp1[1][:], sp1[2][:], sp2[0][:], sp2[1][:]))
-    a = coef1*ay-coef2*ax
-    b = coef1*by-coef2*bx
-    c = coef1*cy-coef2*cx
-    d = coef1*(y0-bb)-coef2*(x0-dd)
-    roots = cubic_solver(a, b, c, d)
-    retval = []
-    for i in roots:
-        if type(i) is complex and abs(i.imag) < 1e-7:
-            i = i.real
-        if type(i) is not complex and -1e-10 <= i <= 1.+1e-10:
-            retval.append(i)
-    return retval
+
+    d = (det(*line1), det(*line2))
+    x = det(d, xdiff) / div
+    y = det(d, ydiff) / div
+    return [x, y]
+
+
+def csp_line_intersection(l1, l2, sp1, sp2):
+
+    precission = 6
+    sp1l = sp1[0]
+    sp2l = sp2[0]
+    l1 = [round(l1[0], precission), round(l1[1], precission)]
+    l2 = [round(l2[0], precission), round(l2[1], precission)]
+
+    inters = line_intersection((l1, l2), (sp1l, sp2l))
+
+    spx_min = min((sp1l[0], sp2l[0]))
+    spx_max = max((sp1l[0], sp2l[0]))
+    spy_min = min((sp1l[1], sp2l[1]))
+    spy_max = max((sp1l[1], sp2l[1]))
+
+    if sp1l == sp2l or l1 == l2 or inters == []:
+        return []
+
+    if round(inters[0], precission) < round(spx_min, precission) or round(inters[0], precission) > round(spx_max, precission):
+        return []
+
+    if round(inters[1], precission) < round(spy_min, precission) or round(inters[1], precission) > round(spy_max, precission):
+        return []
+
+    return inters
 
 
 def csp_normalized_slope(sp1, sp2, t):
@@ -259,9 +272,16 @@ def point_inside_csp(p, csp, on_the_path=True):
         for i in range(1, len(subpath)):
             sp1, sp2 = subpath[i-1], subpath[i]
             ax, bx, cx, dx = csp_parameterize(sp1, sp2)[::2]
+            #print_("sp1: ", sp1[0])
+            #print_("sp2: ", sp2[0])
+            #print_("ax: ", ax)
+            #print_("bx: ", bx)
+            #print_("cx: ", cx)
+            # print_("dx: ", dx)s
             if ax == 0 and bx == 0 and cx == 0 and dx == x:
                 # we've got a special case here
                 b = csp_true_bounds([[sp1, sp2]])
+                #print_("True Bounds ", b)
                 if b[1][1] <= y <= b[3][1]:
                     # points is on the path
                     return on_the_path
@@ -269,52 +289,21 @@ def point_inside_csp(p, csp, on_the_path=True):
                     # we can skip this segment because it wont influence the answer.
                     pass
             else:
-                for t in csp_line_intersection([x, y], [x, y+5], sp1, sp2):
+                p = csp_line_intersection([x, y], [x, y+5], sp1, sp2)
 
-                    if t == 0 or t == 1:
-                        # we've got another special case here
-                        y1 = csp_at_t(sp1, sp2, t)[1]
+                if len(p) == 2:
+                    # print_("p")
+                    # print_(p)
 
-                        if y1 == y:
-                            # the point is on the path
-                            return on_the_path
-                        # if t == 0 we sould have considered this case previously.
+                    # if p[1] > (y):
+                    #     ray_intersections_count += 1
 
-                        if t == 1:
-                            # we have to check the next segmant if it is on the same side of the ray
-                            st_d = csp_normalized_slope(sp1, sp2, 1)[0]
-
-                            if st_d == 0:
-                                st_d = csp_normalized_slope(sp1, sp2, 0.99)[0]
-
-                            for j in range(1, len(subpath)+1):
-
-                                if (i+j) % len(subpath) == 0:
-                                    continue  # skip the closing segment
-
-                                sp11, sp22 = subpath[(
-                                    i-1+j) % len(subpath)], subpath[(i+j) % len(subpath)]
-                                ax1, bx1, cx1, dx1 = csp_parameterize(
-                                    sp1, sp2)[::2]
-
-                                if ax1 == 0 and bx1 == 0 and cx1 == 0 and dx1 == x:
-                                    continue  # this segment parallel to the ray, so skip it
-                                en_d = csp_normalized_slope(sp11, sp22, 0)[0]
-                                if en_d == 0:
-                                    en_d = csp_normalized_slope(
-                                        sp11, sp22, 0.01)[0]
-                                if st_d*en_d <= 0:
-                                    ray_intersections_count += 1
-                                    break
+                    if p[1] == y:
+                        # the point is on the path
+                        return on_the_path
                     else:
-                        y1 = csp_at_t(sp1, sp2, t)[1]
-
-                        if y1 == y:
-                            # the point is on the path
-                            return on_the_path
-                        else:
-                            if y1 > y and 3*ax*t**2 + 2*bx*t + cx != 0:  # if it's 0 the path only touches the ray
-                                ray_intersections_count += 1
+                        if p[1] > y:
+                            ray_intersections_count += 1
 
     return ray_intersections_count % 2 == 1
 
@@ -354,6 +343,9 @@ def cubic_solver(a, b, c, d):
     if a != 0:
         #    Monics formula see http://en.wikipedia.org/wiki/Cubic_function#Monic_formula_of_roots
         a, b, c = (b/a, c/a, d/a)
+        # print_("abc")
+        #print_(a, b, c)
+
         m = 2*a**3 - 9*a*b + 27*c
         k = a**2 - 3*b
         n = m**2 - 4*k**3
@@ -957,7 +949,6 @@ class laser_gcode(inkex.EffectExtension):
 # Get Gcodetools info from the svg
 ################################################################################
 
-
     def get_info(self):
         self.svg.selected_paths = {}
         self.paths = {}
@@ -1053,8 +1044,7 @@ class laser_gcode(inkex.EffectExtension):
                     b = [0.0, 0.0, 0.0, 0.0]
                     for k in range(4):
                         i, j, t = bounds[k][2], bounds[k][3], bounds[k][4]
-                        b[k] = csp_at_t(rotated_path[i][j-1],
-                                        rotated_path[i][j], t)[k % 2]
+                        b[k] = csp_at_t(rotated_path[i][j-1], rotated_path[i][j], t)[k % 2]
 
                     print_time("Time for calculating bounds")
 
@@ -1067,7 +1057,7 @@ class laser_gcode(inkex.EffectExtension):
                     lines += [[]]
 
                     # i = b[0] - self.options.area_fill_shift*r
-                    i = b[0] - r + 0.001
+                    i = b[0] - r + 0.01
                     top = True
                     last_one = True
                     while (i < b[2] or last_one):
@@ -1083,13 +1073,15 @@ class laser_gcode(inkex.EffectExtension):
                         i += r
 
                     print_time("Time for calculating zigzag pattern")
+                    # Lines ok
+                    # print_("lines")
+                    # print_(lines)
 
                     # Rotate created paths back
                     a = self.options.area_fill_angle
                     lines = [[[point[0]*math.cos(a) - point[1]*math.sin(a), point[0]*math.sin(
                         a)+point[1]*math.cos(a)] for point in subpath] for subpath in lines]
 
-                    # print_("lines: ", lines)
                     print_time("Time for rotating")
 
                     # get the intersection points
@@ -1098,27 +1090,35 @@ class laser_gcode(inkex.EffectExtension):
                     for l1, l2, in zip(lines[0], lines[0][1:]):
                         ints = []
 
-                        if l1[0] == l2[0] and l1[1] == l2[1]:
-                            continue
+                        # if l1[0] == l2[0] and l1[1] == l2[1]:
+                        # continue
+
                         for i in range(len(csp)):
                             for j in range(1, len(csp[i])):
                                 sp1, sp2 = csp[i][j-1], csp[i][j]
-                                roots = csp_line_intersection(l1, l2, sp1, sp2)
+                                p = csp_line_intersection(l1, l2, sp1, sp2)
 
-                                for t in roots:
-                                    p = tuple(csp_at_t(sp1, sp2, t))
+                                if len(p) > 1:
+
                                     if l1[0] == l2[0]:
                                         t1 = (p[1]-l1[1])/(l2[1]-l1[1])
                                     else:
                                         t1 = (p[0]-l1[0])/(l2[0]-l1[0])
-                                    if 0 <= t1 <= 1:
-                                        ints += [[t1, p[0], p[1], i, j, t]]
+
+                                    if 0 <= round(t1, 6) < 1:
+                                        ints += [[t1, p[0], p[1]]]
+
+                                    # print_(" ")
+                                    # print_("sp")
+                                    # print_(sp1[0], sp2[0])
+                                    # print_("l")
+                                    # print_(l1, l2)
+                                    # print_("p")
+                                    # print_(p)
+                                    # print_("ints")
+                                    # print_(ints)
 
                         ints.sort()
-
-                        if len(ints) % 2 != 0:
-                            print_debug("removing intersection: ", ints)
-                            ints = []
 
                         for i in ints:
                             splitted_line[-1] += [[i[1], i[2]]]
@@ -1131,6 +1131,9 @@ class laser_gcode(inkex.EffectExtension):
 
                     finalLines = []
 
+                    # print_("sl")
+                    # print_(splitted_line)
+
                     # TODO: fix for Windows Systems. Causes infinite loop due to lack of Fork
                     if self.options.multi_thread and os.name != 'nt':
                         with Pool() as pool:
@@ -1139,9 +1142,9 @@ class laser_gcode(inkex.EffectExtension):
                             finalLines = pool.map(check_if_line_inside_shape, splitted_line_csp)  # 13s; s1:57
 
                     else:
-                        splitted_line_csp = zip(splitted_line, [csp] * len(splitted_line))
+                        # splitted_line_csp = zip(splitted_line, [csp] * len(splitted_line))
                         while i < len(splitted_line):
-                            finalLines += [check_if_line_inside_shape(splitted_line_csp[i])]
+                            finalLines += [check_if_line_inside_shape([splitted_line[i], csp])]
                             i += 1
 
                     i = 0
@@ -1168,6 +1171,16 @@ class laser_gcode(inkex.EffectExtension):
                     print_time("Time for calculating infill paths")
 
                     csp_line = csp_from_polyline(np_finalLines)
+
+                    #TODO: Remove
+                    #print_("csp line")
+                    # print_(csp_line)
+                    # print_("splitted_line")
+                    #splitted_line = csp_from_polyline(splitted_line)
+                    # print_(splitted_line)
+                    curve = self.parse_curve2d(csp_line, layer)
+                    self.draw_curve(curve, layer, area_group)
+
                     csp_line = self.transform_csp(csp_line, layer, True)
 
                     print_time("Time for transforming infill paths")
@@ -1193,7 +1206,7 @@ class laser_gcode(inkex.EffectExtension):
 ################################################################################
     def engraving(self):
         global cspm
-        #global nlLT, i, j
+        # global nlLT, i, j
         # global max_dist  # minimum of tool radius and user's requested maximum distance
 
         def bisect(nx1, ny1, nx2, ny2):
