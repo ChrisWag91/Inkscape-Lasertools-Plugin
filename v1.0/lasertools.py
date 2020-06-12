@@ -112,58 +112,31 @@ def check_if_line_inside_shape(splitted_line_csp):
         return [[0, 0], [0, 0]]
 
 
-def csp_segment_to_bez(sp1, sp2):
-    return sp1[1:]+sp2[:2]
-
-
-def csp_true_bounds(csp_temp):
+def csp_bounds(csp_temp):
 
     # Finds minx,miny,maxx,maxy of the csp and return their (x,y,i,j,t)
-    minx = [float("inf"), 0, 0, 0]
-    maxx = [float("-inf"), 0, 0, 0]
-    miny = [float("inf"), 0, 0, 0]
-    maxy = [float("-inf"), 0, 0, 0]
+    minx, miny, maxx, maxy = float("inf"), float("inf"), 0, 0
     for i in range(len(csp_temp)):
         for j in range(1, len(csp_temp[i])):
-            ax, ay, bx, by, cx, cy, x0, y0 = bezierparameterize((csp_temp[i][j-1][1], csp_temp[i][j-1][2], csp_temp[i][j][0], csp_temp[i][j][1]))
-            roots = cubic_solver(0, 3*ax, 2*bx, cx) + [0, 1]
-            for root in roots:
-                if type(root) is complex and abs(root.imag) < 1e-10:
-                    root = root.real
-                if type(root) is not complex and 0 <= root <= 1:
-                    y = ay*(root**3)+by*(root**2)+cy*root+y0
-                    x = ax*(root**3)+bx*(root**2)+cx*root+x0
-                    maxx = max([x, y, i, j, root], maxx)
-                    minx = min([x, y, i, j, root], minx)
 
-            roots = cubic_solver(0, 3*ay, 2*by, cy) + [0, 1]
-            for root in roots:
-                if type(root) is complex and root.imag == 0:
-                    root = root.real
-                if type(root) is not complex and 0 <= root <= 1:
-                    y = ay*(root**3)+by*(root**2)+cy*root+y0
-                    x = ax*(root**3)+bx*(root**2)+cx*root+x0
-                    maxy = max([y, x, i, j, root], maxy)
-                    miny = min([y, x, i, j, root], miny)
-    maxy[0], maxy[1] = maxy[1], maxy[0]
-    miny[0], miny[1] = miny[1], miny[0]
+            minx_temp, miny_temp, maxx_temp, maxy_temp = bounds_of_line([csp_temp[i][j-1][0][0], csp_temp[i][j-1][0][1]], [csp_temp[i][j][0][0], csp_temp[i][j][0][1]])
+
+            maxx = max(maxx_temp, maxx)
+            minx = min(minx_temp, minx)
+            maxy = max(maxy_temp, maxy)
+            miny = min(miny_temp, miny)
 
     return minx, miny, maxx, maxy
 
 
-def csp_at_t(sp1, sp2, t):
-    ax, bx, cx, dx = sp1[1][0], sp1[2][0], sp2[0][0], sp2[1][0]
-    ay, by, cy, dy = sp1[1][1], sp1[2][1], sp2[0][1], sp2[1][1]
+def bounds_of_line(p1, p2):
 
-    x1, y1 = ax+(bx-ax)*t, ay+(by-ay)*t
-    x2, y2 = bx+(cx-bx)*t, by+(cy-by)*t
-    x3, y3 = cx+(dx-cx)*t, cy+(dy-cy)*t
+    minx = min((p1[0], p2[0]))
+    maxx = max((p1[0], p2[0]))
+    miny = min((p1[1], p2[1]))
+    maxy = max((p1[1], p2[1]))
 
-    x4, y4 = x1+(x2-x1)*t, y1+(y2-y1)*t
-    x5, y5 = x2+(x3-x2)*t, y2+(y3-y2)*t
-
-    x, y = x4+(x5-x4)*t, y4+(y5-y4)*t
-    return [x, y]
+    return minx, miny, maxx, maxy
 
 
 def line_intersection(line1, line2):
@@ -190,6 +163,8 @@ def csp_line_intersection(l1, l2, sp1, sp2):
     sp2l = sp2[0]
 
     inters = line_intersection((l1, l2), (sp1l, sp2l))
+
+    spx_min, spy_min, spx_max, spy_max = bounds_of_line(sp1l, sp2l)
 
     spx_min = min((sp1l[0], sp2l[0]))
     spx_max = max((sp1l[0], sp2l[0]))
@@ -249,10 +224,6 @@ def csp_normalized_slope(sp1, sp2, t):
 def csp_normalized_normal(sp1, sp2, t):
     nx, ny = csp_normalized_slope(sp1, sp2, t)
     return [-ny, nx]
-
-
-def csp_parameterize(sp1, sp2):
-    return bezierparameterize(csp_segment_to_bez(sp1, sp2))
 
 
 ################################################################################
@@ -919,7 +890,6 @@ class laser_gcode(inkex.EffectExtension):
 # Get Gcodetools info from the svg
 ################################################################################
 
-
     def get_info(self):
         self.svg.selected_paths = {}
         self.paths = {}
@@ -1008,16 +978,11 @@ class laser_gcode(inkex.EffectExtension):
                     a = - self.options.area_fill_angle
                     rotated_path = [[[[point[0]*math.cos(a) - point[1]*math.sin(a), point[0]*math.sin(
                         a)+point[1]*math.cos(a)] for point in sp] for sp in subpath] for subpath in csp]
-                    bounds = csp_true_bounds(rotated_path)
 
                     # Draw the lines
                     # Get path's bounds
                     b = [0.0, 0.0, 0.0, 0.0]
-                    for k in range(4):
-                        i, j, t = bounds[k][2], bounds[k][3], bounds[k][4]
-                        b[k] = csp_at_t(rotated_path[i][j-1], rotated_path[i][j], t)[k % 2]
-
-                    print_time("Time for calculating bounds")
+                    b = csp_bounds(rotated_path)
 
                     # Zig-zag
                     r = self.options.laser_beam_with
@@ -1027,7 +992,6 @@ class laser_gcode(inkex.EffectExtension):
 
                     lines += [[]]
 
-                    # i = b[0] - self.options.area_fill_shift*r
                     i = b[0] - r + 0.01
                     top = True
                     last_one = True
