@@ -957,7 +957,6 @@ class laser_gcode(inkex.EffectExtension):
 # Get Gcodetools info from the svg
 ################################################################################
 
-
     def get_info(self):
         self.svg.selected_paths = {}
         self.paths = {}
@@ -1139,9 +1138,8 @@ class laser_gcode(inkex.EffectExtension):
                             finalLines = pool.map(check_if_line_inside_shape, splitted_line_csp)  # 13s; s1:57
 
                     else:
-                        splitted_line_csp = zip(splitted_line, [csp] * len(splitted_line))
                         while i < len(splitted_line):
-                            finalLines += [check_if_line_inside_shape(splitted_line_csp[i])]
+                            finalLines += [check_if_line_inside_shape([splitted_line[i], csp])]
                             i += 1
 
                     i = 0
