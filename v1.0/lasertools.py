@@ -226,7 +226,7 @@ def point_inside_csp(p, csp, on_the_path=True):
 
 
 def csp_from_polyline(line):
-    return [[[point[:] for _ in range(3)] for point in subline] for subline in line]
+    return [[[point[:]] for point in subline] for subline in line]
 
 
 '''
@@ -378,29 +378,30 @@ class laser_gcode(inkex.EffectExtension):
         c = []
         if len(p) == 0:
             return []
-        p = self.transform_csp(p, layer)
+        p = self.transform_csp_lin(p, layer)
 
         # Sort to reduce Rapid distance
         k = list(range(1, len(p)))
         keys = [0]
         while len(k) > 0:
-            end = p[keys[-1]][-1][1]
+            end = p[keys[-1]][-1][0]
             dist = (-10000000, -10000000)
 
             for i in range(len(k)):
-                start = p[k[i]][0][1]
+                start = p[k[i]][0][0]
                 dist = max((-((end[0] - start[0]) ** 2 + (end[1] - start[1]) ** 2), i), dist)
 
             keys += [k[dist[1]]]
             del k[dist[1]]
         for k in keys:
             subpath = p[k]
-            c += [[[subpath[0][1][0], subpath[0][1][1]], 'move', 0, 0]]
+
+            c += [[[subpath[0][0][0], subpath[0][0][1]], 'move', 0, 0]]
             for i in range(1, len(subpath)):
-                sp1 = [[subpath[i - 1][j][0], subpath[i - 1][j][1]] for j in range(3)]
-                sp2 = [[subpath[i][j][0], subpath[i][j][1]] for j in range(3)]
+                sp1 = [[subpath[i - 1][0][0], subpath[i - 1][0][1]]]
+                sp2 = [[subpath[i][0][0], subpath[i][0][1]]]
                 c += [[[sp1[0][0], sp1[0][1]], 'line', [sp2[0][0], sp2[0][1]]]]
-            c += [[[subpath[-1][1][0], subpath[-1][1][1]], 'end', 0, 0]]
+            c += [[[subpath[-1][0][0], subpath[-1][0][1]], 'end', 0, 0]]
         return c
 
     def parse_curve2d(self, p, layer):
@@ -408,7 +409,7 @@ class laser_gcode(inkex.EffectExtension):
         c = []
         if len(p) == 0:
             return []
-        p = self.transform_csp(p, layer)
+        p = self.transform_csp_lin(p, layer)
         np_p = np.array(p)
         sorted_tool_paths = self.sort_points(np_p[:, 0, 0, 0], np_p[:, 0, 0, 1], np_p[:, 1, 0, 0], np_p[:, 1, 0, 1])
 
@@ -499,8 +500,6 @@ class laser_gcode(inkex.EffectExtension):
         for sk in curve:
             si = sk[:]
             si[0] = self.transform(si[0], layer, True)
-            if len(si) == 3:
-                si[2] = self.transform(si[2], layer, True)
 
             if s != '':
                 if s[1] == 'line':
@@ -778,12 +777,11 @@ class laser_gcode(inkex.EffectExtension):
             t = self.transform_matrix_reverse[layer]
         return [t[0][0]*x+t[0][1]*y+t[0][2], t[1][0]*x+t[1][1]*y+t[1][2]]
 
-    def transform_csp(self, csp_, layer, reverse=False):
-        csp = [[[csp_[i][j][0][:], csp_[i][j][1][:], csp_[i][j][2][:]]
-                for j in range(len(csp_[i]))] for i in range(len(csp_))]
+    def transform_csp_lin(self, csp_, layer, reverse=False):
+        #TODO: Refactor
+        csp = [[[csp_[i][j][0][:]] for j in range(len(csp_[i]))] for i in range(len(csp_))]
 
         for i in xrange(len(csp)):
-
             for j in xrange(len(csp[i])):
                 for k in xrange(len(csp[i][j])):
                     csp[i][j][k] = self.transform(csp[i][j][k], layer, reverse)
@@ -890,7 +888,7 @@ class laser_gcode(inkex.EffectExtension):
                         self.error("Warning: omitting non-path")
                         continue
 
-                    csp = self.transform_csp(csp, layer)
+                    csp = self.transform_csp_lin(csp, layer)
 
                     print_debug("csp length: ", len(csp))
                     print_time("Time for csp transformation")
@@ -982,7 +980,6 @@ class laser_gcode(inkex.EffectExtension):
                             finalLines = pool.map(check_if_line_inside_shape, splitted_line_csp)  # 13s; s1:57
 
                     else:
-                        # splitted_line_csp = zip(splitted_line, [csp] * len(splitted_line))
                         while i < len(splitted_line):
                             finalLines += [check_if_line_inside_shape([splitted_line[i], csp])]
                             i += 1
@@ -991,8 +988,7 @@ class laser_gcode(inkex.EffectExtension):
 
                     print_time("Time for checking if line is insied of shape")
                     print_debug("number of final lines before removing emptys: ", len(finalLines))
-                    # remove empty elements
-                    # print_("final_line: ", finalLines)
+
                     np_finalLines = np.array(finalLines, dtype=np.float32)
                     index_zeros = np.argwhere(np_finalLines == [[0, 0], [0, 0]])
                     np_finalLines = np.delete(np_finalLines, index_zeros, axis=0)
@@ -1006,23 +1002,18 @@ class laser_gcode(inkex.EffectExtension):
                         distances = np.array(end_coords[:, 1]-start_coords[:, 1])
                         distances = np.abs(distances)
                         np_finalLines = (np_finalLines[distances > (TINY_INFILL_FACTOR * options.laser_beam_with)])
-                        # print_("final_line: ", np_finalLines)
 
                     print_time("Time for calculating infill paths")
 
                     csp_line = csp_from_polyline(np_finalLines)
 
-                    # TODO: Remove
+                    # for debugging
                     # curve = self.parse_curve2d(csp_line, layer)
                     # self.draw_curve(curve, layer, area_group)
 
-                    csp_line = self.transform_csp(csp_line, layer, True)
+                    csp_line = self.transform_csp_lin(csp_line, layer, True)
 
                     print_time("Time for transforming infill paths")
-
-                    print_("csp line 1:")
-                    for csp in csp_line:
-                        print_(csp)
 
                     curve = self.parse_curve2d(csp_line, layer)
                     self.draw_curve(curve, layer, area_group)
@@ -1069,18 +1060,6 @@ class laser_gcode(inkex.EffectExtension):
                 sinturn = 0  # set to zero if less than the user wants to see.
             return (cosBis/costurn, sinBis/costurn, sinturn)
 
-        def save_point_new(x, y, i, j):
-
-            global cspm
-
-            x = round(x, 3)  # round to 3 decimals
-            y = round(y, 3)  # round to 3 decimals
-
-            # if len(cspm) > 1:
-            #     cspm += [[[x, y], [x, y], [x, y]]]
-
-            cspm += [[[x, y], [x, y], [x, y]]]
-
         def save_point(x, y, i, j):
 
             global cspm
@@ -1088,20 +1067,7 @@ class laser_gcode(inkex.EffectExtension):
             x = round(x, 3)  # round to 3 decimals
             y = round(y, 3)  # round to 3 decimals
 
-            if len(cspm) > 1:
-                _, xy1, _, i1, j1 = cspm[-1]
-                if i == i1 and j == j1:  # one match
-                    _, xy2, _, i1, j1 = cspm[-2]
-                    if i == i1 and j == j1:  # two matches. Now test linearity
-                        length1 = math.hypot(xy1[0]-x, xy1[1]-y)
-                        length2 = math.hypot(xy2[0]-x, xy2[1]-y)
-                        length12 = math.hypot(xy2[0]-xy1[0], xy2[1]-xy1[1])
-                        # get the xy distance of point 1 from the line 0-2
-                        if length2 > length1 and length2 > length12:  # point 1 between them
-                            xydist = abs((xy2[0]-x)*(xy1[1]-y)-(xy1[0]-x)*(xy2[1]-y))/length2
-                            if xydist < ENGRAVING_TOLERANCE:  # so far so good
-                                cspm.pop()
-            cspm += [[[x, y], [x, y], [x, y], i, j]]
+            cspm += [[[x, y]]]
 
         # end of subfunction definitions. engraving() starts here:
         ###########################################################
@@ -1126,7 +1092,7 @@ class laser_gcode(inkex.EffectExtension):
 
         for layer in self.layers:
             if layer in self.svg.selected_paths:
-                # Calculate scale in pixels per user unit (mm or inch)
+                # Calculate scale in pixels per user unit (mm)
 
                 engraving_group = self.svg.selected_paths[layer][0].getparent().add(Group())
 
@@ -1143,9 +1109,9 @@ class laser_gcode(inkex.EffectExtension):
                         for csp in cspi:
                             nlLT.append([])
 
-                            for i in range(0, len(csp)):  # LT for each point
+                            for i in range(0, len(csp)):
                                 sp0, sp1, sp2 = csp[i-2], csp[i-1], csp[i]
-                                # LT find angle between this and previous segment
+                                # find angle between this and previous segment
                                 x0, y0 = sp1[1]
                                 nx1, ny1 = csp_normalized_normal(sp1, sp2)
                                 nx0, ny0 = csp_normalized_normal(sp0, sp1)
@@ -1175,15 +1141,11 @@ class laser_gcode(inkex.EffectExtension):
 
                                     save_point(x1, y1, i, j)
 
-                            # LT next i
                             if len(cspm) != 0:
                                 cspm += [cspm[0]]
                                 cspe += [cspm]
 
                 if cspe != []:
-
-                    # print_("cspe:")
-                    # print_(cspe)
 
                     curve = self.parse_curve(cspe, layer)
                     self.draw_curve(curve, layer, engraving_group)
