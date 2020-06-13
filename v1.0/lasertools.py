@@ -183,46 +183,18 @@ def csp_line_intersection(l1, l2, sp1, sp2):
     return inters
 
 
-def csp_normalized_slope(sp1, sp2, t):
-    ax, ay, bx, by, cx, cy = bezierparameterize((sp1[1][:], sp1[2][:], sp2[0][:], sp2[1][:]))[0:6]
-    if sp1[1] == sp2[1] == sp1[2] == sp2[0]:
-        return [1., 0.]
-    f1x = 3*ax*t*t+2*bx*t+cx
-    f1y = 3*ay*t*t+2*by*t+cy
-    if abs(f1x*f1x+f1y*f1y) > 1e-20:
-        l = math.hypot(f1x, f1y)
-        return [f1x/l, f1y/l]
+def csp_normalized_normal(sp1, sp2):
 
-    if t == 0:
-        f1x = sp2[0][0]-sp1[1][0]
-        f1y = sp2[0][1]-sp1[1][1]
-        if abs(f1x*f1x+f1y*f1y) > 1e-20:
-            l = math.hypot(f1x, f1y)
-            return [f1x/l, f1y/l]
-        else:
-            f1x = sp2[1][0]-sp1[1][0]
-            f1y = sp2[1][1]-sp1[1][1]
-            if f1x*f1x+f1y*f1y != 0:
-                l = math.hypot(f1x, f1y)
-                return [f1x/l, f1y/l]
-    elif t == 1:
-        f1x = sp2[1][0]-sp1[2][0]
-        f1y = sp2[1][1]-sp1[2][1]
-        if abs(f1x*f1x+f1y*f1y) > 1e-20:
-            l = math.hypot(f1x, f1y)
-            return [f1x/l, f1y/l]
-        else:
-            f1x = sp2[1][0]-sp1[1][0]
-            f1y = sp2[1][1]-sp1[1][1]
-            if f1x*f1x+f1y*f1y != 0:
-                l = math.hypot(f1x, f1y)
-                return [f1x/l, f1y/l]
+    dif_x = sp1[0][0] - sp2[0][0]
+    dif_y = sp1[0][1] - sp2[0][1]
+    len_seg = math.sqrt(dif_x**2+dif_y**2)
+
+    if len_seg != 0:
+        nx = dif_y/len_seg
+        ny = dif_x/len_seg
     else:
-        return [1., 0.]
+        return[0, 1]
 
-
-def csp_normalized_normal(sp1, sp2, t):
-    nx, ny = csp_normalized_slope(sp1, sp2, t)
     return [-ny, nx]
 
 
@@ -273,56 +245,10 @@ def csp_close_all_subpaths(csp, tolerance=0.000001):
 # Common functions
 ################################################################################
 
-
-def atan2(*arg):
-    if len(arg) == 1 and (type(arg[0]) == type([0., 0.]) or type(arg[0]) == type((0., 0.))):
-        return (math.pi/2 - math.atan2(arg[0][0], arg[0][1])) % math.pi * 2
-    elif len(arg) == 2:
-
-        return (math.pi/2 - math.atan2(arg[0], arg[1])) % math.pi * 2
-    else:
-        raise ValueError("Bad argumets for atan! (%s)" % arg)
-
-
-def cubic_solver(a, b, c, d):
-    if a != 0:
-        #    Monics formula see http://en.wikipedia.org/wiki/Cubic_function#Monic_formula_of_roots
-        a, b, c = (b/a, c/a, d/a)
-
-        m = 2*a**3 - 9*a*b + 27*c
-        k = a**2 - 3*b
-        n = m**2 - 4*k**3
-        w1 = -.5 + .5*cmath.sqrt(3)*1j
-        w2 = -.5 - .5*cmath.sqrt(3)*1j
-        if n >= 0:
-            t = m+math.sqrt(n)
-            m1 = pow(t/2, 1./3) if t >= 0 else -pow(-t/2, 1./3)
-            t = m-math.sqrt(n)
-            n1 = pow(t/2, 1./3) if t >= 0 else -pow(-t/2, 1./3)
-        else:
-            m1 = pow(complex((m+cmath.sqrt(n))/2), 1./3)
-            n1 = pow(complex((m-cmath.sqrt(n))/2), 1./3)
-        x1 = -1./3 * (a + m1 + n1)
-        x2 = -1./3 * (a + w1*m1 + w2*n1)
-        x3 = -1./3 * (a + w2*m1 + w1*n1)
-        return [x1, x2, x3]
-    elif b != 0:
-        det = c**2-4*b*d
-        if det > 0:
-            return [(-c+math.sqrt(det))/(2*b), (-c-math.sqrt(det))/(2*b)]
-        elif d == 0:
-            return [-c/(b*b)]
-        else:
-            return [(-c+cmath.sqrt(det))/(2*b), (-c-cmath.sqrt(det))/(2*b)]
-    elif c != 0:
-        return [-d/c]
-    else:
-        return []
-
-
 ################################################################################
-# print_ prints any arguments into specified log file
+# Logging
 ################################################################################
+
 
 def print_(*arg):
     if os.path.isdir(options.directory):
@@ -441,11 +367,7 @@ class laser_gcode(inkex.EffectExtension):
 
         add_argument("--suppress-all-messages", type=inkex.Boolean, dest="suppress_all_messages", default=True, help="Hide messages during g-code generation")
         add_argument("--create-log", type=inkex.Boolean, dest="log_create_log", default=True, help="Create log files")
-        add_argument("--engraving-draw-calculation-paths", type=inkex.Boolean, dest="engraving_draw_calculation_paths",
-                     default=True, help="Draw additional graphics to debug engraving path")
-        add_argument("--biarc-max-split-depth", type=int, dest="biarc_max_split_depth", default="2", help="Defines maximum depth of splitting while approximating using biarcs.")
         add_argument("--area-fill-angle", type=float, dest="area_fill_angle", default="0", help="Fill area with lines heading this angle")
-        add_argument("--engraving-newton-iterations", type=int, dest="engraving_newton_iterations", default="20", help="Number of sample points used to calculate distance")
 
         add_argument("--active-tab", dest="active_tab", default="",	help="Defines which tab is active")
 
@@ -488,10 +410,9 @@ class laser_gcode(inkex.EffectExtension):
             return []
         p = self.transform_csp(p, layer)
         np_p = np.array(p)
-        sortedToolpaths = self.sort_points(
-            np_p[:, 0, 0, 0], np_p[:, 0, 0, 1], np_p[:, 1, 0, 0], np_p[:, 1, 0, 1])
+        sorted_tool_paths = self.sort_points(np_p[:, 0, 0, 0], np_p[:, 0, 0, 1], np_p[:, 1, 0, 0], np_p[:, 1, 0, 1])
 
-        for path in sortedToolpaths:
+        for path in sorted_tool_paths:
             c += [[[path[0], path[1]], 'move']]
             c += [[[path[0], path[1]], 'line', [path[2], path[3]]]]
             c += [[[path[2], path[3]], 'end']]
@@ -499,14 +420,14 @@ class laser_gcode(inkex.EffectExtension):
         return c
 
     def sort_points(self, x1, y1, x2, y2):
-        sortedList = np.zeros((len(x1), 4))
+        sorted_list = np.zeros((len(x1), 4))
 
         xpos = np.array(x1[1:])
-        xposInv = np.array(x2[1:])
+        xpos_inv = np.array(x2[1:])
         ypos = np.array(y1[1:])
-        yposInv = np.array(y2[1:])
+        ypos_inv = np.array(y2[1:])
 
-        sortedList[0] = [x1[0], y1[0], x2[0], y2[0]]
+        sorted_list[0] = [x1[0], y1[0], x2[0], y2[0]]
         actXPos = x2[0]
         actYPos = y2[0]
 
@@ -514,9 +435,9 @@ class laser_gcode(inkex.EffectExtension):
 
         while len(xpos) > 0:
             xDist = np.abs(xpos - actXPos)
-            xDistInv = np.abs(xposInv - actXPos)
+            xDistInv = np.abs(xpos_inv - actXPos)
             yDist = np.abs(ypos - actYPos)
-            yDistInv = np.abs(yposInv - actYPos)
+            yDistInv = np.abs(ypos_inv - actYPos)
 
             distances = np.array(
                 [np.add(xDist, yDist), np.add(xDistInv, yDistInv)])
@@ -526,25 +447,25 @@ class laser_gcode(inkex.EffectExtension):
                 np.argmin(distances, axis=None), distances.shape)
 
             if minInd[0] == 0:
-                sortedList[i] = [xpos[minInd[1]], ypos[minInd[1]],
-                                 xposInv[minInd[1]], yposInv[minInd[1]]]
-                actXPos = xposInv[minInd[1]]
-                actYPos = yposInv[minInd[1]]
+                sorted_list[i] = [xpos[minInd[1]], ypos[minInd[1]],
+                                  xpos_inv[minInd[1]], ypos_inv[minInd[1]]]
+                actXPos = xpos_inv[minInd[1]]
+                actYPos = ypos_inv[minInd[1]]
 
             else:
-                sortedList[i] = [xposInv[minInd[1]],
-                                 yposInv[minInd[1]], xpos[minInd[1]], ypos[minInd[1]]]
+                sorted_list[i] = [xpos_inv[minInd[1]],
+                                  ypos_inv[minInd[1]], xpos[minInd[1]], ypos[minInd[1]]]
                 actXPos = xpos[minInd[1]]
                 actYPos = ypos[minInd[1]]
 
             xpos = np.delete(xpos, minInd[1])
             ypos = np.delete(ypos, minInd[1])
-            xposInv = np.delete(xposInv, minInd[1])
-            yposInv = np.delete(yposInv, minInd[1])
+            xpos_inv = np.delete(xpos_inv, minInd[1])
+            ypos_inv = np.delete(ypos_inv, minInd[1])
 
             i = i+1
 
-        return sortedList
+        return sorted_list
 
     def draw_curve(self, curve, layer, group=None, style=MARKER_STYLE["biarc_style"]):
 
@@ -1040,16 +961,6 @@ class laser_gcode(inkex.EffectExtension):
                                     if 0 <= round(t1, 12) < 1:
                                         ints += [[t1, p[0], p[1]]]
 
-                                    # print_(" ")
-                                    # print_("sp")
-                                    # print_(sp1[0], sp2[0])
-                                    # print_("l")
-                                    # print_(l1, l2)
-                                    # print_("p")
-                                    # print_(p)
-                                    # print_("ints")
-                                    # print_(ints)
-
                         ints.sort()
 
                         for i in ints:
@@ -1101,13 +1012,17 @@ class laser_gcode(inkex.EffectExtension):
 
                     csp_line = csp_from_polyline(np_finalLines)
 
-                    #TODO: Remove
+                    # TODO: Remove
                     # curve = self.parse_curve2d(csp_line, layer)
                     # self.draw_curve(curve, layer, area_group)
 
                     csp_line = self.transform_csp(csp_line, layer, True)
 
                     print_time("Time for transforming infill paths")
+
+                    print_("csp line 1:")
+                    for csp in csp_line:
+                        print_(csp)
 
                     curve = self.parse_curve2d(csp_line, layer)
                     self.draw_curve(curve, layer, area_group)
@@ -1130,9 +1045,8 @@ class laser_gcode(inkex.EffectExtension):
 ################################################################################
     def engraving(self):
         global cspm
-        # global nlLT, i, j
-        # global max_dist  # minimum of tool radius and user's requested maximum distance
 
+        # TODO: Candidate for refactoring
         def bisect(nx1, ny1, nx2, ny2):
 
             cosBis = math.sqrt(max(0, (1.0+nx1*nx2-ny1*ny2)/2.0))
@@ -1154,34 +1068,18 @@ class laser_gcode(inkex.EffectExtension):
             if 0 < sinturn*114.6 < (0):
                 sinturn = 0  # set to zero if less than the user wants to see.
             return (cosBis/costurn, sinBis/costurn, sinturn)
-            # end bisect
 
-        def bez_divide(a, b, c, d):
+        def save_point_new(x, y, i, j):
 
-            bx = b[0]-a[0]
-            by = b[1]-a[1]
-            cx = c[0]-a[0]
-            cy = c[1]-a[1]
-            dx = d[0]-a[0]
-            dy = d[1]-a[1]
-            limit = 8*math.hypot(dx, dy) / \
-                self.options.engraving_newton_iterations
-            # LT This is the only limit we get from the user currently
-            if abs(dx*by-bx*dy) < limit and abs(dx*cy-cx*dy) < limit:
-                return [[a, b, c, d]]
-            abx = (a[0]+b[0])/2.0
-            aby = (a[1]+b[1])/2.0
-            bcx = (b[0]+c[0])/2.0
-            bcy = (b[1]+c[1])/2.0
-            cdx = (c[0]+d[0])/2.0
-            cdy = (c[1]+d[1])/2.0
-            abcx = (abx+bcx)/2.0
-            abcy = (aby+bcy)/2.0
-            bcdx = (bcx+cdx)/2.0
-            bcdy = (bcy+cdy)/2.0
-            m = [(abcx+bcdx)/2.0, (abcy+bcdy)/2.0]
-            return bez_divide(a, [abx, aby], [abcx, abcy], m) + bez_divide(m, [bcdx, bcdy], [cdx, cdy], d)
-            # end of bez_divide
+            global cspm
+
+            x = round(x, 3)  # round to 3 decimals
+            y = round(y, 3)  # round to 3 decimals
+
+            # if len(cspm) > 1:
+            #     cspm += [[[x, y], [x, y], [x, y]]]
+
+            cspm += [[[x, y], [x, y], [x, y]]]
 
         def save_point(x, y, i, j):
 
@@ -1200,13 +1098,10 @@ class laser_gcode(inkex.EffectExtension):
                         length12 = math.hypot(xy2[0]-xy1[0], xy2[1]-xy1[1])
                         # get the xy distance of point 1 from the line 0-2
                         if length2 > length1 and length2 > length12:  # point 1 between them
-                            xydist = abs(
-                                (xy2[0]-x)*(xy1[1]-y)-(xy1[0]-x)*(xy2[1]-y))/length2
+                            xydist = abs((xy2[0]-x)*(xy1[1]-y)-(xy1[0]-x)*(xy2[1]-y))/length2
                             if xydist < ENGRAVING_TOLERANCE:  # so far so good
                                 cspm.pop()
             cspm += [[[x, y], [x, y], [x, y], i, j]]
-
-            # end of save_point
 
         # end of subfunction definitions. engraving() starts here:
         ###########################################################
@@ -1229,9 +1124,6 @@ class laser_gcode(inkex.EffectExtension):
             if not self.check_dir():
                 return
 
-        # LT See if we can use this parameter for line and Bezier subdivision:
-        bitlen = 20/self.options.engraving_newton_iterations
-
         for layer in self.layers:
             if layer in self.svg.selected_paths:
                 # Calculate scale in pixels per user unit (mm or inch)
@@ -1249,87 +1141,33 @@ class laser_gcode(inkex.EffectExtension):
                         nlLT = []
 
                         for csp in cspi:
-                            # print_("csp is",csp)
                             nlLT.append([])
+
                             for i in range(0, len(csp)):  # LT for each point
                                 sp0, sp1, sp2 = csp[i-2], csp[i-1], csp[i]
                                 # LT find angle between this and previous segment
                                 x0, y0 = sp1[1]
-                                nx1, ny1 = csp_normalized_normal(sp1, sp2, 0)
-                                nx0, ny0 = csp_normalized_normal(sp0, sp1, 1)
-                                bx, by, s = bisect(nx0, ny0, nx1, ny1)
-                                # record x,y,normal,ifCorner, sin(angle-turned/2)
-                                nlLT[-1] += [[[x0, y0], [bx, by], True, s]]
+                                nx1, ny1 = csp_normalized_normal(sp1, sp2)
+                                nx0, ny0 = csp_normalized_normal(sp0, sp1)
 
-                                # LT now do the line
-                                if sp1[1] == sp1[2] and sp2[0] == sp2[1]:  # straightline
-                                    nlLT[-1] += [[sp1[1], [nx1, ny1], False, i]]
-                                else:  # Bezier. First, recursively cut it up:
-                                    nn = bez_divide(
-                                        sp1[1], sp1[2], sp2[0], sp2[1])
-                                    first = True  # Flag entry to divided Bezier
-                                    for bLT in nn:  # save as two line segments
-                                        for seg in range(3):
-                                            if seg > 0 or first:
-                                                nx1 = bLT[seg][1]-bLT[seg+1][1]
-                                                ny1 = bLT[seg+1][0]-bLT[seg][0]
-                                                l1 = math.hypot(nx1, ny1)
-                                                if l1 < ENGRAVING_TOLERANCE:
-                                                    continue
-                                                nx1 = nx1/l1  # normalise them
-                                                ny1 = ny1/l1
-                                                nlLT[-1] += [[bLT[seg],
-                                                              [nx1, ny1], False, i]]
-                                                first = False
-                                            if seg < 2:  # get outgoing bisector
-                                                nx0 = nx1
-                                                ny0 = ny1
-                                                nx1 = bLT[seg+1][1] - bLT[seg+2][1]
-                                                ny1 = bLT[seg+2][0] - bLT[seg+1][0]
-                                                l1 = math.hypot(nx1, ny1)
-                                                if l1 < ENGRAVING_TOLERANCE:
-                                                    continue
-                                                nx1 = nx1/l1  # normalise them
-                                                ny1 = ny1/l1
-                                                # bisect
-                                                bx, by, s = bisect(
-                                                    nx0, ny0, nx1, ny1)
-                                                nlLT[-1] += [[bLT[seg+1],
-                                                              [bx, by], True, 0.]]
+                                s = bisect(nx0, ny0, nx1, ny1)[2]
+
+                                # record x,y,normal,ifCorner, sin(angle-turned/2)
+                                nlLT[-1] += [[[x0, y0], [0, 0], True, s]]
 
                         reflex = False
                         for j in xrange(len(nlLT)):  # LT6b for each subpath
                             cspm = []  # Will be my output. List of csps.
-                            r = 0  # LT initial, as first point is an angle
                             for i in xrange(len(nlLT[j])):  # LT for each node
-                                n0 = nlLT[j][i-2]  # previous node
                                 n1 = nlLT[j][i-1]  # current node
-                                n2 = nlLT[j][i]  # next node
                                 # this point/start of this line
-                                x1a, y1a = n1[0]
-                                nx, ny = n1[1]
-                                x1b, y1b = n2[0]  # next point/end of this line
+                                x1, y1 = n1[0]
+
                                 if n1[2]:  # We're at a corner
                                     bits = 1
-                                    bit0 = 0
 
-                                else:  # line. Cut it up if long.
-                                    if n0[3] > 0 and not self.options.engraving_draw_calculation_paths:
-                                        bit0 = r*n0[3]  # after acute corner
-                                    else:
-                                        bit0 = 0.0
-                                    length = math.hypot((x1b-x1a), (y1a-y1b))
-                                    bit0 = (min(length, bit0))
-                                    bits = int((length-bit0)/bitlen)
-                                    # split excess evenly at both ends
-                                    bit0 += (length-bit0-bitlen*bits)/2
-                                    # print_("j,i,r,bit0,bits",j,i,w,bit0,bits)
                                 for b in xrange(bits):  # divide line into bits
-                                    x1 = x1a+ny*(b*bitlen+bit0)
-                                    y1 = y1a-nx*(b*bitlen+bit0)
 
-                                    if reflex:  # just after a reflex corner
-                                        reflex = False
                                     if n1[2]:  # We're at a corner
                                         if n1[3] > 0:  # acute
                                             save_point(x1, y1, i, j)
@@ -1337,15 +1175,16 @@ class laser_gcode(inkex.EffectExtension):
 
                                     save_point(x1, y1, i, j)
 
-                                # LT end of for each bit of this line
-                                if n1[2] == True and n1[3] < 0:  # reflex angle
-                                    reflex = True
                             # LT next i
                             if len(cspm) != 0:
                                 cspm += [cspm[0]]
                                 cspe += [cspm]
 
                 if cspe != []:
+
+                    # print_("cspe:")
+                    # print_(cspe)
+
                     curve = self.parse_curve(cspe, layer)
                     self.draw_curve(curve, layer, engraving_group)
 
