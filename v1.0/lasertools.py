@@ -56,7 +56,7 @@ if "errormsg" not in dir(inkex):
 # Styles and additional parameters
 ################################################################################
 
-PROFILING = True   # Disable if not debugging
+PROFILING = False   # Disable if not debugging
 DEBUG = False      # Disable if not debugging
 TINY_INFILL_FACTOR = 2  # x times the laser beam width will be removed
 ENGRAVING_TOLERANCE = 0.000002
