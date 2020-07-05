@@ -51,11 +51,9 @@ if sys.version_info[0] > 2:
 if "errormsg" not in dir(inkex):
     inkex.errormsg = lambda msg: sys.stderr.write((str(msg) + "\n").encode("UTF-8"))
 
-
 ################################################################################
 # Styles and additional parameters
 ################################################################################
-
 PROFILING = False   # Disable if not debugging
 DEBUG = False      # Disable if not debugging
 TINY_INFILL_FACTOR = 2  # x times the laser beam width will be removed
@@ -245,10 +243,10 @@ def csp_normalized_normal(sp1, sp2, t):
 def csp_parameterize(sp1, sp2):
     return bezierparameterize(csp_segment_to_bez(sp1, sp2))
 
-
 ################################################################################
 # Area Fill Stuff
 ################################################################################
+
 
 def point_inside_csp(p, csp, on_the_path=True):
 
@@ -322,19 +320,6 @@ def point_inside_csp(p, csp, on_the_path=True):
 def csp_from_polyline(line):
     return [[[point[:] for _ in range(3)] for point in subline] for subline in line]
 
-
-'''
-def csp_close_all_subpaths(csp, tolerance=0.000001):
-    for i in range(len(csp)):
-        if point_to_point_d2(csp[i][0][1], csp[i][-1][1]) > tolerance**2:
-            csp[i][-1][2] = csp[i][-1][1][:]
-            csp[i] += [[csp[i][0][1][:] for _ in range(3)]]
-        else:
-            if csp[i][0][1] != csp[i][-1][1]:
-                csp[i][-1][1] = csp[i][0][1][:]
-    return csp
-'''
-
 ################################################################################
 # Common functions
 ################################################################################
@@ -384,10 +369,10 @@ def cubic_solver(a, b, c, d):
     else:
         return []
 
-
 ################################################################################
 # print_ prints any arguments into specified log file
 ################################################################################
+
 
 def print_(*arg):
     if os.path.isdir(options.directory):
@@ -441,10 +426,10 @@ class P:
 
     def l2(self): return self.x*self.x + self.y*self.y
 
-
 ################################################################################
 # Lasertools class
 ################################################################################
+
 
 class laser_gcode(inkex.EffectExtension):
 
@@ -716,7 +701,6 @@ class laser_gcode(inkex.EffectExtension):
 # infill strategy will allow for acceleration and deceleration buffer distance to prevent speed change burn.
 #
 ################################################################################
-
     def generate_gcode(self, curve, layer, tool, strategy):
 
         print_debug("    Laser parameters: " + str(tool))
@@ -952,11 +936,9 @@ class laser_gcode(inkex.EffectExtension):
             inkex.errormsg(s)
             sys.exit()
 
-
 ################################################################################
 # Get Gcodetools info from the svg
 ################################################################################
-
     def get_info(self):
         self.svg.selected_paths = {}
         self.paths = {}
@@ -997,7 +979,6 @@ class laser_gcode(inkex.EffectExtension):
 ################################################################################
 # Fill area
 ################################################################################
-
     def area_fill(self):
 
         global gcode
@@ -1191,8 +1172,6 @@ class laser_gcode(inkex.EffectExtension):
 ################################################################################
     def engraving(self):
         global cspm
-        #global nlLT, i, j
-        # global max_dist  # minimum of tool radius and user's requested maximum distance
 
         def bisect(nx1, ny1, nx2, ny2):
 
@@ -1358,7 +1337,6 @@ class laser_gcode(inkex.EffectExtension):
                                                 nlLT[-1] += [[bLT[seg+1],
                                                               [bx, by], True, 0.]]
 
-                        reflex = False
                         for j in xrange(len(nlLT)):  # LT6b for each subpath
                             cspm = []  # Will be my output. List of csps.
                             r = 0  # LT initial, as first point is an angle
@@ -1388,33 +1366,14 @@ class laser_gcode(inkex.EffectExtension):
                                 for b in xrange(bits):  # divide line into bits
                                     x1 = x1a+ny*(b*bitlen+bit0)
                                     y1 = y1a-nx*(b*bitlen+bit0)
-
-                                    if reflex:  # just after a reflex corner
-                                        reflex = False
-                                    if n1[2]:  # We're at a corner
-                                        if n1[3] > 0:  # acute
-                                            save_point(x1, y1, i, j)
-                                            save_point(x1, y1, i, j)
-
                                     save_point(x1, y1, i, j)
 
-                                # LT end of for each bit of this line
-                                if n1[2] == True and n1[3] < 0:  # reflex angle
-                                    reflex = True
-                            # LT next i
                             if len(cspm) != 0:
                                 cspm += [cspm[0]]
-
-                                # for entr in cspm:
-                                #    print_("cspm ", entr)
                                 cspe += [cspm]
 
                 if cspe != []:
-                    # for entr in cspe:
-                    #    print_("cspe ", entr)
                     curve = self.parse_curve(cspe, layer)
-                    # for entr in curve:
-                    #    print_("curve ", entr)
                     self.draw_curve(curve, layer, engraving_group)
 
                     gcode += self.generate_gcode(curve, layer, self.tool_perimeter, "perimeter")
@@ -1464,7 +1423,6 @@ class laser_gcode(inkex.EffectExtension):
     ################################################################################
     # ApplyTransform
     ################################################################################
-
     @staticmethod
     def objectToPath(node):
 
@@ -1536,7 +1494,6 @@ class laser_gcode(inkex.EffectExtension):
             self.recursiveFuseTransform(child, transf)
 
     def applytransforms(self):
-        # Apply transformations
         self.svg.get_selected()
 
         if self.svg.selected:
@@ -1544,11 +1501,8 @@ class laser_gcode(inkex.EffectExtension):
                 self.recursiveFuseTransform(shape)
         else:
             self.recursiveFuseTransform(self.document.getroot())
-        # Transformations applied
 
     def flatten(self, tolerance=0.1):
-        print_("Elements in path: ", self.svg.get_selected(inkex.PathElement))
-
         for layer in self.layers:
             if layer in self.svg.selected_paths:
                 for node in self.svg.selected_paths[layer]:
@@ -1569,7 +1523,6 @@ class laser_gcode(inkex.EffectExtension):
 # Effect
 # Main function of Lasertools class
 ################################################################################
-
     def effect(self):
         global options
         options = self.options
