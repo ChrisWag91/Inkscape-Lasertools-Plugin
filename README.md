@@ -14,7 +14,15 @@ This project is based on the Gcodetools extension.
 *******************************************************************************************************************************
 
 ## How to use Lasertools
-**Watch this Video for a quick introduction:**
+
+**Watch this Video for a tutorial:**
+
+<a href="https://youtu.be/F2U58onWOFM
+" target="_blank"><img src="http://img.youtube.com/vi/NhUvRJsa4D0/0.jpg"
+alt="Detailed Youtube Video" width="240" height="180" border="10" /></a>
+
+
+**Watch this Video for some Backgrund:**
 
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=NhUvRJsa4D0
 " target="_blank"><img src="http://img.youtube.com/vi/NhUvRJsa4D0/0.jpg"
