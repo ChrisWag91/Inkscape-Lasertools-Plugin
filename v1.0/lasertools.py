@@ -855,16 +855,12 @@ class laser_gcode(inkex.EffectExtension):
                 if self.layers[i] in self.orientation_points:
                     break
 
-            if self.layers[i] not in self.orientation_points:
-                self.error("Orientation points for '{}' layer have not been found! Please add orientation points using Orientation tab!".format(
-                    layer.get(inkex.addNS('label', 'inkscape'))), "error")
-            elif self.layers[i] in self.transform_matrix:
+            if self.layers[i] in self.transform_matrix:
                 self.transform_matrix[layer] = self.transform_matrix[self.layers[i]]
             else:
                 orientation_layer = self.layers[i]
-                if len(self.orientation_points[orientation_layer]) > 1:
-                    self.error("There are more than one orientation point groups in '{}' layer".format(orientation_layer.get(inkex.addNS('label', 'inkscape'))))
-                points = self.orientation_points[orientation_layer][0]
+                points = orient_points
+
                 if len(points) == 2:
                     points += [[[(points[1][0][1]-points[0][0][1])+points[0][0][0], -(points[1][0][0]-points[0][0][0])+points[0][0][1]],
                                 [-(points[1][1][1]-points[0][1][1])+points[0][1][0], points[1][1][0]-points[0][1][0]+points[0][1][1]]]]
@@ -892,9 +888,9 @@ class laser_gcode(inkex.EffectExtension):
                         self.transform_matrix[layer] = [[m[j*3+i][0] for i in range(3)] for j in range(3)]
 
                     else:
-                        self.error("Orientation points are wrong! (if there are two orientation points they sould not be the same. If there are three orientation points they should not be in a straight line.)")
+                        self.error("Orientation points are wrong! (If there are three orientation points they should not be in a straight line.)")
                 else:
-                    self.error("Orientation points are wrong! (if there are two orientation points they sould not be the same. If there are three orientation points they should not be in a straight line.)")
+                    self.error("Orientation points are wrong! (If there are two orientation points they sould not be the same.)")
 
             self.transform_matrix_reverse[layer] = np.linalg.inv(self.transform_matrix[layer]).tolist()
 
@@ -1404,14 +1400,9 @@ class laser_gcode(inkex.EffectExtension):
 
         print_("Inserting orientation points")
 
-        if layer in self.orientation_points:
-            self.error("Active layer already has orientation points! Remove them or select another layer!", "error")
-
         attr = {"gcodetools": "Gcodetools orientation group"}
         if transform:
             attr["transform"] = transform
-
-        orientation_group = layer.add(Group(**attr))
 
         doc_height = self.svg.unittouu(self.document.getroot().get('height'))
         if self.document.getroot().get('height') == "100%":
@@ -1556,10 +1547,9 @@ class laser_gcode(inkex.EffectExtension):
             time.sleep(3)
             print_debug("Starting Program")
 
-        if self.orientation_points == {}:
-            self.orientation(self.layers[min(0, len(self.layers)-1)])
-            print_debug("Orientation Points: ", self.orientation_points)
-            self.get_info()
+        self.orientation(self.layers[min(0, len(self.layers)-1)])
+        self.get_info()
+
         # handle power on delay
         delayOn = ""
         if round(float(self.options.power_delay), 1) > 0:
