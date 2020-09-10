@@ -46,15 +46,14 @@ If you work from a picture (.png, .jpeg ...):
 
 If you work from a svg file:
 
-1. ungroup all objects
+1. ungroup all objects until there are no more groups left
 2. convert all objects to paths (especially text) using [Path/Object to Path] or [Path/Stroke to Path]
 3. set the size of the page to the size you want your engraving to be [under File/Document Properties/Page]
 4. **IMPORTANT:** set *Display Units* and *Units* to *mm* and set *Scale x* to 1 [under File/Document Properties/Page]
-5. convert your picture to vector graphics [Path/Trace Bitmap]
-6. open Lasertools and set your parameters [under Extensions/Lasertools]
-7. click Apply
-8. **IMPORTANT:** the calculation takes some time, so be patient
-9. finished
+5. open Lasertools and set your parameters [under Extensions/Lasertools]
+6. click Apply
+7. **IMPORTANT:** the calculation takes some time, so be patient
+8. finished
 
 **Hint:**
 If you end up with very complex paths (paths with thousands of points) you can simplify the path before exporting it to Gcode.
