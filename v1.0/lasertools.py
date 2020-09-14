@@ -446,6 +446,10 @@ class laser_gcode(inkex.EffectExtension):
 
         f = open(self.options.directory + filename, "w")
 
+        f.write(self.header + "\n" + gcode + self.footer)
+        f.close()
+
+    def generate_gcode_header_footer(self):
         if self.options.prefix_1 != "":
             self.header += self.options.prefix_1 + "\n"
         if self.options.prefix_2 != "":
@@ -459,9 +463,6 @@ class laser_gcode(inkex.EffectExtension):
             self.footer += self.options.suffix_2 + "\n"
         if self.options.suffix_3 != "":
             self.footer += self.options.suffix_3 + "\n"
-
-        f.write(self.header + "\n" + gcode + self.footer)
-        f.close()
 
     def add_arguments(self, pars):
         add_argument = pars.add_argument
@@ -655,20 +656,13 @@ class laser_gcode(inkex.EffectExtension):
                 self.options.directory += "\\"
             else:
                 self.options.directory += "/"
-        print_("Checking direcrory: ", self.options.directory)
+
+        print_("Checking directory: ", self.options.directory)
+
         if os.path.isdir(self.options.directory):
-            if os.path.isfile(self.options.directory+'header'):
-                f = open(self.options.directory+'header', 'r')
-                self.header = f.read()
-                f.close()
-            else:
-                self.header = DEFAULTS['header']
-            if os.path.isfile(self.options.directory+'footer'):
-                f = open(self.options.directory+'footer', 'r')
-                self.footer = f.read()
-                f.close()
-            else:
-                self.footer = DEFAULTS['footer']
+            self.header = DEFAULTS['header']
+            self.footer = DEFAULTS['footer']
+            self.generate_gcode_header_footer()
 
         else:
             self.error("Directory does not exist! Please specify existing directory at options tab!", "error")
@@ -982,7 +976,7 @@ class laser_gcode(inkex.EffectExtension):
         recursive_search(self.document.getroot(), self.document.getroot())
 
 ################################################################################
-# Fill area
+# Infill
 ################################################################################
     def area_fill(self):
 
@@ -992,7 +986,7 @@ class laser_gcode(inkex.EffectExtension):
         self.options.area_fill_angle = self.options.area_fill_angle * math.pi / 180
 
         print_("===================================================================")
-        print_("Start filling area", time.strftime("%d.%m.%Y %H:%M:%S"))
+        print_("Start generating infill", time.strftime("%d.%m.%Y %H:%M:%S"))
         print_("===================================================================")
 
         if len(self.svg.selected_paths) <= 0:
@@ -1166,17 +1160,18 @@ class laser_gcode(inkex.EffectExtension):
                     print_time("Time for generating Gcode")
 
                     if self.options.generate_bb_preview:
-                        self.calc_bb(csp)
+                        for element in csp:
+                            self.calc_bb([element])
 
         if gcode != '' and not self.options.add_contours:
             self.export_gcode(gcode, self.options.file)
 
         print_("===================================================================")
-        print_("Finished filling area", time.strftime("%d.%m.%Y %H:%M:%S"))
+        print_("Finished infill generation", time.strftime("%d.%m.%Y %H:%M:%S"))
         print_("===================================================================")
 
 ################################################################################
-# Engraving
+# Outline
 ################################################################################
     def engraving(self):
         global cspm
@@ -1260,7 +1255,7 @@ class laser_gcode(inkex.EffectExtension):
         ###########################################################
 
         print_("===================================================================")
-        print_("Start doing perimeters", time.strftime("%d.%m.%Y %H:%M:%S"))
+        print_("Start generating outline", time.strftime("%d.%m.%Y %H:%M:%S"))
         print_("===================================================================")
         timestamp2 = time.time()
 
@@ -1345,9 +1340,8 @@ class laser_gcode(inkex.EffectExtension):
                                                 nlLT[-1] += [[bLT[seg+1],
                                                               [bx, by], True, 0.]]
 
-                        if self.options.generate_bb_preview and len(csp) > 0:
-                            print_(self.transform_csp([csp], layer, True))
-                            self.calc_bb(self.transform_csp([csp], layer, True))
+                            if self.options.generate_bb_preview and len(csp) > 0:
+                                self.calc_bb(self.transform_csp([csp], layer, True))
 
                         for j in xrange(len(nlLT)):  # LT6b for each subpath
                             cspm = []  # Will be my output. List of csps.
@@ -1394,7 +1388,7 @@ class laser_gcode(inkex.EffectExtension):
             self.export_gcode(gcode, self.options.file)
 
         print_("===================================================================")
-        print_("Finished doing parameters", time.strftime("%d.%m.%Y %H:%M:%S"))
+        print_("Finished outline generation", time.strftime("%d.%m.%Y %H:%M:%S"))
         print_("===================================================================")
         print_(time.time() - timestamp2, "s for parameters")
 
@@ -1435,10 +1429,13 @@ class laser_gcode(inkex.EffectExtension):
 
         global bounding_box
 
-        print_("csp:")
-        print_(csp)
-
         csp_np = np.array(csp)
+        print_("csp_shape")
+        print_(csp_np.shape)
+        print_("csp")
+        print_(csp)
+        print_("csp_np")
+        print_(csp_np)
         csp_np = csp_np[0, 0:, 0]  # XY Coords
         x_coords = csp_np[0:, 0]
         y_coords = csp_np[0:, 1]
@@ -1459,9 +1456,6 @@ class laser_gcode(inkex.EffectExtension):
 
         if y_max > bounding_box[3]:
             bounding_box[3] = y_max
-
-        print_("csp:")
-        print_(csp_np)
 
         ################################################################################
         # Orientation
