@@ -1159,7 +1159,7 @@ class laser_gcode(inkex.EffectExtension):
 
                     print_time("Time for generating Gcode")
 
-                    if self.options.generate_bb_preview:
+                    if self.options.generate_bb_preview or self.options.generate_cross_preview:
                         for element in csp:
                             self.calc_bb([element])
 
@@ -1340,8 +1340,9 @@ class laser_gcode(inkex.EffectExtension):
                                                 nlLT[-1] += [[bLT[seg+1],
                                                               [bx, by], True, 0.]]
 
-                            if self.options.generate_bb_preview and len(csp) > 0:
-                                self.calc_bb(self.transform_csp([csp], layer, True))
+                            if self.options.generate_bb_preview or self.options.generate_cross_preview:
+                                if len(csp) > 0:
+                                    self.calc_bb(self.transform_csp([csp], layer, True))
 
                         for j in xrange(len(nlLT)):  # LT6b for each subpath
                             cspm = []  # Will be my output. List of csps.
@@ -1397,8 +1398,6 @@ class laser_gcode(inkex.EffectExtension):
 ################################################################################
     def bb_preview(self):
 
-        global gcode
-
         print_("===================================================================")
         print_("Start generating preview G-Code file", time.strftime("%d.%m.%Y %H:%M:%S"))
         print_("===================================================================")
@@ -1430,12 +1429,7 @@ class laser_gcode(inkex.EffectExtension):
         global bounding_box
 
         csp_np = np.array(csp)
-        print_("csp_shape")
-        print_(csp_np.shape)
-        print_("csp")
-        print_(csp)
-        print_("csp_np")
-        print_(csp_np)
+
         csp_np = csp_np[0, 0:, 0]  # XY Coords
         x_coords = csp_np[0:, 0]
         y_coords = csp_np[0:, 1]
@@ -1456,6 +1450,39 @@ class laser_gcode(inkex.EffectExtension):
 
         if y_max > bounding_box[3]:
             bounding_box[3] = y_max
+
+    def crosshair_preview(self):
+
+        print_("===================================================================")
+        print_("Start generating preview G-Code file", time.strftime("%d.%m.%Y %H:%M:%S"))
+        print_("===================================================================")
+
+        preview_gcode = "\n"
+        preview_gcode += "G0 X{} Y{}\n".format(self.half_dist(bounding_box[0], bounding_box[2]), bounding_box[1])
+        preview_gcode += "{} F{}\n".format(self.options.laser_command_preview, self.options.laser_speed_preview)
+
+        for _ in xrange(self.options.repetitions_preview):
+            preview_gcode += "G1 Y{}\n".format(bounding_box[3])
+            preview_gcode += "G1 Y{}\n".format(self.half_dist(bounding_box[1], bounding_box[3]))
+            preview_gcode += "G1 X{}\n".format(bounding_box[0])
+            preview_gcode += "G1 X{}\n".format(bounding_box[2])
+            preview_gcode += "G1 X{}\n".format(self.half_dist(bounding_box[0], bounding_box[2]))
+
+        preview_gcode += "{}\n".format(self.options.laser_off_command)
+
+        filename = self.options.file
+        index_of_point = filename.rfind('.')
+        filename = filename[:index_of_point] + "_crosshair" + filename[index_of_point:]
+
+        self.export_gcode(preview_gcode, filename)
+
+        print_("===================================================================")
+        print_("Finished generating preview G-Code file", time.strftime("%d.%m.%Y %H:%M:%S"))
+        print_("===================================================================")
+
+    def half_dist(self, coord_min, coord_max):
+
+        return (coord_min + ((coord_max-coord_min)/2))
 
         ################################################################################
         # Orientation
@@ -1682,6 +1709,9 @@ class laser_gcode(inkex.EffectExtension):
 
         if self.options.generate_bb_preview:
             self.bb_preview()
+
+        if self.options.generate_cross_preview:
+            self.crosshair_preview()
 
 
 if __name__ == '__main__':
