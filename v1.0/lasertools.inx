@@ -40,6 +40,14 @@
 			<param name="suffix2" type="string" _gui-text=""></param>
 			<param name="suffix3" type="string" _gui-text="">M02	;End of program</param>			
 		</page>
+
+		<page name='bb_preview' _gui-text='Bounding Box'>
+			<param name="generate-bb-preview" type="boolean" _gui-text="Generate G-Code for bounding box preview">false</param>
+			<param name="generate-cross-preview" type="boolean" _gui-text="Generate G-Code for mid cross preview">false</param>
+			<param name="laser-command-preview" type="string" _gui-text="Laser ON command preview:">S0.1</param>
+			<param name="laser-speed-preview" type="int" min="0" max="7000" _gui-text="Laser speed for preview (mm/min):">1200</param>
+			<param name="repetitions-preview" type="int" min="1" max="100" _gui-text="Number of repetitions:">1</param>			
+		</page>
 	</param>
 
 	<effect needs-live-preview="false">

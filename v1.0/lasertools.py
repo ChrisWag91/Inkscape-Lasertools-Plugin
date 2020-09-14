@@ -80,6 +80,9 @@ options = {}
 cspm = []
 orient_points = []
 
+#               x_min, y_min, x_max, y_max
+bounding_box = [900000, 900000, 0, 0]
+
 
 def marker_style(stroke, marker='DrawCurveMarker', width=1):
     """Set a marker style with some basic defaults"""
@@ -433,7 +436,7 @@ class P:
 
 class laser_gcode(inkex.EffectExtension):
 
-    def export_gcode(self, gcode):
+    def export_gcode(self, gcode, filename):
         gcode_pass = gcode
         for _ in range(1, self.options.passes):
             if self.options.z_stepdown == 0:
@@ -441,7 +444,7 @@ class laser_gcode(inkex.EffectExtension):
             else:
                 gcode += "\nG91 \nG0 Z%s \nG90 \n" % self.options.z_stepdown + gcode_pass
 
-        f = open(self.options.directory+self.options.file, "w")
+        f = open(self.options.directory + filename, "w")
 
         if self.options.prefix_1 != "":
             self.header += self.options.prefix_1 + "\n"
@@ -496,6 +499,12 @@ class laser_gcode(inkex.EffectExtension):
         add_argument("--biarc-max-split-depth", type=int, dest="biarc_max_split_depth", default="2", help="Defines maximum depth of splitting while approximating using biarcs.")
         add_argument("--area-fill-angle", type=float, dest="area_fill_angle", default="0", help="Fill area with lines heading this angle")
         add_argument("--engraving-newton-iterations", type=int, dest="engraving_newton_iterations", default="20", help="Number of sample points used to calculate distance")
+
+        add_argument("--generate-bb-preview", type=inkex.Boolean, dest="generate_bb_preview", default=False, help="Generate a G-Code file which draws a bounding box outline")
+        add_argument("--generate-cross-preview", type=inkex.Boolean, dest="generate_cross_preview", default=False, help="Generate a G-Code file which draws a mid cross")
+        add_argument("--laser-command-preview", dest="laser_command_preview", default="S0.1", help="Laser On gcode command preview")
+        add_argument("--laser-speed-preview", type=int, dest="laser_speed_preview", default="1800", help="Laser speed for preview (mm/min)")
+        add_argument("--repetitions-preview", type=int, dest="repetitions_preview", default="10", help="Number of times the preview be run")
 
         add_argument("--active-tab", dest="active_tab", default="",	help="Defines which tab is active")
 
@@ -1156,8 +1165,11 @@ class laser_gcode(inkex.EffectExtension):
 
                     print_time("Time for generating Gcode")
 
+                    if self.options.generate_bb_preview:
+                        self.calc_bb(csp)
+
         if gcode != '' and not self.options.add_contours:
-            self.export_gcode(gcode)
+            self.export_gcode(gcode, self.options.file)
 
         print_("===================================================================")
         print_("Finished filling area", time.strftime("%d.%m.%Y %H:%M:%S"))
@@ -1333,6 +1345,10 @@ class laser_gcode(inkex.EffectExtension):
                                                 nlLT[-1] += [[bLT[seg+1],
                                                               [bx, by], True, 0.]]
 
+                        if self.options.generate_bb_preview and len(csp) > 0:
+                            print_(self.transform_csp([csp], layer, True))
+                            self.calc_bb(self.transform_csp([csp], layer, True))
+
                         for j in xrange(len(nlLT)):  # LT6b for each subpath
                             cspm = []  # Will be my output. List of csps.
                             r = 0  # LT initial, as first point is an angle
@@ -1375,7 +1391,7 @@ class laser_gcode(inkex.EffectExtension):
                     gcode += self.generate_gcode(curve, layer, self.tool_perimeter, "perimeter")
 
         if gcode != '':
-            self.export_gcode(gcode)
+            self.export_gcode(gcode, self.options.file)
 
         print_("===================================================================")
         print_("Finished doing parameters", time.strftime("%d.%m.%Y %H:%M:%S"))
@@ -1383,8 +1399,74 @@ class laser_gcode(inkex.EffectExtension):
         print_(time.time() - timestamp2, "s for parameters")
 
 ################################################################################
-# Orientation
+# Preview G-Code Files
 ################################################################################
+    def bb_preview(self):
+
+        global gcode
+
+        print_("===================================================================")
+        print_("Start generating preview G-Code file", time.strftime("%d.%m.%Y %H:%M:%S"))
+        print_("===================================================================")
+
+        preview_gcode = "\n"
+        preview_gcode += "G0 X{} Y{}\n".format(bounding_box[0], bounding_box[1])
+        preview_gcode += "{} F{}\n".format(self.options.laser_command_preview, self.options.laser_speed_preview)
+
+        for _ in xrange(self.options.repetitions_preview):
+            preview_gcode += "G1 X{}\n".format(bounding_box[2])
+            preview_gcode += "G1 Y{}\n".format(bounding_box[3])
+            preview_gcode += "G1 X{}\n".format(bounding_box[0])
+            preview_gcode += "G1 Y{}\n".format(bounding_box[1])
+
+        preview_gcode += "{}\n".format(self.options.laser_off_command)
+
+        filename = self.options.file
+        index_of_point = filename.rfind('.')
+        filename = filename[:index_of_point] + "_bounding_box" + filename[index_of_point:]
+
+        self.export_gcode(preview_gcode, filename)
+
+        print_("===================================================================")
+        print_("Finished generating preview G-Code file", time.strftime("%d.%m.%Y %H:%M:%S"))
+        print_("===================================================================")
+
+    def calc_bb(self, csp):
+
+        global bounding_box
+
+        print_("csp:")
+        print_(csp)
+
+        csp_np = np.array(csp)
+        csp_np = csp_np[0, 0:, 0]  # XY Coords
+        x_coords = csp_np[0:, 0]
+        y_coords = csp_np[0:, 1]
+
+        x_min = round(x_coords.min(), 2)
+        x_max = round(x_coords.max(), 2)
+        y_min = round(y_coords.min(), 2)
+        y_max = round(y_coords.max(), 2)
+
+        if x_min < bounding_box[0]:
+            bounding_box[0] = x_min
+
+        if y_min < bounding_box[1]:
+            bounding_box[1] = y_min
+
+        if x_max > bounding_box[2]:
+            bounding_box[2] = x_max
+
+        if y_max > bounding_box[3]:
+            bounding_box[3] = y_max
+
+        print_("csp:")
+        print_(csp_np)
+
+        ################################################################################
+        # Orientation
+        ################################################################################
+
     def orientation(self, layer=None):
         global orient_points
         self.get_info()
@@ -1603,6 +1685,9 @@ class laser_gcode(inkex.EffectExtension):
                 kFile.close()
 
             self.engraving()
+
+        if self.options.generate_bb_preview:
+            self.bb_preview()
 
 
 if __name__ == '__main__':

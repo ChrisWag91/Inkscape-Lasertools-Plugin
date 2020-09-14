@@ -7,34 +7,34 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   sodipodi:docname="test14_orientation_point_test.svg"
-   inkscape:version="1.0 (4035a4fb49, 2020-05-01)"
-   id="svg8"
-   version="1.1"
-   viewBox="0 0 210 297"
+   width="210mm"
    height="297mm"
-   width="210mm">
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg8"
+   inkscape:version="1.0 (4035a4fb49, 2020-05-01)"
+   sodipodi:docname="test14_orientation_point_test.svg">
   <defs
      id="defs2" />
   <sodipodi:namedview
-     inkscape:window-maximized="1"
-     inkscape:window-y="0"
-     inkscape:window-x="0"
-     inkscape:window-height="1015"
-     inkscape:window-width="1920"
-     showgrid="false"
-     inkscape:document-rotation="0"
-     inkscape:current-layer="layer1"
-     inkscape:document-units="mm"
-     inkscape:cy="743.27377"
-     inkscape:cx="-396.47978"
-     inkscape:zoom="0.49497475"
-     inkscape:pageshadow="2"
-     inkscape:pageopacity="0.0"
-     borderopacity="1.0"
-     bordercolor="#666666"
+     id="base"
      pagecolor="#ffffff"
-     id="base" />
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.49497475"
+     inkscape:cx="-396.47978"
+     inkscape:cy="743.27377"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     inkscape:document-rotation="0"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1015"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1" />
   <metadata
      id="metadata5">
     <rdf:RDF>
@@ -43,20 +43,24 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
   <g
-     id="layer1"
+     inkscape:label="Layer 1"
      inkscape:groupmode="layer"
-     inkscape:label="Layer 1">
+     id="layer1">
     <path
-       d="m 29.435776,221.0032 h 33.68246 c 1.662002,0 3.000004,1.33801 3.000004,3.00001 v 46.65592 c 0,1.662 -1.338002,3 -3.000004,3 h -33.68246 c -1.662002,0 -3.000004,-1.338 -3.000004,-3 v -46.65592 c 0,-1.662 1.338002,-3.00001 3.000004,-3.00001 z"
+       id="rect1402"
        style="fill:#0000ff;fill-rule:evenodd;stroke-width:0.264583"
-       id="rect1402" />
+       d="m 29.435776,221.0032 h 33.68246 c 1.662002,0 3.000004,1.33801 3.000004,3.00001 v 46.65592 c 0,1.662 -1.338002,3 -3.000004,3 h -33.68246 c -1.662002,0 -3.000004,-1.338 -3.000004,-3 v -46.65592 c 0,-1.662 1.338002,-3.00001 3.000004,-3.00001 z" />
+    <path
+       d="m 107.8479,164.81418 h 33.68246 c 1.662,0 3,1.33801 3,3.00001 v 46.65592 c 0,1.662 -1.338,3 -3,3 H 107.8479 c -1.662,0 -3,-1.338 -3,-3 v -46.65592 c 0,-1.662 1.338,-3.00001 3,-3.00001 z"
+       style="fill:#0000ff;fill-rule:evenodd;stroke-width:0.264583"
+       id="rect1402-9" />
   </g>
   <g
-     gcodetools="Gcodetools orientation group"
-     id="g1409" />
+     id="g1409"
+     gcodetools="Gcodetools orientation group" />
 </svg>
