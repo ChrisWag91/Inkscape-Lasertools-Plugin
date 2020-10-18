@@ -2,6 +2,7 @@
 """
 Modified by Christoph Wagner 2020
 Modified by Alain Pelletier 2020
+Modified by Teun van Dooren 2020
 
 based on gcodetools, https://gitlab.com/inkscape/extensions/-/blob/master/gcodetools.py
 based on flatten, https://gitlab.com/inkscape/extensions/-/blob/master/flatten.py
@@ -475,6 +476,7 @@ class laser_gcode(inkex.EffectExtension):
         add_argument("--laser-beam-with", type=float, dest="laser_beam_with", default="0.3", help="Laser speed (mm/min)")
         add_argument("--infill-overshoot", type=float, dest="infill_overshoot", default="0.0", help="Overshoot to limit acceleration overburn")
         add_argument("--contour-tolerance", type=float, dest="tolerance", default="0.1", help="Tolerance for contour approximation")
+        add_argument("--travel-speed", type=int, dest="travel_speed", default="3000", help="Travel speed (mm/min)")
         add_argument("--laser-speed", type=int, dest="laser_speed", default="1200", help="Laser speed (mm/min)")
         add_argument("--laser-param-speed", type=int, dest="laser_param_speed", default="700", help="Laser speed for Parameter (mm/min)")
         add_argument("--passes", type=int, dest="passes", default="1", help="Quantity of passes")
@@ -725,6 +727,7 @@ class laser_gcode(inkex.EffectExtension):
             self.last_used_tool = None
 
         lg, f = 'G00', "F%.1f" % tool['penetration feed']
+        ft = "F%.1f" % tool['travel feed']
         g = "; START " + strategy+" strategy\nG01 " + f + "\n"
 
         # linuxcnc trajectory planning to limit corner burns and acceleration burns
@@ -749,9 +752,9 @@ class laser_gcode(inkex.EffectExtension):
             # move without overshoot moves the X and Y
             if newcoord_different and s[1] == 'move' and strategy == "infill":
                 if round(self.options.infill_overshoot, 1) > 0:
-                    g += "G00 X" + str(round(si[0][0], 2)) + "\n"
+                    g += "G00 X" + str(round(si[0][0], 2)) + " " + ft + "\n"
                 else:
-                    g += "G00" + c(si[0]) + "\n"
+                    g += "G00" + c(si[0]) + " " + ft + "\n"
                 # write past used command and coordinates
                 pastX, pastY, lg = round(
                     si[0][0], 2), round(si[0][1], 2), 'G00'
@@ -770,15 +773,15 @@ class laser_gcode(inkex.EffectExtension):
                 if round(si[0][1], 2) > pastY:
                     if round(self.options.infill_overshoot, 1) > 0:
                         g += "G00 Y" + \
-                            str(round(pastY-self.options.infill_overshoot, 2)) + "\n"
-                        g += "G01 Y" + str(pastY) + "\n"
+                            str(round(pastY-self.options.infill_overshoot, 2)) + " " + ft + "\n"
+                        g += "G01 Y" + str(pastY) + " " + f + "\n"
                     g += tool['gcode before path'] + "\n"
-                    g += "G01 Y" + str(round(si[0][1], 2)) + "\n"
+                    g += "G01 Y" + str(round(si[0][1], 2)) + " " + f + "\n"
                     g += tool['gcode after path'] + "\n"
                     if round(self.options.infill_overshoot, 1) > 0:
                         g += "G01 Y" + \
                             str(round(
-                                si[0][1]+self.options.infill_overshoot, 2)) + "\n"
+                                si[0][1]+self.options.infill_overshoot, 2)) + " " + f + "\n"
                         # write past used command and coordinates
                     pastX, pastY, lg = round(
                         si[0][0], 2), round(si[0][1], 2), 'G01'
@@ -786,15 +789,15 @@ class laser_gcode(inkex.EffectExtension):
                 elif round(si[0][1], 2) < pastY:
                     if round(self.options.infill_overshoot, 1) > 0:
                         g += "G00 Y" + \
-                            str(round(pastY+self.options.infill_overshoot, 2)) + "\n"
-                        g += "G01 Y" + str(pastY) + "\n"
+                            str(round(pastY+self.options.infill_overshoot, 2)) + " " + ft + "\n"
+                        g += "G01 Y" + str(pastY) + " " + f + "\n"
                     g += tool['gcode before path'] + "\n"
-                    g += "G01 Y" + str(round(si[0][1], 2)) + "\n"
+                    g += "G01 Y" + str(round(si[0][1], 2)) + " " + f + "\n"
                     g += tool['gcode after path'] + "\n"
                     if round(self.options.infill_overshoot, 1) > 0:
                         g += "G01 Y" + \
                             str(round(
-                                si[0][1]-self.options.infill_overshoot, 2)) + "\n"
+                                si[0][1]-self.options.infill_overshoot, 2)) + " " + f + "\n"
                         # write past used command and coordinates
                     pastX, pastY, lg = round(
                         si[0][0], 2), round(si[0][1], 2), 'G01'
@@ -806,14 +809,14 @@ class laser_gcode(inkex.EffectExtension):
             elif newcoord_different and s[1] == 'move' and strategy == "perimeter":
                 # turn off laser before fast move
                 g += tool['gcode after path'] + "\n"
-                g += "G00" + c(si[0]) + "\n"
+                g += "G00" + c(si[0]) + " " + ft + "\n"
                 # write past used command and coordinates
                 pastX, pastY, lg = round(
                     si[0][0], 2), round(si[0][1], 2), 'G00'
             elif newcoord_different and s[1] == 'line' and strategy == "perimeter":
                 if lg == 'G00':
                     # burn laser only after a G00 move
-                    g += tool['gcode before path'] + "\n"
+                    g += tool['gcode before path'] + " " + ft + "\n"
                 x, y = round(si[0][0], 2), round(si[0][1], 2)
                 gx, gy = "", ""  # clear gx and gy
                 if x != pastX:
@@ -822,12 +825,13 @@ class laser_gcode(inkex.EffectExtension):
                 if y != pastY:
                     # only include Y0.00 coordinates if they are diffrent from past burn
                     gy = " Y"+str(y)
-                g += "G01" + gx+gy + "\n"
+                g += "G01" + gx+gy + " " + f + "\n"
                 # write past used command and coordinates
                 pastX, pastY, lg = round(si[0][0], 2), round(si[0][1], 2), 'G01'
 
                 # Turn off laser before leaving
         g += tool['gcode after path'] + "\n;END " + strategy + "\n\n"
+        
         return g
 
     def get_transforms(self, g):
@@ -1663,6 +1667,7 @@ class laser_gcode(inkex.EffectExtension):
             "id": "Laser Engraver Infill",
             "penetration feed": self.options.laser_speed,
             "feed": self.options.laser_speed,
+            "travel feed": self.options.travel_speed,
             "gcode before path": (delayOn + self.options.laser_command),
             "gcode after path": self.options.laser_off_command
         }
@@ -1672,6 +1677,7 @@ class laser_gcode(inkex.EffectExtension):
             "id": "Laser Engraver Perimeter",
             "penetration feed": self.options.laser_param_speed,
             "feed": self.options.laser_param_speed,
+            "travel feed": self.options.travel_speed,
             "gcode before path": (delayOn + self.options.laser_command_perimeter),
             "gcode after path": self.options.laser_off_command
         }
