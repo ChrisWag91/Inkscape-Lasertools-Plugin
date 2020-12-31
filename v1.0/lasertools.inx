@@ -29,17 +29,23 @@
 			<param name="remove-tiny-infill-paths" type="boolean" _gui-text="Remove tiny infill paths">false</param>
 			<param name="add-numeric-suffix-to-filename" type="boolean" _gui-text="Add numeric suffix to filename">true</param>
 			<param name="create-log" type="boolean" _gui-text="Create log files">true</param>
-			<param name="multi_thread" type="boolean" _gui-text="Enable multithreading">true</param>
+			<param name="multi_thread" type="boolean" _gui-text="Enable multithreading">true</param>		
+		</page>
 
+		<page name='gcode' _gui-text='G-Code'>			
 			<param name="name" type="description">Prefix G-Code</param>
 			<param name="prefix1" type="string" _gui-text=" ">G90	;Absolute programming</param>	
 			<param name="prefix2" type="string" _gui-text=" ">G21	;Programming in millimeters (mm)</param>
-			<param name="prefix3" type="string" _gui-text=" ">M03 S1 ;Activate laser and set power to 0 (CUSTOM)</param>
+			<param name="prefix3" type="string" _gui-text=" "></param>
+			<param name="prefix4" type="string" _gui-text=" "></param>
+			<param name="prefix5" type="string" _gui-text=" ">M03 S1 ;Activate laser and set power to 0 (CUSTOM)</param>
 
 			<param name="name" type="description">Suffix G-Code</param>
 			<param name="suffix1" type="string" _gui-text=" ">M05 S0	;Deactivate laser and set power to 0 (CUSTOM)</param>	
 			<param name="suffix2" type="string" _gui-text=" "></param>
-			<param name="suffix3" type="string" _gui-text=" ">M02	;End of program</param>			
+			<param name="suffix3" type="string" _gui-text=" "></param>
+			<param name="suffix4" type="string" _gui-text=" "></param>
+			<param name="suffix5" type="string" _gui-text=" ">M02	;End of program</param>			
 		</page>
 
 		<page name='bb_preview' _gui-text='Bounding Box'>

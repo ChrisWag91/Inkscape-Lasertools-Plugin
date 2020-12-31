@@ -57,11 +57,12 @@ if "errormsg" not in dir(inkex):
 ################################################################################
 PROFILING = False   # Disable if not debugging
 DEBUG = False      # Disable if not debugging
-TINY_INFILL_FACTOR =  1 # x times the laser beam width will be removed
+TINY_INFILL_FACTOR = 1  # x times the laser beam width will be removed
 ENGRAVING_TOLERANCE = 0.000002
 DEFAULTS = {
     'header': """
 ;Inkscape Lasertools G-code
+;https://github.com/ChrisWag91/Inkscape-Lasertools-Plugin
 
 """,
     'footer': """G00 X0 Y0
@@ -457,6 +458,10 @@ class laser_gcode(inkex.EffectExtension):
             self.header += self.options.prefix_2 + "\n"
         if self.options.prefix_3 != "":
             self.header += self.options.prefix_3 + "\n"
+        if self.options.prefix_4 != "":
+            self.header += self.options.prefix_4 + "\n"
+        if self.options.prefix_5 != "":
+            self.header += self.options.prefix_5 + "\n"
 
         if self.options.suffix_1 != "":
             self.footer += self.options.suffix_1 + "\n"
@@ -464,6 +469,10 @@ class laser_gcode(inkex.EffectExtension):
             self.footer += self.options.suffix_2 + "\n"
         if self.options.suffix_3 != "":
             self.footer += self.options.suffix_3 + "\n"
+        if self.options.suffix_4 != "":
+            self.footer += self.options.suffix_4 + "\n"
+        if self.options.suffix_5 != "":
+            self.footer += self.options.suffix_5 + "\n"
 
     def add_arguments(self, pars):
         add_argument = pars.add_argument
@@ -486,12 +495,17 @@ class laser_gcode(inkex.EffectExtension):
         add_argument("--add-contours", type=inkex.Boolean, dest="add_contours", default=True, help="Add contour to Gcode paths")
         add_argument("--add-infill", type=inkex.Boolean, dest="add_infill", default=True, help="Add infill to Gcode paths")
         add_argument("--remove-tiny-infill-paths", type=inkex.Boolean, dest="remove_tiny_infill_paths", default=False, help="Remove tiny infill paths from Gcode")
+
         add_argument("--prefix1", dest="prefix_1", default="", help="First line before G-Code starts")
         add_argument("--prefix2", dest="prefix_2", default="", help="Second line before G-Code starts")
         add_argument("--prefix3", dest="prefix_3", default="", help="Third line before G-Code starts")
+        add_argument("--prefix4", dest="prefix_4", default="", help="Fourth line before G-Code starts")
+        add_argument("--prefix5", dest="prefix_5", default="", help="Fith line before G-Code starts")
         add_argument("--suffix1", dest="suffix_1", default="", help="First line after G-Code ends")
         add_argument("--suffix2", dest="suffix_2", default="", help="Second line after G-Code ends")
         add_argument("--suffix3", dest="suffix_3", default="", help="Third line after G-Code ends")
+        add_argument("--suffix4", dest="suffix_4", default="", help="Fourth line after G-Code ends")
+        add_argument("--suffix5", dest="suffix_5", default="", help="Fith line after G-Code ends")
 
         add_argument("--multi_thread", type=inkex.Boolean, dest="multi_thread", default=True, help="Activate multithreading support")
 
@@ -831,7 +845,7 @@ class laser_gcode(inkex.EffectExtension):
 
                 # Turn off laser before leaving
         g += tool['gcode after path'] + "\n;END " + strategy + "\n\n"
-        
+
         return g
 
     def get_transforms(self, g):
