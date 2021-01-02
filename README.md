@@ -74,9 +74,22 @@ Copy the .py and .inx file from /v0.92 for Inkscape 0.9x or /v1.0 for Inkscape 1
 - under linux:    /usr/share/inkscape/extensions 
 - under windows   C:\Program Files\Inkscape\share\extensions 
 
-## Dependencies
+## Dependencies for v0.9x
 - python2-lxml
 - python2-numpy
+
+## Dependencies for v1.0
+- python-lxml
+- python-numpy
+
+**Hint:**
+
+If you get an error on execution similar to: "ModuleNotFoundError: No module named 'lxml'", make sure to install the dependencies mentioned aboth.
+
+On Linux for v1.0: 
+
+    - sudo apt-get install python-lxml
+    - sudo pacman -S python-lxml
 
 *******************************************************************************************************************************
 
