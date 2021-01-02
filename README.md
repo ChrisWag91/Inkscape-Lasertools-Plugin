@@ -87,9 +87,14 @@ Copy the .py and .inx file from /v0.92 for Inkscape 0.9x or /v1.0 for Inkscape 1
 If you get an error on execution similar to: "ModuleNotFoundError: No module named 'lxml'", make sure to install the dependencies mentioned aboth.
 
 On Linux for v1.0: 
+```console
+sudo apt-get install python-lxml
+```
+or
 
-    - sudo apt-get install python-lxml
+```console
     - sudo pacman -S python-lxml
+```
 
 *******************************************************************************************************************************
 
