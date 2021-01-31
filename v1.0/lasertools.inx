@@ -12,7 +12,7 @@
 			<param name="laser-beam-with" type="float" precision="2" min="0.00" max="10.00" _gui-text="Laser beam with (mm):">0.20</param>	
 			<param name="travel-speed" type="int" min="0" max="7000" _gui-text="Laser travel speed (mm/min):">3000</param>	
 			<param name="laser-speed" type="int" min="0" max="7000" _gui-text="Laser infill speed (mm/min):">1200</param>			
-			<param name="laser-param-speed" type="int" min="0" max="7000" _gui-text="Laser parameter speed (mm/min):">700</param>				
+			<param name="laser-param-speed" type="int" min="0" max="7000" _gui-text="Laser perimeter speed (mm/min):">700</param>				
 			<param name="passes" type="int" min="1" max="100" _gui-text="Passes:">1</param>	
 			<param name="z-stepdown" type="float" precision="2" min="-50.00" max="0.00" _gui-text="Z-Stepdown per pass (mm):">0.00</param>			
 			<param name="add-contours" type="boolean" _gui-text="Add contours">true</param>
