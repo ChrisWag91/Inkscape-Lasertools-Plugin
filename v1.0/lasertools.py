@@ -1313,7 +1313,7 @@ class laser_gcode(inkex.EffectExtension):
                             # print_("csp is",csp)
                             nlLT.append([])
                             for i in range(0, len(csp)):  # LT for each point
-                                sp0, sp1, sp2 = csp[i-2], csp[i-1], csp[i]
+                                sp0, sp1, sp2 = csp[i-1], csp[i], csp[(i+1) % len(csp)]
                                 # LT find angle between this and previous segment
                                 x0, y0 = sp1[1]
                                 nx1, ny1 = csp_normalized_normal(sp1, sp2, 0)
@@ -1324,7 +1324,10 @@ class laser_gcode(inkex.EffectExtension):
 
                                 # LT now do the line
                                 if sp1[1] == sp1[2] and sp2[0] == sp2[1]:  # straightline
-                                    nlLT[-1] += [[sp1[1], [nx1, ny1], False, i]]
+                                    # we don't add a line to join the final point to the original
+                                    # point - this closes open paths
+                                    if (i != len(csp)-1):
+                                        nlLT[-1] += [[sp1[1], [nx1, ny1], False, i]]
                                 else:  # Bezier. First, recursively cut it up:
                                     nn = bez_divide(
                                         sp1[1], sp1[2], sp2[0], sp2[1])
@@ -1366,9 +1369,9 @@ class laser_gcode(inkex.EffectExtension):
                             cspm = []  # Will be my output. List of csps.
                             r = 0  # LT initial, as first point is an angle
                             for i in xrange(len(nlLT[j])):  # LT for each node
-                                n0 = nlLT[j][i-2]  # previous node
-                                n1 = nlLT[j][i-1]  # current node
-                                n2 = nlLT[j][i]  # next node
+                                n0 = nlLT[j][i-1]  # previous node
+                                n1 = nlLT[j][i]  # current node
+                                n2 = nlLT[j][(i+1) % len(nlLT[j])]  # next node
                                 # this point/start of this line
                                 x1a, y1a = n1[0]
                                 nx, ny = n1[1]
@@ -1394,7 +1397,6 @@ class laser_gcode(inkex.EffectExtension):
                                     save_point(x1, y1, i, j)
 
                             if len(cspm) != 0:
-                                cspm += [cspm[0]]
                                 cspe += [cspm]
 
                 if cspe != []:
