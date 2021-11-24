@@ -1606,7 +1606,6 @@ class laser_gcode(inkex.EffectExtension):
             self.recursiveFuseTransform(child, transf)
 
     def applytransforms(self):
-        self.svg.get_selected()
 
         if self.svg.selected:
             for id, shape in self.svg.selected.items():
