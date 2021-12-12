@@ -490,6 +490,7 @@ class laser_gcode(inkex.EffectExtension):
         add_argument("--laser-param-speed", type=int, dest="laser_param_speed", default="700", help="Laser speed for Parameter (mm/min)")
         add_argument("--passes", type=int, dest="passes", default="1", help="Quantity of passes")
         add_argument("--power-delay", dest="power_delay", default="0", help="Laser power-on delay (ms)")
+        add_argument("--power-off-delay", dest="power_off_delay", default="0", help="Laser power-off delay (ms)")
         add_argument("--z-stepdown", type=float, dest="z_stepdown", default="0.0", help="Z-stepdown per pass for cutting operations")
         add_argument("--linuxcnc", type=inkex.Boolean, dest="linuxcnc", default=False, help="Use G64 P0.1 trajectory planning")
         add_argument("--add-contours", type=inkex.Boolean, dest="add_contours", default=True, help="Add contour to Gcode paths")
@@ -1673,7 +1674,11 @@ class laser_gcode(inkex.EffectExtension):
         # handle power on delay
         delayOn = ""
         if round(float(self.options.power_delay), 1) > 0:
-            delayOn = "G04 P" + str(round(float(self.options.power_delay)/1000, 3)) + "\n"
+            delayOn = "G04 P" + str(round(float(self.options.power_delay), 3)) + "\n"
+        # handle power off delay
+        delayOff = ""
+        if round(float(self.options.power_off_delay), 1) > 0:
+            delayOff = "\n" + "G04 P" + str(round(float(self.options.power_off_delay), 3))
 
         self.tool_infill = {
             "name": "Laser Engraver Infill",
@@ -1682,7 +1687,7 @@ class laser_gcode(inkex.EffectExtension):
             "feed": self.options.laser_speed,
             "travel feed": self.options.travel_speed,
             "gcode before path": (delayOn + self.options.laser_command),
-            "gcode after path": self.options.laser_off_command
+            "gcode after path": (self.options.laser_off_command + delayOff)
         }
 
         self.tool_perimeter = {
@@ -1692,7 +1697,7 @@ class laser_gcode(inkex.EffectExtension):
             "feed": self.options.laser_param_speed,
             "travel feed": self.options.travel_speed,
             "gcode before path": (delayOn + self.options.laser_command_perimeter),
-            "gcode after path": self.options.laser_off_command
+            "gcode after path": (self.options.laser_off_command + delayOff)
         }
 
         self.get_info()
