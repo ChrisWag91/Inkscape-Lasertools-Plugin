@@ -14,7 +14,15 @@ This project is based on the Gcodetools extension.
 *******************************************************************************************************************************
 
 ## How to use Lasertools
-**Watch this Video for a quick introduction:**
+
+**Watch this Video for a tutorial:**
+
+<a href="https://youtu.be/F2U58onWOFM
+" target="_blank"><img src="http://img.youtube.com/vi/F2U58onWOFM/0.jpg"
+alt="Detailed Youtube Video" width="240" height="180" border="10" /></a>
+
+
+**Watch this Video for some Backgrund:**
 
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=NhUvRJsa4D0
 " target="_blank"><img src="http://img.youtube.com/vi/NhUvRJsa4D0/0.jpg"
@@ -38,15 +46,14 @@ If you work from a picture (.png, .jpeg ...):
 
 If you work from a svg file:
 
-1. ungroup all objects
+1. ungroup all objects until there are no more groups left
 2. convert all objects to paths (especially text) using [Path/Object to Path] or [Path/Stroke to Path]
 3. set the size of the page to the size you want your engraving to be [under File/Document Properties/Page]
 4. **IMPORTANT:** set *Display Units* and *Units* to *mm* and set *Scale x* to 1 [under File/Document Properties/Page]
-5. convert your picture to vector graphics [Path/Trace Bitmap]
-6. open Lasertools and set your parameters [under Extensions/Lasertools]
-7. click Apply
-8. **IMPORTANT:** the calculation takes some time, so be patient
-9. finished
+5. open Lasertools and set your parameters [under Extensions/Lasertools]
+6. click Apply
+7. **IMPORTANT:** the calculation takes some time, so be patient
+8. finished
 
 **Hint:**
 If you end up with very complex paths (paths with thousands of points) you can simplify the path before exporting it to Gcode.
@@ -67,9 +74,30 @@ Copy the .py and .inx file from /v0.92 for Inkscape 0.9x or /v1.0 for Inkscape 1
 - under linux:    /usr/share/inkscape/extensions 
 - under windows   C:\Program Files\Inkscape\share\extensions 
 
-## Dependencies
+## Dependencies for v0.9x
 - python2-lxml
 - python2-numpy
+
+## Dependencies for v1.0
+- python-lxml
+- python-numpy
+
+**Hint:**
+
+If you get an error on execution similar to: 
+```console
+"ModuleNotFoundError: No module named 'lxml'"
+```
+make sure to install the dependencies mentioned aboth.
+
+On Linux for v1.0: 
+```console
+sudo apt-get install python-lxml
+```
+or
+```console
+sudo pacman -S python-lxml
+```
 
 *******************************************************************************************************************************
 
@@ -90,6 +118,7 @@ https://github.com/nevir/readable-licenses/blob/master/markdown/GPLv2-LICENSE.md
     - Workaround: export as png, reimport and convert to paths again
 - Scaling factor needs to be Set to 1
 - Displayed units needs to be set to mm
+- Fix multithreading on Windows in v1
 
 ## Features to be implemented / tested
 - Automatically convert text to paths 

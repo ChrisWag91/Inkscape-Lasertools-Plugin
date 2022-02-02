@@ -12,7 +12,7 @@
 			<param name="laser-off-command" type="string" _gui-text="Laser OFF command:">S1</param>	
 			<param name="laser-beam-with" type="float" precision="2" min="0.00" max="10.00" _gui-text="Laser beam with (mm):">0.20</param>	
 			<param name="laser-speed" type="int" min="0" max="7000" _gui-text="Laser infill speed (mm/min):">1200</param>			
-			<param name="laser-param-speed" type="int" min="0" max="7000" _gui-text="Laser parameter speed (mm/min):">700</param>				
+			<param name="laser-param-speed" type="int" min="0" max="7000" _gui-text="Laser perimeter speed (mm/min):">700</param>				
 			<param name="passes" type="int" min="1" max="100" _gui-text="Passes:">1</param>	
 			<param name="z-stepdown" type="float" precision="2" min="-50.00" max="0.00" _gui-text="Z-Stepdown per pass (mm):">0.00</param>			
 			<param name="add-contours" type="boolean" _gui-text="Add contours">true</param>
@@ -31,14 +31,14 @@
 			<param name="multi_thread" type="boolean" _gui-text="Enable multithreading">true</param>
 
 			<param name="name" type="description">Prefix G-Code</param>
-			<param name="prefix1" type="string" _gui-text="">G90	;Absolute programming</param>	
-			<param name="prefix2" type="string" _gui-text="">G21	;Programming in millimeters (mm)</param>
-			<param name="prefix3" type="string" _gui-text="">M03 S1 ;Activate laser and set power to 0 (CUSTOM)</param>
+			<param name="prefix1" type="string" _gui-text=" ">G90	;Absolute programming</param>	
+			<param name="prefix2" type="string" _gui-text=" ">G21	;Programming in millimeters (mm)</param>
+			<param name="prefix3" type="string" _gui-text=" ">M03 S1 ;Activate laser and set power to 0 (CUSTOM)</param>
 
 			<param name="name" type="description">Suffix G-Code</param>
-			<param name="suffix1" type="string" _gui-text="">M05 S0	;Deactivate laser and set power to 0 (CUSTOM)</param>	
-			<param name="suffix2" type="string" _gui-text=""></param>
-			<param name="suffix3" type="string" _gui-text="">M02	;End of program</param>			
+			<param name="suffix1" type="string" _gui-text=" ">M05 S0	;Deactivate laser and set power to 0 (CUSTOM)</param>	
+			<param name="suffix2" type="string" _gui-text=" "></param>
+			<param name="suffix3" type="string" _gui-text=" ">M02	;End of program</param>			
 		</page>
 	</param>
 
