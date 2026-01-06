@@ -32,7 +32,7 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 
 elif [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" || "$OSTYPE" == "win32" ]]; then
     # System-wide path for Windows
-    TARGET_DIR="$PROGRAMFILES/Inkscape/share/extensions"
+    TARGET_DIR="$PROGRAMFILES\Inkscape\share\inkscape\extensions"
     COPY_CMD="cp" 
     # Windows launch command (using start to detach process)
     LAUNCH_CMD="start inkscape -g --actions=file-new"
