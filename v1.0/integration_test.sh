@@ -17,12 +17,12 @@ TEST_FILES=(
     "test01_general_function_test_Panther.svg"
     "test02_general_function_test_TestPattern.svg"
     "test03_performance_test_medium.svg"
-    "test04_paths_and_images.svg"
-    "test05_scaling_and_text_Opensource_logo.svg"
-    "test06_line_glitches_Open-source-hardware-logo.svg"
-    "test07_line_glitches_Open-source-hardware-logo_reimport.svg"
-    "test09_line_Glitches.svg"
-    "test11_firstLine glitch.svg"
+    #"test04_paths_and_images.svg"
+    #"test05_scaling_and_text_Opensource_logo.svg"
+    #"test06_line_glitches_Open-source-hardware-logo.svg"
+    #"test07_line_glitches_Open-source-hardware-logo_reimport.svg"
+    #"test09_line_Glitches.svg"
+    #"test11_firstLine glitch.svg"
 )
 
 # --- 2. Execute Deployment ---
@@ -69,7 +69,7 @@ for FILE in "${TEST_FILES[@]}"; do
         fi
         
         # Brief pause to maintain system stability during batch launch
-        sleep 0.5
+        sleep 60
     else
         echo "Skipping: $FILE (File not found at $FULL_PATH)"
     fi

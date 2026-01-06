@@ -1130,7 +1130,7 @@ class laser_gcode(inkex.EffectExtension):
                     finalLines = []
 
                     # TODO: fix for Windows Systems. Causes infinite loop due to lack of Fork
-                    if self.options.multi_thread and os.name != 'nt':
+                    if self.options.multi_thread: #and os.name != 'nt':
                         with Pool() as pool:
 
                             splitted_line_csp = zip(splitted_line, [csp] * len(splitted_line))
