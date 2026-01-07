@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg8"
+   inkscape:version="1.0 (4035a4fb49, 2020-05-01)"
+   sodipodi:docname="test14_orientation_point_test.svg">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.9899495"
+     inkscape:cx="4.7434729"
+     inkscape:cy="651.21998"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     inkscape:document-rotation="0"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1015"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       id="rect1402"
+       style="fill:#0000ff;fill-rule:evenodd;stroke-width:0.264583"
+       d="M 29.4358 221.003 L 63.1182 221.003 L 64.2881 221.238 L 65.2414 221.88 L 65.8832 222.833 L 66.1182 224.003 L 66.1182 270.659 L 65.8832 271.829 L 65.2414 272.782 L 64.2881 273.424 L 63.1182 273.659 L 29.4358 273.659 L 28.2659 273.424 L 27.3126 272.782 L 26.6708 271.829 L 26.4358 270.659 L 26.4358 224.003 L 26.6708 222.833 L 27.3126 221.88 L 28.2659 221.238 L 29.4358 221.003 L 29.4358 221.003" />
+    <path
+       d="M 107.848 164.814 L 141.53 164.814 L 142.7 165.049 L 143.653 165.691 L 144.295 166.644 L 144.53 167.814 L 144.53 214.47 L 144.295 215.64 L 143.653 216.593 L 142.7 217.235 L 141.53 217.47 L 107.848 217.47 L 106.678 217.235 L 105.725 216.593 L 105.083 215.64 L 104.848 214.47 L 104.848 167.814 L 105.083 166.644 L 105.725 165.691 L 106.678 165.049 L 107.848 164.814 L 107.848 164.814"
+       style="fill:#0000ff;fill-rule:evenodd;stroke-width:0.264583"
+       id="rect1402-9" />
+  </g>
+  <g
+     id="g1409"
+     gcodetools="Gcodetools orientation group" />
+</svg>
